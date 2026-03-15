@@ -1,0 +1,4 @@
+# Git LFS: track large DSSTox files in DSS/ for GitHub
+# Install LFS once: https://git-lfs.com → then run: git lfs install
+DSS/*.csv filter=lfs diff=lfs merge=lfs -text
+DSS/*.xlsx filter=lfs diff=lfs merge=lfs -text
