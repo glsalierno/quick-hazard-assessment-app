@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Quick Hazard Assessment — Streamlit App
 
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox local** (no API key required). Part of the [quick_hazard_assessment](https://github.com/glsalierno/quick_hazard_assessment) ecosystem.
@@ -24,9 +25,8 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 1. **Clone and enter the repo**
    ```bash
-   git clone https://github.com/glsalierno/quick_hazard_assessment.git
-   cd quick_hazard_assessment
-   # If the app lives in a subfolder (e.g. GHhaz2), cd into that folder
+   git clone https://github.com/glsalierno/quick-hazard-assessment-app.git
+   cd quick-hazard-assessment-app
    ```
 
 2. **Create a virtual environment and install dependencies**
@@ -113,10 +113,10 @@ See **`DSS/README.md`** for download links and update instructions.
 If this tool contributes to your research, please cite:
 
 - **Zenodo:** [DOI 10.5281/zenodo.14636704](https://doi.org/10.5281/zenodo.14636704)
-- **Repository:** [quick_hazard_assessment](https://github.com/glsalierno/quick_hazard_assessment)
+- **Repository:** [quick-hazard-assessment-app](https://github.com/glsalierno/quick-hazard-assessment-app)
 
 ---
 
 ## License
 
-MIT (see LICENSE in the parent repository).
+MIT (see [LICENSE](LICENSE)).
