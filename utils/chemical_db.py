@@ -194,12 +194,12 @@ def get_toxicity_by_dtxsid(dtxsid: str, numeric_only: bool = True) -> list[dict[
                 """
                 SELECT * FROM toxvaldb
                 WHERE dtxsid = ? AND toxval_numeric IS NOT NULL AND CAST(toxval_numeric AS TEXT) != ''
-                ORDER BY study_type, species
+                ORDER BY study_type
                 """,
                 (dtxsid,),
             )
         else:
-            cursor.execute("SELECT * FROM toxvaldb WHERE dtxsid = ? ORDER BY study_type, species", (dtxsid,))
+            cursor.execute("SELECT * FROM toxvaldb WHERE dtxsid = ? ORDER BY study_type", (dtxsid,))
         cols = [d[0] for d in cursor.description]
         return [dict(zip(cols, row)) for row in cursor.fetchall()]
 
@@ -223,8 +223,7 @@ def get_toxicity_summary(dtxsid: str) -> list[dict[str, Any]]:
                    COUNT(*) AS record_count,
                    COUNT(toxval_numeric) AS numeric_count,
                    MIN(CAST(toxval_numeric AS REAL)) AS min_value,
-                   MAX(CAST(toxval_numeric AS REAL)) AS max_value,
-                   GROUP_CONCAT(DISTINCT species) AS species_list
+                   MAX(CAST(toxval_numeric AS REAL)) AS max_value
             FROM toxvaldb WHERE dtxsid = ?
             GROUP BY study_type ORDER BY record_count DESC
             """,
