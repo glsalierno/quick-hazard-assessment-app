@@ -26,6 +26,15 @@ if "result_data" not in st.session_state:
     st.session_state["result_data"] = None  # { "pubchem": ..., "dtxsid": ..., "clean_cas": ... }
 if "dsstox_loaded" not in st.session_state:
     st.session_state["dsstox_loaded"] = None  # True/False/None before first load
+# GHS display preferences (persist during session)
+if "show_h_phrases" not in st.session_state:
+    st.session_state["show_h_phrases"] = True
+if "show_p_phrases" not in st.session_state:
+    st.session_state["show_p_phrases"] = True
+if "show_signal_word" not in st.session_state:
+    st.session_state["show_signal_word"] = True
+if "ghs_layout" not in st.session_state:
+    st.session_state["ghs_layout"] = "two_columns"
 
 # Load DSSTox mapping once (cached)
 dtxsid_map = dsstox_local.load_dsstox_mapping()
@@ -119,22 +128,110 @@ if current_query:
             st.write(f"**Flash Point:** {pubchem_data.get('flash_point') or 'N/A'}")
             st.write(f"**Vapor Pressure:** {pubchem_data.get('vapor_pressure') or 'N/A'}")
 
-        # --- GHS Classification ---
+        # --- GHS Classification (filtered, user-controlled) ---
         st.subheader("⚠️ GHS Classification")
         ghs = pubchem_data.get("ghs") or {}
         h_codes = ghs.get("h_codes") or []
         p_codes = ghs.get("p_codes") or []
-        if h_codes or p_codes:
-            h_phrases = ghs_formatter.expand_h_codes_with_phrases(h_codes)
-            p_phrases = ghs_formatter.expand_p_codes_with_phrases(p_codes)
-            for line in h_phrases:
-                st.write(f"**{line.split(':')[0]}:** {line.split(':', 1)[-1].strip()}")
-            for line in p_phrases:
-                st.write(f"**{line.split(':')[0]}:** {line.split(':', 1)[-1].strip()}")
-            if ghs.get("signal_word"):
-                st.caption(f"Signal word: {ghs['signal_word']}")
+        signal_word = (ghs.get("signal_word") or "").strip()
+
+        # Build code -> phrase only for phrases that exist (filter out "(phrase not found)")
+        def _filter_found_phrases(codes: list[str], expand_fn) -> dict[str, str]:
+            out = {}
+            for code in (c for c in codes if (c or "").strip()):
+                phrase = (expand_fn(code) or "").strip()
+                if phrase and "(phrase not found)" not in phrase.lower():
+                    out[code.strip()] = phrase
+            return out
+
+        h_phrases_dict = _filter_found_phrases(h_codes, ghs_formatter.get_h_phrase)
+        p_phrases_dict = _filter_found_phrases(p_codes, ghs_formatter.get_p_phrase)
+        has_signal = signal_word and signal_word.lower() not in ("none", "n/a", "")
+        has_any_ghs = bool(h_phrases_dict or p_phrases_dict or has_signal)
+
+        if has_any_ghs:
+            with st.expander("⚙️ GHS display options", expanded=False):
+                c1, c2, c3 = st.columns(3)
+                with c1:
+                    show_h = st.checkbox(
+                        "Show Hazard (H) phrases",
+                        value=st.session_state["show_h_phrases"],
+                        key="ghs_show_h",
+                    )
+                    st.session_state["show_h_phrases"] = show_h
+                with c2:
+                    show_p = st.checkbox(
+                        "Show Precautionary (P) phrases",
+                        value=st.session_state["show_p_phrases"],
+                        key="ghs_show_p",
+                    )
+                    st.session_state["show_p_phrases"] = show_p
+                with c3:
+                    show_signal = st.checkbox(
+                        "Show signal word",
+                        value=st.session_state["show_signal_word"],
+                        key="ghs_show_signal",
+                    )
+                    st.session_state["show_signal_word"] = show_signal
+                layout_choice = st.radio(
+                    "Layout:",
+                    ["Two columns (H left, P right)", "Single column (H then P)"],
+                    horizontal=True,
+                    index=0 if st.session_state["ghs_layout"] == "two_columns" else 1,
+                    key="ghs_layout_radio",
+                )
+                st.session_state["ghs_layout"] = (
+                    "two_columns" if layout_choice.startswith("Two") else "single_column"
+                )
+
+            if h_phrases_dict or p_phrases_dict:
+                st.caption(
+                    f"📊 Found {len(h_phrases_dict)} hazard and {len(p_phrases_dict)} precautionary statements"
+                )
+
+            if st.session_state["ghs_layout"] == "two_columns":
+                col_left, col_right = st.columns(2)
+                with col_left:
+                    st.markdown("**Hazard Statements**")
+                    if st.session_state["show_h_phrases"]:
+                        if h_phrases_dict:
+                            for code, phrase in h_phrases_dict.items():
+                                st.write(f"**{code}:** {phrase}")
+                        else:
+                            st.write("*No hazard statements found*")
+                    else:
+                        st.write("*Hidden*")
+                with col_right:
+                    st.markdown("**Precautionary Statements**")
+                    if st.session_state["show_p_phrases"]:
+                        if p_phrases_dict:
+                            for code, phrase in p_phrases_dict.items():
+                                st.write(f"**{code}:** {phrase}")
+                        else:
+                            st.write("*No precautionary statements found*")
+                    else:
+                        st.write("*Hidden*")
+            else:
+                if st.session_state["show_h_phrases"]:
+                    st.markdown("**Hazard Statements**")
+                    if h_phrases_dict:
+                        for code, phrase in h_phrases_dict.items():
+                            st.write(f"**{code}:** {phrase}")
+                    else:
+                        st.write("*No hazard statements found*")
+                    st.write("")
+                if st.session_state["show_p_phrases"]:
+                    st.markdown("**Precautionary Statements**")
+                    if p_phrases_dict:
+                        for code, phrase in p_phrases_dict.items():
+                            st.write(f"**{code}:** {phrase}")
+                    else:
+                        st.write("*No precautionary statements found*")
+
+            if st.session_state["show_signal_word"] and has_signal:
+                st.write(f"**Signal word:** {signal_word}")
         else:
-            st.write("No GHS data available from PubChem.")
+            st.write("No GHS classification data available from PubChem.")
 
         # --- Citation ---
         st.markdown("---")
