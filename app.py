@@ -23,9 +23,7 @@ if "query" not in st.session_state:
 if "result_for" not in st.session_state:
     st.session_state["result_for"] = None
 if "result_data" not in st.session_state:
-    st.session_state["result_data"] = None  # { "pubchem": ..., "dtxsid": ..., "clean_cas": ... }
-if "dsstox_loaded" not in st.session_state:
-    st.session_state["dsstox_loaded"] = None  # True/False/None before first load
+    st.session_state["result_data"] = None  # { "pubchem": ..., "dsstox_info": ..., "clean_cas": ... }
 # GHS display preferences (persist during session)
 if "show_h_phrases" not in st.session_state:
     st.session_state["show_h_phrases"] = True
@@ -36,21 +34,28 @@ if "show_signal_word" not in st.session_state:
 if "ghs_layout" not in st.session_state:
     st.session_state["ghs_layout"] = "two_columns"
 
-# Load DSSTox mapping once (cached)
-dtxsid_map = dsstox_local.load_dsstox_mapping()
-if st.session_state["dsstox_loaded"] is None:
-    st.session_state["dsstox_loaded"] = dtxsid_map is not None
-
-if dtxsid_map is None:
-    st.info("DSSTox local database not found. Running in **PubChem-only** mode. DTXSID will not be shown.")
-else:
-    st.session_state["dsstox_loaded"] = True
+# Load enhanced DSSTox data once (cached inside utils)
+dsstox_data = dsstox_local.load_dsstox_enhanced()
 
 # Title and description
 st.title(f"🧪 {config.APP_TITLE}")
 st.markdown(
     "Chemical hazard assessment from **PubChem** + **DSSTox local** (no API key required)."
 )
+
+# Sidebar: DSSTox database stats (if loaded)
+with st.sidebar:
+    st.header("📊 DSSTox database")
+    if dsstox_data:
+        stats = dsstox_local.get_dsstox_summary_stats(dsstox_data)
+        st.success(f"Loaded {stats.get('total_compounds', 0)} compounds")
+        st.caption(
+            f"{stats.get('with_dtxsid', 0)} with DTXSID, "
+            f"{stats.get('with_preferred_name', 0)} with names, "
+            f"{stats.get('with_formula', 0)} with formulas"
+        )
+    else:
+        st.warning("DSSTox local database not loaded (PubChem-only mode).")
 
 # Input form
 with st.form("cas_input"):
@@ -86,7 +91,11 @@ if current_query:
     need_fetch = st.session_state.get("result_for") != clean_cas
     if need_fetch:
         with st.spinner("Fetching data and generating structure..."):
-            dtxsid = dsstox_local.get_dtxsid(clean_cas, dtxsid_map)
+            # DSSTox local (enhanced)
+            dsstox_info = dsstox_local.get_dsstox_info(clean_cas, dsstox_data) if dsstox_data else None
+            dtxsid = dsstox_info.get("dtxsid") if dsstox_info else None
+            preferred_name = dsstox_info.get("preferred_name") if dsstox_info else None
+
             # Resolve input type: CAS format vs name
             if cas_validator.is_valid_cas_format(clean_cas):
                 input_type = "cas"
@@ -94,9 +103,9 @@ if current_query:
                 input_type = "name"
             pubchem_data = pubchem_client.get_compound_data(clean_cas, input_type=input_type)
             st.session_state["result_for"] = clean_cas
-            preferred_name = dsstox_local.get_preferred_name(clean_cas, dtxsid_map)
             st.session_state["result_data"] = {
                 "pubchem": pubchem_data,
+                "dsstox_info": dsstox_info,
                 "dtxsid": dtxsid,
                 "preferred_name": preferred_name,
                 "clean_cas": clean_cas,
@@ -105,6 +114,7 @@ if current_query:
     result = st.session_state.get("result_data")
     if result and result.get("pubchem"):
         pubchem_data = result["pubchem"]
+        dsstox_info = result.get("dsstox_info")
         dtxsid = result.get("dtxsid")
         preferred_name = result.get("preferred_name")
         clean_cas = result["clean_cas"]
@@ -159,19 +169,29 @@ if current_query:
                 st.write("**SMILES:** N/A")
             if preferred_name:
                 st.write(f"**Preferred name (DSSTox):** {preferred_name}")
-            if dtxsid:
-                st.success(f"**DTXSID:** {dtxsid} *(from DSSTox local)*")
+
+            # Enhanced DSSTox display
+            display_data = dsstox_local.format_dsstox_display(dsstox_info) if dsstox_info else {}
+            if display_data.get("DTXSID"):
+                st.success(f"**DTXSID:** {display_data['DTXSID']} *(from DSSTox local)*")
             else:
-                if dtxsid_map is None:
-                    st.warning(
-                        "**DTXSID:** No local database loaded. "
-                        "Place a CAS→DTXSID mapping file in the **DSS/** folder (see [DSS/README.md](https://github.com/glsalierno/quick-hazard-assessment-app/blob/main/DSS/README.md))."
-                    )
+                if dsstox_data is None:
+                    st.write("**DTXSID:** DSSTox local database not loaded.")
                 else:
-                    st.info(
-                        "**DTXSID:** This CAS was not found in the local DSSTox file. "
-                        "Try an updated mapping from EPA Figshare or use PubChem-only data."
-                    )
+                    st.write("**DTXSID:** This CAS was not found in the local DSSTox file.")
+
+            if display_data.get("Names"):
+                with st.expander("📋 DSSTox names", expanded=False):
+                    for label, value in display_data["Names"]:
+                        st.write(f"**{label}:** {value}")
+            if display_data.get("Molecular"):
+                with st.expander("🧪 DSSTox molecular data", expanded=False):
+                    for label, value in display_data["Molecular"]:
+                        st.write(f"**{label}:** {value}")
+            if display_data.get("Structure"):
+                with st.expander("🔬 DSSTox structure identifiers", expanded=False):
+                    for label, value in display_data["Structure"]:
+                        st.write(f"**{label}:** {value}")
         with col2:
             st.subheader("Key Properties")
             # Build table: Property, Value, Unit, Observations (like toxicity endpoints)
@@ -219,41 +239,25 @@ if current_query:
                 st.markdown("**Aquatic hazard (GHS):** " + ", ".join(h_aquatic))
             if eco_entries:
                 st.markdown("**Aquatic toxicity (PubChem):**")
+                # Group entries by species so each species is on one line
+                by_species: dict[str, list[dict]] = {}
                 for e in eco_entries:
-                    sp = e.get("species") or "—"
-                    val = e.get("value") or ""
-                    u = e.get("unit") or ""
-                    st.write(f"- **Species:** {sp} — {val}" + (f" ({u})" if u else ""))
+                    sp = (e.get("species") or "—").strip()
+                    by_species.setdefault(sp, []).append(e)
+                for sp, entries in by_species.items():
+                    parts = []
+                    for e in entries:
+                        val = e.get("value") or ""
+                        u = e.get("unit") or ""
+                        parts.append(val + (f" ({u})" if u else ""))
+                    joined = " | ".join(parts)
+                    st.write(f"- **Species:** {sp} — {joined}")
             lc = eco.get("aquatic_lc50_mg_l")
             ec = eco.get("aquatic_ec50_mg_l")
             if lc is not None:
                 st.write(f"**LC50 (mg/L):** {lc}")
             if ec is not None:
                 st.write(f"**EC50 (mg/L):** {ec}")
-
-        # --- Exposure bands (oral, dermal, inhalation) ---
-        bands = pubchem_data.get("exposure_bands") or {}
-        has_bands = any(bands.get(k) for k in ("oral", "dermal", "inhalation"))
-        if has_bands:
-            st.subheader("📊 Exposure bands (GHS-style)")
-            st.caption("Band 1 = most hazardous, 5 = least. Based on LD50/LC50 from PubChem.")
-            o, d, i = bands.get("oral") or {}, bands.get("dermal") or {}, bands.get("inhalation") or {}
-            band_cols = st.columns(3)
-            with band_cols[0]:
-                if o:
-                    st.metric("Oral", f"Band {o.get('band', '—')}", f"LD50 {o.get('ld50_mg_kg')} mg/kg" if o.get("ld50_mg_kg") else None)
-                else:
-                    st.write("**Oral:** —")
-            with band_cols[1]:
-                if d:
-                    st.metric("Dermal", f"Band {d.get('band', '—')}", f"LD50 {d.get('ld50_mg_kg')} mg/kg" if d.get("ld50_mg_kg") else None)
-                else:
-                    st.write("**Dermal:** —")
-            with band_cols[2]:
-                if i:
-                    st.metric("Inhalation", f"Band {i.get('band', '—')}", f"LC50 {i.get('lc50_mg_m3')} mg/m³" if i.get("lc50_mg_m3") else None)
-                else:
-                    st.write("**Inhalation:** —")
 
         # --- GHS Classification (filtered, user-controlled) ---
         st.subheader("⚠️ GHS Classification")
@@ -375,8 +379,6 @@ if current_query:
             fp_str = "; ".join(fp) if isinstance(fp, list) else (fp or "")
             vp_str = "; ".join(vp) if isinstance(vp, list) else (vp or "")
             eco = pubchem_data.get("ecotoxicity") or {}
-            bands = pubchem_data.get("exposure_bands") or {}
-            o, d, i = bands.get("oral") or {}, bands.get("dermal") or {}, bands.get("inhalation") or {}
             return {
                 "CAS": clean_cas,
                 "DTXSID": dtxsid or "",
@@ -391,12 +393,6 @@ if current_query:
                 "Aquatic H-codes": " | ".join(eco.get("h_codes_aquatic") or []),
                 "Aquatic LC50 (mg/L)": eco.get("aquatic_lc50_mg_l") or "",
                 "Aquatic EC50 (mg/L)": eco.get("aquatic_ec50_mg_l") or "",
-                "Oral band": o.get("band") or "",
-                "Oral LD50 (mg/kg)": o.get("ld50_mg_kg") or "",
-                "Dermal band": d.get("band") or "",
-                "Dermal LD50 (mg/kg)": d.get("ld50_mg_kg") or "",
-                "Inhalation band": i.get("band") or "",
-                "Inhalation LC50 (mg/m3)": i.get("lc50_mg_m3") or "",
             }
 
         df_report = pd.DataFrame([_report_row()])
