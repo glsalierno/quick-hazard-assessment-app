@@ -481,7 +481,6 @@ if current_query:
             f"📝 **For research use:** If this tool contributes to your work, "
             f"please cite the Zenodo DOI: {config.ZENODO_DOI}"
         )
-        st.caption(f"*{config.OPERA_NOTE}*")
 
         # --- Download: full report (no truncation) ---
         st.markdown("---")
@@ -529,4 +528,3 @@ if current_query:
 # Footer when no query yet
 if not current_query:
     st.markdown("---")
-    st.caption(f"*{config.OPERA_NOTE}*")
