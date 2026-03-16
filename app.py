@@ -326,19 +326,28 @@ if current_query:
                 st.markdown("**Aquatic hazard (GHS):** " + ", ".join(h_aquatic))
             if eco_entries:
                 st.markdown("**Aquatic toxicity (PubChem):**")
-                # Group entries by species so each species is on one line
-                by_species: dict[str, list[dict]] = {}
+                # Build table similar to Key Properties
+                eco_rows = []
                 for e in eco_entries:
                     sp = (e.get("species") or "—").strip()
-                    by_species.setdefault(sp, []).append(e)
-                for sp, entries in by_species.items():
-                    parts = []
-                    for e in entries:
-                        val = e.get("value") or ""
-                        u = e.get("unit") or ""
-                        parts.append(val + (f" ({u})" if u else ""))
-                    joined = " | ".join(parts)
-                    st.write(f"- **Species:** {sp} — {joined}")
+                    raw = e.get("value") or ""
+                    unit = e.get("unit") or ""
+                    upper = raw.upper()
+                    if "LC50" in upper:
+                        endpoint = "LC50"
+                    elif "EC50" in upper:
+                        endpoint = "EC50"
+                    else:
+                        endpoint = "Toxicity"
+                    eco_rows.append(
+                        {
+                            "Species": sp,
+                            "Endpoint": endpoint,
+                            "Value": raw,
+                            "Unit": unit or "mg/L",
+                        }
+                    )
+                st.dataframe(pd.DataFrame(eco_rows), width="stretch", hide_index=True)
             lc = eco.get("aquatic_lc50_mg_l")
             ec = eco.get("aquatic_ec50_mg_l")
             if lc is not None:
