@@ -1,0 +1,4 @@
+# Optional system deps for RDKit on Streamlit Community Cloud (if needed)
+libxrender1
+libxext6
+libx11-6

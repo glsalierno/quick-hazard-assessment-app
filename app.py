@@ -112,7 +112,38 @@ if current_query:
         # --- Molecular structure at top ---
         if pubchem_data.get("smiles"):
             st.subheader("Molecular Structure")
-            smiles_drawer.draw_smiles(pubchem_data["smiles"])
+            if "mol_draw_style" not in st.session_state:
+                st.session_state["mol_draw_style"] = "acs_1996"
+            if "mol_draw_show_h" not in st.session_state:
+                st.session_state["mol_draw_show_h"] = False
+            with st.expander("Drawing options", expanded=False):
+                c1, c2 = st.columns(2)
+                with c1:
+                    style = st.selectbox(
+                        "Style",
+                        ["acs_1996", "acs_2006", "nature", "simple"],
+                        format_func=lambda x: {
+                            "acs_1996": "ACS 1996 (Classic)",
+                            "acs_2006": "ACS 2006 (Modern)",
+                            "nature": "Nature/Science",
+                            "simple": "Simple (Minimal)",
+                        }.get(x, x),
+                        key="mol_style_select",
+                    )
+                    st.session_state["mol_draw_style"] = style
+                with c2:
+                    show_h = st.checkbox("Show explicit hydrogens", value=False, key="mol_show_h")
+                    st.session_state["mol_draw_show_h"] = show_h
+            mol_img = smiles_drawer.draw_smiles(
+                pubchem_data["smiles"],
+                width=600,
+                height=350,
+                style=st.session_state["mol_draw_style"],
+                explicit_hydrogens=st.session_state["mol_draw_show_h"],
+            )
+            if mol_img is not None:
+                st.image(mol_img, use_container_width=True)
+            # If mol_img is None, draw_smiles already rendered the JS fallback
 
         # --- Identifiers and properties in columns ---
         col1, col2 = st.columns(2)
@@ -120,6 +151,12 @@ if current_query:
             st.subheader("Identifiers")
             st.write(f"**CAS:** {clean_cas}")
             st.write(f"**IUPAC Name:** {pubchem_data.get('iupac_name') or 'N/A'}")
+            smiles_val = pubchem_data.get("smiles")
+            if smiles_val:
+                st.write("**SMILES:**")
+                st.code(smiles_val, language="text")
+            else:
+                st.write("**SMILES:** N/A")
             if preferred_name:
                 st.write(f"**Preferred name (DSSTox):** {preferred_name}")
             if dtxsid:
@@ -137,32 +174,22 @@ if current_query:
                     )
         with col2:
             st.subheader("Key Properties")
-            st.write(f"**Molecular Formula:** {pubchem_data.get('formula') or 'N/A'}")
-            st.write(f"**Molecular Weight:** {pubchem_data.get('mw') or 'N/A'}")
-            # Flash point: one value per line (list or split by ";")
+            # Build table: Property, Value, Unit, Observations (like toxicity endpoints)
             fp = pubchem_data.get("flash_point")
-            if isinstance(fp, list):
-                fp_list = [str(x).strip() for x in fp if x]
-            else:
-                fp_list = [x.strip() for x in (str(fp or "").split(";")) if x.strip()]
-            if fp_list:
-                st.markdown("**Flash Point:**")
-                for p in fp_list:
-                    st.write(f"- {p}")
-            else:
-                st.write("**Flash Point:** N/A")
-            # Vapor pressure: one value per line
             vp = pubchem_data.get("vapor_pressure")
-            if isinstance(vp, list):
-                vp_list = [str(x).strip() for x in vp if x]
-            else:
-                vp_list = [x.strip() for x in (str(vp or "").split(";")) if x.strip()]
-            if vp_list:
-                st.markdown("**Vapor Pressure:**")
-                for p in vp_list:
-                    st.write(f"- {p}")
-            else:
-                st.write("**Vapor Pressure:** N/A")
+            fp_list = [str(x).strip() for x in (fp if isinstance(fp, list) else [fp] if fp else []) if x]
+            if not fp_list and fp and not isinstance(fp, list):
+                fp_list = [x.strip() for x in str(fp).split(";") if x.strip()]
+            vp_list = [str(x).strip() for x in (vp if isinstance(vp, list) else [vp] if vp else []) if x]
+            if not vp_list and vp and not isinstance(vp, list):
+                vp_list = [x.strip() for x in str(vp).split(";") if x.strip()]
+            prop_rows = [
+                {"Property": "Molecular Formula", "Value": pubchem_data.get("formula") or "—", "Unit": "—", "Observations": ""},
+                {"Property": "Molecular Weight", "Value": pubchem_data.get("mw") or "—", "Unit": "g/mol", "Observations": ""},
+                {"Property": "Flash Point", "Value": " | ".join(fp_list) if fp_list else "—", "Unit": "°C (typical)", "Observations": "Multiple values" if len(fp_list) > 1 else ""},
+                {"Property": "Vapor Pressure", "Value": " | ".join(vp_list) if vp_list else "—", "Unit": "mmHg (typical)", "Observations": "Multiple values" if len(vp_list) > 1 else ""},
+            ]
+            st.dataframe(pd.DataFrame(prop_rows), use_container_width=True, hide_index=True)
 
         # --- Toxic doses (route, species, value, unit) ---
         toxicities = pubchem_data.get("toxicities") or []
