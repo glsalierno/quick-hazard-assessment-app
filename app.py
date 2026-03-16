@@ -66,7 +66,7 @@ with st.sidebar:
         st.success(f"✅ ToxValDB (SQLite): {db_stats['toxvaldb']['records']:,} records")
         st.caption(f"{db_stats['toxvaldb']['chemicals']:,} chemicals")
     else:
-        st.caption("ToxValDB: optional (build SQLite or use API key)")
+        st.error("ToxValDB (SQLite) not found. Build it locally with `scripts/setup_chemical_db.py`.")
 
 # Input form
 with st.form("cas_input"):
@@ -494,7 +494,7 @@ if current_query:
             **Data sources**
             - **PubChem**: identifiers, properties, GHS, toxicity text from PUG View.
             - **DSSTox (local)**: DTXSID, preferred/systematic names, formula, InChI/SMILES when present in your mapping file.
-            - **ToxValDB (local, optional)**: quantitative toxicity values loaded from the local COMPTOX Excel files into the SQLite database (no API key required).
+            - **ToxValDB (local)**: quantitative toxicity values loaded from the local COMPTOX Excel files into the SQLite database (no API key required).
             """)
     else:
         st.error(f"No data found for '{current_query}'. Please check the input.")
