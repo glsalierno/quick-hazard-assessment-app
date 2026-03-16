@@ -14,6 +14,14 @@ DSS_PATH = os.path.join(REPO_ROOT, DSS_DIR)
 # Preferred mapping filename; loader also accepts any .csv or .xlsx in DSS/
 DSSTOX_MAPPING_FILENAMES = ("cas_dtxsid_mapping.csv",)
 
+# Local SQLite chemical DB (DSSTox + ToxValDB); built by scripts/setup_chemical_db.py
+DATA_DIR = os.path.join(REPO_ROOT, "data")
+CHEMICAL_DB_PATH = os.path.join(DATA_DIR, "chemical_db.sqlite")
+
+# COMPTOX public data folders (Excel and MySQL dump) — used by setup script
+COMPTOX_EXCEL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data Excel Files Folder)", "Data Excel Files")
+COMPTOX_MYSQL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data MySQL Dump File Folder)")
+
 # App
 APP_TITLE = "Quick Hazard Assessment"
 ZENODO_DOI = "10.5281/zenodo.14636704"

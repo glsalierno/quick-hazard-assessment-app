@@ -13,7 +13,7 @@ import pandas as pd
 import streamlit as st
 
 import config
-from utils import cas_validator, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
+from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
 from utils import toxvaldb_client
 
 # Page config
@@ -36,8 +36,11 @@ if "show_signal_word" not in st.session_state:
 if "ghs_layout" not in st.session_state:
     st.session_state["ghs_layout"] = "two_columns"
 
-# Load enhanced DSSTox data once (cached inside utils)
-dsstox_data = dsstox_local.load_dsstox_enhanced()
+# Prefer SQLite chemical DB when present (fast); else fall back to CSV-based DSSTox
+db_stats = chemical_db.get_db_stats()
+use_sqlite_dsstox = db_stats.get("dsstox", {}).get("exists", False)
+use_sqlite_toxval = db_stats.get("toxvaldb", {}).get("exists", False)
+dsstox_data = None if use_sqlite_dsstox else dsstox_local.load_dsstox_enhanced()
 
 # Title and description
 st.title(f"🧪 {config.APP_TITLE}")
@@ -45,19 +48,25 @@ st.markdown(
     "Chemical hazard assessment from **PubChem** + **DSSTox local** (no API key required)."
 )
 
-# Sidebar: DSSTox database stats (if loaded)
+# Sidebar: database stats (SQLite or CSV)
 with st.sidebar:
-    st.header("📊 DSSTox database")
-    if dsstox_data:
+    st.header("📊 Local database")
+    if use_sqlite_dsstox:
+        st.success(f"✅ DSSTox (SQLite): {db_stats['dsstox']['records']:,} compounds")
+    elif dsstox_data:
         stats = dsstox_local.get_dsstox_summary_stats(dsstox_data)
-        st.success(f"Loaded {stats.get('total_compounds', 0)} compounds")
+        st.success(f"✅ DSSTox (CSV): {stats.get('total_compounds', 0)} compounds")
         st.caption(
             f"{stats.get('with_dtxsid', 0)} with DTXSID, "
-            f"{stats.get('with_preferred_name', 0)} with names, "
-            f"{stats.get('with_formula', 0)} with formulas"
+            f"{stats.get('with_preferred_name', 0)} with names"
         )
     else:
-        st.warning("DSSTox local database not loaded (PubChem-only mode).")
+        st.warning("DSSTox not loaded (PubChem-only mode).")
+    if use_sqlite_toxval:
+        st.success(f"✅ ToxValDB (SQLite): {db_stats['toxvaldb']['records']:,} records")
+        st.caption(f"{db_stats['toxvaldb']['chemicals']:,} chemicals")
+    else:
+        st.caption("ToxValDB: optional (build SQLite or use API key)")
 
 # Input form
 with st.form("cas_input"):
@@ -93,19 +102,36 @@ if current_query:
     need_fetch = st.session_state.get("result_for") != clean_cas
     if need_fetch:
         with st.spinner("Fetching data and generating structure..."):
-            # DSSTox local (enhanced)
-            dsstox_info = dsstox_local.get_dsstox_info(clean_cas, dsstox_data) if dsstox_data else None
-            dtxsid = dsstox_info.get("dtxsid") if dsstox_info else None
-            preferred_name = dsstox_info.get("preferred_name") if dsstox_info else None
+            # DSSTox: SQLite (fast) or CSV
+            if use_sqlite_dsstox:
+                dsstox_info = chemical_db.get_dsstox_by_cas(clean_cas)
+            else:
+                dsstox_info = dsstox_local.get_dsstox_info(clean_cas, dsstox_data) if dsstox_data else None
+            dtxsid = (dsstox_info or {}).get("dtxsid")
+            preferred_name = (dsstox_info or {}).get("preferred_name")
 
-            # Resolve input type: CAS format vs name
+            # PubChem
             if cas_validator.is_valid_cas_format(clean_cas):
                 input_type = "cas"
             else:
                 input_type = "name"
             pubchem_data = pubchem_client.get_compound_data(clean_cas, input_type=input_type)
+
+            # ToxValDB: SQLite (local) or API
             toxval_data = None
-            if dtxsid:
+            if dtxsid and use_sqlite_toxval:
+                recs = chemical_db.get_toxicity_by_dtxsid(dtxsid, numeric_only=False)
+                toxval_data = {}
+                for rec in recs:
+                    cat = (rec.get("study_type") or "other").strip() or "other"
+                    toxval_data.setdefault(cat, []).append({
+                        "value": rec.get("toxval_numeric"),
+                        "units": rec.get("toxval_units", ""),
+                        "species": rec.get("species", ""),
+                        "route": rec.get("exposure_route", ""),
+                        "study_type": rec.get("study_type", ""),
+                    })
+            elif dtxsid:
                 try:
                     api_key = st.secrets.get("COMPTOX_API_KEY") if hasattr(st, "secrets") else None
                     if not api_key:
@@ -115,6 +141,7 @@ if current_query:
                         toxval_data = toxvaldb_client.fetch_toxval_data(dtxsid, api_key)
                 except Exception:
                     toxval_data = None
+
             st.session_state["result_for"] = clean_cas
             st.session_state["result_data"] = {
                 "pubchem": pubchem_data,
