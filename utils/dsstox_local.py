@@ -58,16 +58,18 @@ def _find_mapping_files() -> list[str]:
     return sorted(paths)
 
 
-def _load_one_mapping(path: str) -> dict[str, str] | None:
-    """Load a single CSV/Excel file into CAS -> DTXSID dict. Returns None on skip/error."""
+# Preferred name column variants (from EPA/DSSTox dumps)
+NAME_COLS = ("preferred_name", "preferredname", "substance_name", "preferred chemical name", "chemical_name", "chemical name")
+
+
+def _load_one_mapping(path: str) -> dict[str, dict] | None:
+    """Load a single CSV/Excel file into CAS -> {dtxsid, preferred_name}. Returns None on skip/error."""
     try:
-        # Skip Git LFS pointer files (Streamlit Cloud doesn't run git lfs pull)
         if _is_lfs_pointer(path):
             return None
         if path.lower().endswith(".xlsx"):
             df = pd.read_excel(path)
             return _df_to_cas_dtxsid(df)
-        # CSV: read in chunks to avoid memory issues on Streamlit Cloud
         result = {}
         for chunk in pd.read_csv(path, chunksize=100_000, dtype=str, on_bad_lines="skip"):
             chunk_dict = _df_to_cas_dtxsid(chunk)
@@ -78,27 +80,33 @@ def _load_one_mapping(path: str) -> dict[str, str] | None:
         return None
 
 
-def _df_to_cas_dtxsid(df: pd.DataFrame) -> dict[str, str] | None:
-    """Extract CAS -> DTXSID dict from a dataframe. Returns None if columns missing."""
+def _df_to_cas_dtxsid(df: pd.DataFrame) -> dict[str, dict] | None:
+    """Extract CAS -> {dtxsid, preferred_name} from a dataframe. Returns None if CAS/DTXSID columns missing."""
     cols_lower = {c.strip().lower(): c for c in df.columns}
     cas_col = cols_lower.get("casrn") or cols_lower.get("cas")
     dtxsid_col = cols_lower.get("dtxsid") or cols_lower.get("dsstox_substance_id")
+    name_col = next((cols_lower.get(c) for c in NAME_COLS if c in cols_lower), None)
     if cas_col is None or dtxsid_col is None:
         return None
     cas_series = df[cas_col].astype(str).str.strip()
     dtxsid_series = df[dtxsid_col].astype(str).str.strip()
+    name_series = df[name_col].astype(str).str.strip() if name_col else pd.Series([""] * len(df))
     mask = (cas_series.str.len() > 0) & (~cas_series.str.lower().isin(("nan", "none", "")))
     cas_series = cas_series[mask]
     dtxsid_series = dtxsid_series[mask]
-    return dict(zip(cas_series, dtxsid_series))
+    name_series = name_series[mask]
+    out = {}
+    for cas, dtxsid, name in zip(cas_series, dtxsid_series, name_series):
+        if cas not in out:
+            out[cas] = {"dtxsid": dtxsid, "preferred_name": name if name and name.lower() not in ("nan", "none", "") else None}
+    return out
 
 
 @st.cache_data
 def load_dsstox_mapping():
     """
     Load DSSTox mapping from all CSV/Excel files in DSS/ with caching.
-    Merges all files so every CAS in any dump is found.
-    Returns dict mapping CAS (str) -> DTXSID, or None if no valid file.
+    Returns dict mapping CAS (str) -> {dtxsid, preferred_name}, or None if no valid file.
     """
     paths = _find_mapping_files()
     if not paths:
@@ -107,26 +115,35 @@ def load_dsstox_mapping():
     for mapping_path in paths:
         one = _load_one_mapping(mapping_path)
         if one:
-            merged.update(one)
+            for cas, rec in one.items():
+                if cas not in merged:
+                    merged[cas] = dict(rec)
+                elif isinstance(merged[cas], dict) and rec.get("preferred_name") and not merged[cas].get("preferred_name"):
+                    merged[cas]["preferred_name"] = rec["preferred_name"]
     return merged if merged else None
 
 
-def get_dtxsid(cas_number: str, mapping_dict: Optional[dict]) -> Optional[str]:
-    """
-    Look up DTXSID from local mapping.
-    cas_number: CAS string (with or without dashes).
-    mapping_dict: result of load_dsstox_mapping() (may be None).
-    Returns DTXSID string or None if not found.
-    """
+def _get_record(cas_number: str, mapping_dict: Optional[dict]) -> Optional[dict]:
+    """Resolve CAS to record {dtxsid, preferred_name}. Handles dashed/undashed CAS."""
     if not mapping_dict or not cas_number:
         return None
-    # Normalize: strip and try with and without dashes if needed
     key = str(cas_number).strip()
     if key in mapping_dict:
-        return mapping_dict[key]
-    # Try normalized CAS (e.g. 67641 vs 67-64-1)
+        return mapping_dict[key] if isinstance(mapping_dict[key], dict) else {"dtxsid": mapping_dict[key], "preferred_name": None}
     key_compact = key.replace("-", "")
     for k, v in mapping_dict.items():
         if k.replace("-", "") == key_compact:
-            return v
+            return v if isinstance(v, dict) else {"dtxsid": v, "preferred_name": None}
     return None
+
+
+def get_dtxsid(cas_number: str, mapping_dict: Optional[dict]) -> Optional[str]:
+    """Look up DTXSID from local mapping."""
+    rec = _get_record(cas_number, mapping_dict)
+    return rec.get("dtxsid") if isinstance(rec, dict) else rec if isinstance(rec, str) else None
+
+
+def get_preferred_name(cas_number: str, mapping_dict: Optional[dict]) -> Optional[str]:
+    """Look up preferred name from local DSSTox mapping (when column present)."""
+    rec = _get_record(cas_number, mapping_dict)
+    return rec.get("preferred_name") if isinstance(rec, dict) else None

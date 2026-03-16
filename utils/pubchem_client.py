@@ -167,6 +167,35 @@ def _extract_hazard_metrics(data: dict) -> dict[str, Any]:
     return result
 
 
+def _extract_toxicities(data: dict) -> list[dict[str, Any]]:
+    """Extract toxicity entries (LD50, LC50, etc.) from PUG View for endpoints of interest."""
+    tox_entries: list[dict[str, Any]] = []
+    tox_keywords = ["tox", "safety", "hazard", "health", "exposure", "carcinogen"]
+
+    def process_section(section: dict, parent_heading: str = "") -> None:
+        if not isinstance(section, dict):
+            return
+        heading = section.get("TOCHeading", "") or parent_heading
+        if not any(kw in str(heading).lower() for kw in tox_keywords):
+            for sub in section.get("Section", []) or []:
+                process_section(sub, heading)
+            return
+        for info in section.get("Information", []) or []:
+            name = info.get("Name", "")
+            val = info.get("Value", {})
+            text = _get_string_from_value(val)
+            if not text:
+                continue
+            tox_entries.append({"type": name or "Toxicity", "value": text[:300]})
+        for sub in section.get("Section", []) or []:
+            process_section(sub, heading)
+
+    record = data.get("Record", {}) or {}
+    for section in record.get("Section", []) or []:
+        process_section(section)
+    return tox_entries
+
+
 def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dict[str, Any]]:
     """
     Fetch compound data for display: SMILES, formula, MW, IUPAC name, GHS, flash point, etc.
@@ -189,7 +218,7 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
     except Exception:
         return None
     # Basic props from pubchempy
-    smiles = getattr(comp, "isomeric_smiles", None) or getattr(comp, "canonical_smiles", None)
+    smiles = getattr(comp, "smiles", None) or getattr(comp, "isomeric_smiles", None) or getattr(comp, "canonical_smiles", None)
     formula = getattr(comp, "molecular_formula", None)
     mw = getattr(comp, "molecular_weight", None)
     iupac_name = getattr(comp, "iupac_name", None) or getattr(comp, "iupac_name_legacy", None)
@@ -202,9 +231,11 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
         "mw": mw,
         "iupac_name": iupac_name,
         "ghs": {"h_codes": [], "p_codes": [], "signal_word": "", "pictograms": []},
-        "flash_point": None,
-        "vapor_pressure": None,
-        "ld50_lc50": None,
+        "flash_point": [],  # list of strings, one per value
+        "vapor_pressure": [],  # list of strings
+        "toxicities": [],  # list of {type, value} for LD50/LC50 etc.
+        "ld50": [],  # subset of toxicities containing LD50
+        "lc50": [],  # subset of toxicities containing LC50
         "nfpa": None,
         "iarc": None,
         "prop65": None,
@@ -213,9 +244,13 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
     if pug:
         out["ghs"] = _extract_ghs_codes(pug)
         hazards = _extract_hazard_metrics(pug)
-        out["flash_point"] = "; ".join(hazards["flash_point"]) if hazards["flash_point"] else None
-        out["vapor_pressure"] = "; ".join(hazards["vapor_pressure"]) if hazards["vapor_pressure"] else None
+        out["flash_point"] = list(hazards["flash_point"]) if hazards["flash_point"] else []
+        out["vapor_pressure"] = list(hazards["vapor_pressure"]) if hazards["vapor_pressure"] else []
         out["nfpa"] = "; ".join(hazards["nfpa"]) if hazards["nfpa"] else None
         out["iarc"] = "; ".join(hazards["iarc"]) if hazards["iarc"] else None
         out["prop65"] = "; ".join(hazards["prop65"]) if hazards["prop65"] else None
+        tox = _extract_toxicities(pug)
+        out["toxicities"] = tox
+        out["ld50"] = [t["value"] for t in tox if "LD50" in (t.get("value") or "").upper()]
+        out["lc50"] = [t["value"] for t in tox if "LC50" in (t.get("value") or "").upper()]
     return out

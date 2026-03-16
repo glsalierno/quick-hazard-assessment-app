@@ -94,9 +94,11 @@ if current_query:
                 input_type = "name"
             pubchem_data = pubchem_client.get_compound_data(clean_cas, input_type=input_type)
             st.session_state["result_for"] = clean_cas
+            preferred_name = dsstox_local.get_preferred_name(clean_cas, dtxsid_map)
             st.session_state["result_data"] = {
                 "pubchem": pubchem_data,
                 "dtxsid": dtxsid,
+                "preferred_name": preferred_name,
                 "clean_cas": clean_cas,
             }
 
@@ -104,6 +106,7 @@ if current_query:
     if result and result.get("pubchem"):
         pubchem_data = result["pubchem"]
         dtxsid = result.get("dtxsid")
+        preferred_name = result.get("preferred_name")
         clean_cas = result["clean_cas"]
 
         # --- Molecular structure at top ---
@@ -117,6 +120,8 @@ if current_query:
             st.subheader("Identifiers")
             st.write(f"**CAS:** {clean_cas}")
             st.write(f"**IUPAC Name:** {pubchem_data.get('iupac_name') or 'N/A'}")
+            if preferred_name:
+                st.write(f"**Preferred name (DSSTox):** {preferred_name}")
             if dtxsid:
                 st.success(f"**DTXSID:** {dtxsid} *(from DSSTox local)*")
             else:
@@ -134,8 +139,48 @@ if current_query:
             st.subheader("Key Properties")
             st.write(f"**Molecular Formula:** {pubchem_data.get('formula') or 'N/A'}")
             st.write(f"**Molecular Weight:** {pubchem_data.get('mw') or 'N/A'}")
-            st.write(f"**Flash Point:** {pubchem_data.get('flash_point') or 'N/A'}")
-            st.write(f"**Vapor Pressure:** {pubchem_data.get('vapor_pressure') or 'N/A'}")
+            # Flash point: one value per line (list or split by ";")
+            fp = pubchem_data.get("flash_point")
+            if isinstance(fp, list):
+                fp_list = [str(x).strip() for x in fp if x]
+            else:
+                fp_list = [x.strip() for x in (str(fp or "").split(";")) if x.strip()]
+            if fp_list:
+                st.markdown("**Flash Point:**")
+                for p in fp_list:
+                    st.write(f"- {p}")
+            else:
+                st.write("**Flash Point:** N/A")
+            # Vapor pressure: one value per line
+            vp = pubchem_data.get("vapor_pressure")
+            if isinstance(vp, list):
+                vp_list = [str(x).strip() for x in vp if x]
+            else:
+                vp_list = [x.strip() for x in (str(vp or "").split(";")) if x.strip()]
+            if vp_list:
+                st.markdown("**Vapor Pressure:**")
+                for p in vp_list:
+                    st.write(f"- {p}")
+            else:
+                st.write("**Vapor Pressure:** N/A")
+
+        # --- Endpoints of interest (LD50, LC50 from PubChem) ---
+        ld50_list = pubchem_data.get("ld50") or []
+        lc50_list = pubchem_data.get("lc50") or []
+        if ld50_list or lc50_list:
+            st.subheader("📌 Endpoints of interest")
+            if ld50_list:
+                st.markdown("**LD50 (PubChem):**")
+                for v in ld50_list[:10]:
+                    st.write(f"- {v}")
+                if len(ld50_list) > 10:
+                    st.caption(f"*… and {len(ld50_list) - 10} more*")
+            if lc50_list:
+                st.markdown("**LC50 (PubChem):**")
+                for v in lc50_list[:10]:
+                    st.write(f"- {v}")
+                if len(lc50_list) > 10:
+                    st.caption(f"*… and {len(lc50_list) - 10} more*")
 
         # --- GHS Classification (filtered, user-controlled) ---
         st.subheader("⚠️ GHS Classification")
@@ -252,18 +297,22 @@ if current_query:
 
         # --- Download report as CSV ---
         def _report_row() -> dict[str, Any]:
-            row = {
+            fp = pubchem_data.get("flash_point")
+            vp = pubchem_data.get("vapor_pressure")
+            fp_str = "; ".join(fp) if isinstance(fp, list) else (fp or "")
+            vp_str = "; ".join(vp) if isinstance(vp, list) else (vp or "")
+            return {
                 "CAS": clean_cas,
                 "DTXSID": dtxsid or "",
+                "Preferred Name": preferred_name or "",
                 "IUPAC Name": pubchem_data.get("iupac_name") or "",
                 "Molecular Formula": pubchem_data.get("formula") or "",
                 "Molecular Weight": pubchem_data.get("mw") or "",
-                "Flash Point": pubchem_data.get("flash_point") or "",
-                "Vapor Pressure": pubchem_data.get("vapor_pressure") or "",
+                "Flash Point": fp_str,
+                "Vapor Pressure": vp_str,
                 "GHS H-codes": " | ".join(h_codes),
                 "GHS P-codes": " | ".join(p_codes),
             }
-            return row
 
         df_report = pd.DataFrame([_report_row()])
         buf = io.BytesIO()
