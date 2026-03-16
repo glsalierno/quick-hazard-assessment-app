@@ -1,0 +1,16 @@
+Instructions to Unzip and Import the Dump File
+ 
+1. Download the File:
+   Download the res_toxval_v95.dmp.gz file from the provided URL.
+ 
+2. Unzip the File:
+   Open Command Prompt or Terminal.
+   Navigate to the directory where the file is downloaded.
+   Run the following command to unzip:
+   gunzip res_toxval_v95.dmp.gz
+ 
+3. Import the Database:
+   Run the following command to import the database:
+   mysql -u [username] -p res_toxval_v95 < res_toxval_v95.dmp
+   Replace [username] with your MySQL username.
+   Enter your MySQL password when prompted.

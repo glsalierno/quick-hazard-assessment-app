@@ -4,3 +4,8 @@ DSS/*.csv filter=lfs diff=lfs merge=lfs -text
 DSS/*.xlsx filter=lfs diff=lfs merge=lfs -text
 # Exception last so it wins: cas_dtxsid_mapping.csv in Git (not LFS) for Streamlit Cloud
 DSS/cas_dtxsid_mapping.csv !filter !diff !merge
+
+# COMPTOX public data and built SQLite DB (paths with spaces; use ** to match)
+COMPTOX_Public/**/*.xlsx filter=lfs diff=lfs merge=lfs -text
+COMPTOX_Public/**/*.sql filter=lfs diff=lfs merge=lfs -text
+data/*.sqlite filter=lfs diff=lfs merge=lfs -text

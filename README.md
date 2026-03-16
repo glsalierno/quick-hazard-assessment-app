@@ -85,6 +85,26 @@ See **`DSS/README.md`** for download links and update instructions.
 
 ---
 
+## Local SQLite database (optional, faster)
+
+For **faster lookups**, you can build a single SQLite database that combines DSSTox identifiers and ToxValDB toxicity data.
+
+1. **One-time setup**
+   - Ensure **DSS** has a CAS–DTXSID CSV (e.g. `DSS/cas_dtxsid_mapping.csv`).
+   - Optionally place the **COMPTOX ToxValDB Excel** files in  
+     `COMPTOX_Public (Data Excel Files Folder)/Data Excel Files/` (each `.xlsx` will be read).
+2. **Build the database**
+   ```bash
+   python scripts/setup_chemical_db.py
+   ```
+   This creates **`data/chemical_db.sqlite`** (DSSTox table and, if Excel files are present, ToxValDB table).
+3. **Run the app**  
+   If `data/chemical_db.sqlite` exists, the app uses it for DSSTox (and ToxValDB when the table is present) and falls back to CSV/API otherwise.
+
+**Performance:** DSSTox lookups drop from seconds (CSV) to milliseconds (SQLite). ToxValDB queries are also served from SQLite when the table is built.
+
+---
+
 ## Project layout
 
 ```
@@ -95,11 +115,16 @@ See **`DSS/README.md`** for download links and update instructions.
 ├── DSS/                   # DSSTox local database (LFS-tracked)
 │   ├── README.md          # Source, LFS instructions, update steps
 │   └── cas_dtxsid_mapping.csv   # (user-downloaded; add to repo via LFS)
-├── data/
-│   └── dsstox/            # Legacy path; app uses DSS/ now
-│       └── README.md
+├── COMPTOX_Public (Data Excel Files Folder)/   # ToxValDB Excel files (optional; LFS)
+│   └── Data Excel Files/*.xlsx
+├── COMPTOX_Public (Data MySQL Dump File Folder)/   # MySQL dump (optional)
+├── data/                  # Built SQLite DB (after setup_chemical_db.py)
+│   └── chemical_db.sqlite
+├── scripts/
+│   └── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
 └── utils/
-    ├── dsstox_local.py     # DSSTox loader from DSS/ (cached, CSV/Excel)
+    ├── chemical_db.py     # SQLite DSSTox + ToxValDB (fast lookups)
+    ├── dsstox_local.py    # DSSTox loader from DSS/ (CSV/Excel fallback)
     ├── cas_validator.py    # CAS validation/normalization
     ├── pubchem_client.py   # PubChem API wrapper
     ├── ghs_formatter.py    # GHS H/P phrase formatting

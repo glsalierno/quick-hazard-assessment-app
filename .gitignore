@@ -25,3 +25,8 @@ Thumbs.db
 reports/
 
 # Do NOT ignore DSS/ — the DSSTox mapping is tracked via Git LFS for publishing.
+
+# Optional: ignore COMPTOX zip and docs (we track the extracted Excel/MySQL folders)
+COMPTOX*.zip
+COMPTOX_Public (Documentation Folder)/
+COMPTOX_Public (Documentation Folder).zip
