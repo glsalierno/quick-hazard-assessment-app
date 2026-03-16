@@ -325,8 +325,8 @@ if current_query:
             if h_aquatic:
                 st.markdown("**Aquatic hazard (GHS):** " + ", ".join(h_aquatic))
             if eco_entries:
-                st.markdown("**Aquatic toxicity (PubChem):**")
-                eco_rows = []
+                quant_rows = []
+                qual_rows = []
                 for e in eco_entries:
                     sp = (e.get("species") or "—").strip()
                     endpoint = (e.get("endpoint") or "").upper() or "Toxicity"
@@ -339,18 +339,26 @@ if current_query:
                     ci_str = ""
                     if ci_low is not None and ci_high is not None:
                         ci_str = f"{ci_low}–{ci_high}"
-                    eco_rows.append(
-                        {
-                            "Species": sp,
-                            "Endpoint": endpoint,
-                            "Duration": duration,
-                            "Value": val_num if val_num is not None else raw,
-                            "Unit": unit,
-                            "CI (low–high)": ci_str,
-                            "Conditions / notes": e.get("conditions") or "",
-                        }
-                    )
-                st.dataframe(pd.DataFrame(eco_rows), width="stretch", hide_index=True)
+                    row = {
+                        "Species": sp,
+                        "Endpoint": endpoint,
+                        "Duration": duration,
+                        "Value": val_num if val_num is not None else raw,
+                        "Unit": unit,
+                        "CI (low–high)": ci_str,
+                        "Conditions / notes": e.get("conditions") or "",
+                    }
+                    if e.get("quantitative") and val_num is not None:
+                        quant_rows.append(row)
+                    else:
+                        qual_rows.append(row)
+                if quant_rows:
+                    st.markdown("**Aquatic toxicity – quantitative endpoints:**")
+                    st.dataframe(pd.DataFrame(quant_rows), width="stretch", hide_index=True)
+                if qual_rows:
+                    st.markdown("**Other aquatic toxicity information (raw PubChem excerpts):**")
+                    for r in qual_rows:
+                        st.write(f"- **{r['Species']}**, {r['Endpoint']} {r['Duration']}: {r['Conditions / notes']}")
             lc = eco.get("aquatic_lc50_mg_l")
             ec = eco.get("aquatic_ec50_mg_l")
             if lc is not None:
