@@ -6,13 +6,15 @@ Chemical hazard assessment from PubChem + DSSTox local (no API key required).
 from __future__ import annotations
 
 import io
+import json
 from typing import Any
 
 import pandas as pd
 import streamlit as st
 
 import config
-from utils import cas_validator, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
+from utils import cas_validator, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
+from utils import toxvaldb_client
 
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
@@ -102,6 +104,17 @@ if current_query:
             else:
                 input_type = "name"
             pubchem_data = pubchem_client.get_compound_data(clean_cas, input_type=input_type)
+            toxval_data = None
+            if dtxsid:
+                try:
+                    api_key = st.secrets.get("COMPTOX_API_KEY") if hasattr(st, "secrets") else None
+                    if not api_key:
+                        import os
+                        api_key = os.environ.get("COMPTOX_API_KEY")
+                    if api_key:
+                        toxval_data = toxvaldb_client.fetch_toxval_data(dtxsid, api_key)
+                except Exception:
+                    toxval_data = None
             st.session_state["result_for"] = clean_cas
             st.session_state["result_data"] = {
                 "pubchem": pubchem_data,
@@ -109,6 +122,7 @@ if current_query:
                 "dtxsid": dtxsid,
                 "preferred_name": preferred_name,
                 "clean_cas": clean_cas,
+                "toxval_data": toxval_data,
             }
 
     result = st.session_state.get("result_data")
@@ -118,6 +132,7 @@ if current_query:
         dtxsid = result.get("dtxsid")
         preferred_name = result.get("preferred_name")
         clean_cas = result["clean_cas"]
+        toxval_data = result.get("toxval_data")
 
         # --- Molecular structure at top ---
         if pubchem_data.get("smiles"):
@@ -211,23 +226,65 @@ if current_query:
             ]
             st.dataframe(pd.DataFrame(prop_rows), width="stretch", hide_index=True)
 
-        # --- Toxic doses (route, species, value, unit) ---
+        # --- Toxic doses & toxicity endpoints (no truncation; prioritized + full table + raw) ---
         toxicities = pubchem_data.get("toxicities") or []
-        if toxicities:
-            st.subheader("📌 Toxic doses & toxicity endpoints")
-            st.caption("Exposure pathway and species are inferred from PubChem text where available.")
+        prioritized = data_formatter.prioritize_toxicity_data(pubchem_data, toxval_data)
+
+        st.markdown("---")
+        st.subheader("📌 Toxic doses & toxicity endpoints")
+        tab_prioritized, tab_complete, tab_raw = st.tabs(["📊 Prioritized view", "📋 Complete table", "🔬 Raw data"])
+
+        with tab_prioritized:
+            st.caption("Quantitative values (with units) first, then categorical. All data shown.")
+            if prioritized["quantitative"] or prioritized["categorical"]:
+                df_pri = data_formatter.build_toxicity_display_df(prioritized)
+                st.dataframe(df_pri, width="stretch", hide_index=True, height=400)
+            else:
+                st.info("No toxicity endpoints found in current data sources.")
+
+        with tab_complete:
+            st.caption("All endpoints from PubChem and ToxValDB (if available). No truncation.")
             rows = []
-            for t in toxicities[:30]:
-                route = t.get("route") or "—"
-                species = t.get("species") or "—"
-                endpoint = (t.get("type") or "Toxicity").strip()
-                value = (t.get("value") or "")[:180]
-                unit = t.get("unit") or "—"
-                rows.append({"Exposure pathway": route, "Species": species, "Endpoint": endpoint, "Value": value, "Unit": unit})
+            for t in toxicities:
+                rows.append({
+                    "Source": "PubChem",
+                    "Exposure pathway": t.get("route") or "—",
+                    "Species": t.get("species") or "—",
+                    "Endpoint": (t.get("type") or "Toxicity").strip(),
+                    "Value": t.get("value") or "",
+                    "Unit": t.get("unit") or "—",
+                })
+            if toxval_data:
+                for _cat, recs in toxval_data.items():
+                    for r in recs:
+                        rows.append({
+                            "Source": "ToxValDB",
+                            "Exposure pathway": r.get("route", "—"),
+                            "Species": r.get("species", ""),
+                            "Endpoint": r.get("study_type", _cat),
+                            "Value": str(r.get("value", "")),
+                            "Unit": r.get("units", ""),
+                        })
             if rows:
-                st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
-            if len(toxicities) > 30:
-                st.caption(f"*Showing 30 of {len(toxicities)} entries. Full list in raw data.*")
+                st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True, height=400)
+            else:
+                st.info("No toxicity data available for this compound.")
+
+        with tab_raw:
+            st.caption("Unmodified data from APIs (for advanced use).")
+            raw_sub = st.tabs(["PubChem", "DSSTox", "ToxValDB"])
+            with raw_sub[0]:
+                st.json(pubchem_data)
+            with raw_sub[1]:
+                if dsstox_info:
+                    st.json(dsstox_info)
+                else:
+                    st.write("No DSSTox record for this compound.")
+            with raw_sub[2]:
+                if toxval_data:
+                    st.json(toxval_data)
+                else:
+                    st.write("No ToxValDB data (optional: set COMPTOX_API_KEY for EPA ToxValDB).")
 
         # --- Ecotoxicity (aquatic LC50/EC50, species, H4xx) ---
         eco = pubchem_data.get("ecotoxicity") or {}
@@ -372,44 +429,46 @@ if current_query:
         )
         st.caption(f"*{config.OPERA_NOTE}*")
 
-        # --- Download report as CSV ---
-        def _report_row() -> dict[str, Any]:
-            fp = pubchem_data.get("flash_point")
-            vp = pubchem_data.get("vapor_pressure")
-            fp_str = "; ".join(fp) if isinstance(fp, list) else (fp or "")
-            vp_str = "; ".join(vp) if isinstance(vp, list) else (vp or "")
-            eco = pubchem_data.get("ecotoxicity") or {}
-            return {
-                "CAS": clean_cas,
-                "DTXSID": dtxsid or "",
-                "Preferred Name": preferred_name or "",
-                "IUPAC Name": pubchem_data.get("iupac_name") or "",
-                "Molecular Formula": pubchem_data.get("formula") or "",
-                "Molecular Weight": pubchem_data.get("mw") or "",
-                "Flash Point": fp_str,
-                "Vapor Pressure": vp_str,
-                "GHS H-codes": " | ".join(h_codes),
-                "GHS P-codes": " | ".join(p_codes),
-                "Aquatic H-codes": " | ".join(eco.get("h_codes_aquatic") or []),
-                "Aquatic LC50 (mg/L)": eco.get("aquatic_lc50_mg_l") or "",
-                "Aquatic EC50 (mg/L)": eco.get("aquatic_ec50_mg_l") or "",
-            }
+        # --- Download: full report (no truncation) ---
+        st.markdown("---")
+        st.subheader("📥 Download report")
+        eco = pubchem_data.get("ecotoxicity") or {}
+        h_codes = (pubchem_data.get("ghs") or {}).get("h_codes") or []
+        p_codes = (pubchem_data.get("ghs") or {}).get("p_codes") or []
 
-        df_report = pd.DataFrame([_report_row()])
-        buf = io.BytesIO()
-        df_report.to_csv(buf, index=False)
-        buf.seek(0)
-        st.download_button(
-            "Download report as CSV",
-            data=buf,
-            file_name=f"hazard_report_{clean_cas.replace('-', '_')}.csv",
-            mime="text/csv",
-            key="download_csv",
-        )
+        st.caption("Full report includes all identifiers, properties, GHS, and every toxicity endpoint (no truncation).")
+        col_dl1, col_dl2 = st.columns(2)
+        with col_dl1:
+            full_csv = data_formatter.download_toxicity_csv(
+                clean_cas, pubchem_data, dsstox_info, dtxsid, preferred_name, h_codes, p_codes, eco
+            )
+            st.download_button(
+                "⬇️ Download full report (CSV)",
+                data=full_csv,
+                file_name=f"hazard_report_{clean_cas.replace('-', '_')}.csv",
+                mime="text/csv",
+                key="download_csv",
+            )
+        with col_dl2:
+            download_payload = data_formatter.create_comprehensive_download_data(
+                clean_cas, pubchem_data, dsstox_info, toxval_data
+            )
+            json_bytes = json.dumps(download_payload, indent=2, default=str).encode("utf-8")
+            st.download_button(
+                "⬇️ Download full report (JSON)",
+                data=json_bytes,
+                file_name=f"hazard_report_{clean_cas.replace('-', '_')}.json",
+                mime="application/json",
+                key="download_json",
+            )
 
-        # --- Expandable raw data ---
-        with st.expander("View raw PubChem data"):
-            st.json(pubchem_data)
+        with st.expander("📚 Data sources"):
+            st.markdown("""
+            **Data sources**
+            - **PubChem**: identifiers, properties, GHS, toxicity text from PUG View.
+            - **DSSTox (local)**: DTXSID, preferred/systematic names, formula, InChI/SMILES when present in your mapping file.
+            - **ToxValDB** (optional): quantitative toxicity values from EPA; set `COMPTOX_API_KEY` in secrets or environment to enable.
+            """)
     else:
         st.error(f"No data found for '{current_query}'. Please check the input.")
 
