@@ -326,25 +326,28 @@ if current_query:
                 st.markdown("**Aquatic hazard (GHS):** " + ", ".join(h_aquatic))
             if eco_entries:
                 st.markdown("**Aquatic toxicity (PubChem):**")
-                # Build table similar to Key Properties
                 eco_rows = []
                 for e in eco_entries:
                     sp = (e.get("species") or "—").strip()
+                    endpoint = (e.get("endpoint") or "").upper() or "Toxicity"
+                    duration = e.get("duration") or ""
                     raw = e.get("value") or ""
-                    unit = e.get("unit") or ""
-                    upper = raw.upper()
-                    if "LC50" in upper:
-                        endpoint = "LC50"
-                    elif "EC50" in upper:
-                        endpoint = "EC50"
-                    else:
-                        endpoint = "Toxicity"
+                    unit = e.get("unit") or "mg/L"
+                    val_num = e.get("value_num")
+                    ci_low = e.get("ci_low")
+                    ci_high = e.get("ci_high")
+                    ci_str = ""
+                    if ci_low is not None and ci_high is not None:
+                        ci_str = f"{ci_low}–{ci_high}"
                     eco_rows.append(
                         {
                             "Species": sp,
                             "Endpoint": endpoint,
-                            "Value": raw,
-                            "Unit": unit or "mg/L",
+                            "Duration": duration,
+                            "Value": val_num if val_num is not None else raw,
+                            "Unit": unit,
+                            "CI (low–high)": ci_str,
+                            "Conditions / notes": e.get("conditions") or "",
                         }
                     )
                 st.dataframe(pd.DataFrame(eco_rows), width="stretch", hide_index=True)

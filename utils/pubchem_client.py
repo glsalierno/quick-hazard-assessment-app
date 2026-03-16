@@ -234,6 +234,17 @@ def _extract_toxicities(data: dict) -> list[dict[str, Any]]:
 _SPECIES_TOKENS = {"rat", "mouse", "rabbit", "dog", "guinea pig", "human", "fish", "trout", "daphnia", "algae"}
 _ROUTE_TOKENS = {"oral", "dermal", "inhalation", "ip", "iv", "sc"}
 
+# Ecotoxicity parsing patterns
+_ECOTOX_ENDPOINT_RE = re.compile(r"\b(LC50|EC50|LC10|LC20|LC90|EC10|EC20|EC90|NOEC|LOEC)\b", re.I)
+_ECOTOX_DURATION_RE = re.compile(r"(\d+\s*(?:h|hr|hrs|hour|hours|d|day|days))\b", re.I)
+_ECOTOX_VALUE_UNIT_RE = re.compile(
+    r"([<>~]?\s*\d+(?:[.,]\d+)?)\s*(mg/L|µg/L|ug/L|mg/kg|g/L|mg/l)\b", re.I
+)
+_ECOTOX_CI_RE = re.compile(
+    r"(?:CI|confidence interval)[^0-9]*([0-9]+(?:\.\d+)?)\s*[–-]\s*([0-9]+(?:\.\d+)?)",
+    re.I,
+)
+
 
 def _classify_route_and_species(entry: dict[str, Any]) -> tuple[str, str]:
     """Infer exposure pathway and species from toxicity entry. Returns (route, species)."""
@@ -271,8 +282,53 @@ def _classify_route_and_species(entry: dict[str, Any]) -> tuple[str, str]:
     return (route, species)
 
 
+def _parse_ecotox_text(raw: str) -> dict[str, Any]:
+    """
+    Heuristic parser for PubChem ecotoxicity text.
+    Returns endpoint, duration, numeric value, units, CI bounds, and leftover conditions.
+    """
+    if not raw:
+        return {}
+    text = raw.strip()
+    out: dict[str, Any] = {}
+
+    # Endpoint (LC50, EC50, NOEC, LOEC, etc.)
+    m_ep = _ECOTOX_ENDPOINT_RE.search(text)
+    if m_ep:
+        out["endpoint"] = m_ep.group(1).upper()
+
+    # Duration (e.g. 96 h, 21 d)
+    m_dur = _ECOTOX_DURATION_RE.search(text)
+    if m_dur:
+        out["duration"] = m_dur.group(1)
+
+    # Primary numeric value + units (mg/L etc.)
+    m_val = _ECOTOX_VALUE_UNIT_RE.search(text)
+    if m_val:
+        val_str = m_val.group(1).replace(",", "")
+        units = m_val.group(2)
+        out["unit"] = units
+        try:
+            out["value_num"] = float(re.sub(r"[<>~]\s*", "", val_str))
+        except ValueError:
+            out["value_num"] = None
+
+    # Confidence interval (if present)
+    m_ci = _ECOTOX_CI_RE.search(text)
+    if m_ci:
+        try:
+            out["ci_low"] = float(m_ci.group(1))
+            out["ci_high"] = float(m_ci.group(2))
+        except ValueError:
+            pass
+
+    # Conditions: for now, keep the full text for display/filtering
+    out["conditions"] = text
+    return out
+
+
 def _extract_ecotoxicity(ghs: dict, toxicities: list[dict]) -> dict[str, Any]:
-    """Extract ecotoxicity endpoints (aquatic LC50/EC50, species, H4xx codes). From QHA ecotoxicity.py."""
+    """Extract ecotoxicity endpoints (aquatic LC50/EC50, species, H4xx codes)."""
     out = {
         "aquatic_lc50_mg_l": None,
         "aquatic_ec50_mg_l": None,
@@ -287,26 +343,35 @@ def _extract_ecotoxicity(ghs: dict, toxicities: list[dict]) -> dict[str, Any]:
         val = (t.get("value") or "").lower()
         if "fish" in val or "trout" in val or "daphnia" in val or "algae" in val or "aquatic" in val:
             raw = t.get("value", "")
-            m = re.search(r"(?:LC50|EC50)\s*[=:]?\s*([0-9.,]+)\s*mg\s*/\s*L", raw, re.I) or re.search(
-                r"([0-9.,]+)\s*mg\s*/\s*L", raw, re.I
-            )
             species = "fish" if "fish" in val or "trout" in val else "Daphnia" if "daphnia" in val else "algae" if "algae" in val else "aquatic"
-            if m:
-                try:
-                    num = float(m.group(1).replace(",", ""))
-                    if "ec50" in val:
-                        out["aquatic_ec50_mg_l"] = num
-                    else:
-                        out["aquatic_lc50_mg_l"] = out["aquatic_lc50_mg_l"] or num
-                    out["aquatic_value_raw"] = raw[:250]
-                    out["aquatic_species"] = out["aquatic_species"] or species
-                    out["entries"].append({"value": raw[:200], "species": species, "unit": "mg/L"})
-                except ValueError:
-                    out["entries"].append({"value": raw[:200], "species": species, "unit": "mg/L"})
+            parsed = _parse_ecotox_text(raw)
+            num = parsed.get("value_num")
+            if num is not None:
+                if (parsed.get("endpoint") or "").upper().startswith("EC"):
+                    out["aquatic_ec50_mg_l"] = num
+                else:
+                    out["aquatic_lc50_mg_l"] = out["aquatic_lc50_mg_l"] or num
+                out["aquatic_value_raw"] = raw[:250]
+                out["aquatic_species"] = out["aquatic_species"] or species
+            entry = {
+                "value": raw[:400],
+                "species": species,
+                "unit": parsed.get("unit") or "mg/L",
+            }
+            entry.update(parsed)
+            out["entries"].append(entry)
     if not out["entries"]:
         for t in toxicities:
             if "LC50" in (t.get("value") or "").upper() and "mg" in (t.get("value") or "").lower() and "L" in (t.get("value") or ""):
-                out["entries"].append({"value": (t.get("value") or "")[:200], "species": "—", "unit": t.get("unit") or "mg/L"})
+                raw = t.get("value") or ""
+                parsed = _parse_ecotox_text(raw)
+                entry = {
+                    "value": raw[:400],
+                    "species": "—",
+                    "unit": parsed.get("unit") or t.get("unit") or "mg/L",
+                }
+                entry.update(parsed)
+                out["entries"].append(entry)
                 if out["aquatic_lc50_mg_l"] is None:
                     out["aquatic_value_raw"] = (t.get("value") or "")[:250]
                 break
