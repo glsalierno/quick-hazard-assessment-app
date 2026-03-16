@@ -52,7 +52,8 @@ st.markdown(
 with st.sidebar:
     st.header("📊 Local database")
     if use_sqlite_dsstox:
-        st.success(f"✅ DSSTox (SQLite): {db_stats['dsstox']['records']:,} compounds")
+        dsstox_records = int(db_stats.get("dsstox", {}).get("records") or 0)
+        st.success(f"✅ DSSTox (SQLite): {dsstox_records:,} compounds")
     elif dsstox_data:
         stats = dsstox_local.get_dsstox_summary_stats(dsstox_data)
         st.success(f"✅ DSSTox (CSV): {stats.get('total_compounds', 0)} compounds")
@@ -63,8 +64,10 @@ with st.sidebar:
     else:
         st.warning("DSSTox not loaded (PubChem-only mode).")
     if use_sqlite_toxval:
-        st.success(f"✅ ToxValDB (SQLite): {db_stats['toxvaldb']['records']:,} records")
-        st.caption(f"{db_stats['toxvaldb']['chemicals']:,} chemicals")
+        tox_records = int(db_stats.get("toxvaldb", {}).get("records") or 0)
+        tox_chems = int(db_stats.get("toxvaldb", {}).get("chemicals") or 0)
+        st.success(f"✅ ToxValDB (SQLite): {tox_records:,} records")
+        st.caption(f"{tox_chems:,} chemicals")
     else:
         st.error("ToxValDB (SQLite) not found. Build it locally with `scripts/setup_chemical_db.py`.")
 
