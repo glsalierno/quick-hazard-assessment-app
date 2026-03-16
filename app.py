@@ -120,7 +120,16 @@ if current_query:
             if dtxsid:
                 st.success(f"**DTXSID:** {dtxsid} *(from DSSTox local)*")
             else:
-                st.info("DTXSID not found in local database.")
+                if dtxsid_map is None:
+                    st.warning(
+                        "**DTXSID:** No local database loaded. "
+                        "Place a CAS→DTXSID mapping file in the **DSS/** folder (see [DSS/README.md](https://github.com/glsalierno/quick-hazard-assessment-app/blob/main/DSS/README.md))."
+                    )
+                else:
+                    st.info(
+                        "**DTXSID:** This CAS was not found in the local DSSTox file. "
+                        "Try an updated mapping from EPA Figshare or use PubChem-only data."
+                    )
         with col2:
             st.subheader("Key Properties")
             st.write(f"**Molecular Formula:** {pubchem_data.get('formula') or 'N/A'}")

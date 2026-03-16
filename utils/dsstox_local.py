@@ -15,51 +15,63 @@ import streamlit as st
 from config import DSS_DIR, DSSTOX_MAPPING_FILENAMES
 
 
-def _find_mapping_file() -> Optional[str]:
-    """Return path to first existing DSSTox mapping file in DSS/ (CSV or Excel)."""
+def _find_mapping_files() -> list[str]:
+    """Return paths to all DSSTox mapping files in DSS/ (CSV and Excel), sorted by name."""
     if not os.path.isdir(DSS_DIR):
-        return None
-    # Prefer configured filenames
+        return []
+    paths = []
+    # Prefer configured filenames first
     for name in DSSTOX_MAPPING_FILENAMES:
         path = os.path.join(DSS_DIR, name)
         if os.path.isfile(path):
-            return path
-    # Then any .csv or .xlsx in DSS/
+            paths.append(path)
+    # Then any .csv or .xlsx in DSS/ (sorted so order is deterministic)
     for name in sorted(os.listdir(DSS_DIR)):
         if name.lower().endswith(".csv") or name.lower().endswith(".xlsx"):
-            return os.path.join(DSS_DIR, name)
-    return None
+            path = os.path.join(DSS_DIR, name)
+            if path not in paths:
+                paths.append(path)
+    return sorted(paths)
+
+
+def _load_one_mapping(path: str) -> dict[str, str] | None:
+    """Load a single CSV/Excel file into CAS -> DTXSID dict. Returns None on skip/error."""
+    try:
+        if path.lower().endswith(".xlsx"):
+            df = pd.read_excel(path)
+        else:
+            df = pd.read_csv(path)
+        cols_lower = {c.strip().lower(): c for c in df.columns}
+        cas_col = cols_lower.get("casrn") or cols_lower.get("cas")
+        dtxsid_col = cols_lower.get("dtxsid") or cols_lower.get("dsstox_substance_id")
+        if cas_col is None or dtxsid_col is None:
+            return None
+        cas_series = df[cas_col].astype(str).str.strip()
+        dtxsid_series = df[dtxsid_col].astype(str).str.strip()
+        mask = (cas_series.str.len() > 0) & (~cas_series.str.lower().isin(("nan", "none", "")))
+        cas_series = cas_series[mask]
+        dtxsid_series = dtxsid_series[mask]
+        return dict(zip(cas_series, dtxsid_series))
+    except Exception:
+        return None
 
 
 @st.cache_data
 def load_dsstox_mapping():
     """
-    Load DSSTox mapping from DSS/ with caching.
-    Returns dict mapping CAS (str) -> DTXSID, or None if file missing or invalid.
+    Load DSSTox mapping from all CSV/Excel files in DSS/ with caching.
+    Merges all files so every CAS in any dump is found.
+    Returns dict mapping CAS (str) -> DTXSID, or None if no valid file.
     """
-    mapping_path = _find_mapping_file()
-    if not mapping_path:
+    paths = _find_mapping_files()
+    if not paths:
         return None
-    try:
-        if mapping_path.lower().endswith(".xlsx"):
-            df = pd.read_excel(mapping_path)
-        else:
-            df = pd.read_csv(mapping_path)
-        # Support common column name variants (EPA uses CASRN, DTXSID)
-        cas_col = "CASRN" if "CASRN" in df.columns else ("CAS" if "CAS" in df.columns else None)
-        dtxsid_col = "DTXSID" if "DTXSID" in df.columns else ("DSSTox_Substance_Id" if "DSSTox_Substance_Id" in df.columns else None)
-        if cas_col is None or dtxsid_col is None:
-            return None
-        # Normalize to string for consistent lookup
-        cas_to_dtxsid = dict(
-            zip(
-                df[cas_col].astype(str).str.strip(),
-                df[dtxsid_col].astype(str).str.strip(),
-            )
-        )
-        return cas_to_dtxsid
-    except Exception:
-        return None
+    merged = {}
+    for mapping_path in paths:
+        one = _load_one_mapping(mapping_path)
+        if one:
+            merged.update(one)
+    return merged if merged else None
 
 
 def get_dtxsid(cas_number: str, mapping_dict: Optional[dict]) -> Optional[str]:
