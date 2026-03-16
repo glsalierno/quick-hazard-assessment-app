@@ -142,7 +142,7 @@ if current_query:
                 explicit_hydrogens=st.session_state["mol_draw_show_h"],
             )
             if mol_img is not None:
-                st.image(mol_img, use_container_width=True)
+                st.image(mol_img, width="stretch")
             # If mol_img is None, draw_smiles already rendered the JS fallback
 
         # --- Identifiers and properties in columns ---
@@ -189,7 +189,7 @@ if current_query:
                 {"Property": "Flash Point", "Value": " | ".join(fp_list) if fp_list else "—", "Unit": "°C (typical)", "Observations": "Multiple values" if len(fp_list) > 1 else ""},
                 {"Property": "Vapor Pressure", "Value": " | ".join(vp_list) if vp_list else "—", "Unit": "mmHg (typical)", "Observations": "Multiple values" if len(vp_list) > 1 else ""},
             ]
-            st.dataframe(pd.DataFrame(prop_rows), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(prop_rows), width="stretch", hide_index=True)
 
         # --- Toxic doses (route, species, value, unit) ---
         toxicities = pubchem_data.get("toxicities") or []
@@ -205,7 +205,7 @@ if current_query:
                 unit = t.get("unit") or "—"
                 rows.append({"Exposure pathway": route, "Species": species, "Endpoint": endpoint, "Value": value, "Unit": unit})
             if rows:
-                st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+                st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True)
             if len(toxicities) > 30:
                 st.caption(f"*Showing 30 of {len(toxicities)} entries. Full list in raw data.*")
 
