@@ -137,7 +137,7 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 
 If this tool contributes to your research, please cite:
 
-- **Zenodo:** [DOI 10.5281/zenodo.14636704](https://doi.org/10.5281/zenodo.14636704)
+- **Zenodo:** [DOI 10./zenodo.](https://doi.org/10./zenodo.)
 - **Repository:** [quick-hazard-assessment-app](https://github.com/glsalierno/quick-hazard-assessment-app)
 
 ---
