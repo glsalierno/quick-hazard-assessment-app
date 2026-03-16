@@ -310,12 +310,8 @@ def _parse_ecotox_text(raw: str) -> dict[str, Any]:
         out["unit"] = units
         try:
             out["value_num"] = float(re.sub(r"[<>~]\s*", "", val_str))
-            out["quantitative"] = True
         except ValueError:
             out["value_num"] = None
-            out["quantitative"] = False
-    else:
-        out["quantitative"] = False
 
     # Confidence interval (if present)
     m_ci = _ECOTOX_CI_RE.search(text)
