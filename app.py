@@ -324,6 +324,12 @@ if current_query:
             st.subheader("🐟 Ecotoxicity")
             if h_aquatic:
                 st.markdown("**Aquatic hazard (GHS):** " + ", ".join(h_aquatic))
+            lc = eco.get("aquatic_lc50_mg_l")
+            ec = eco.get("aquatic_ec50_mg_l")
+            if lc is not None:
+                st.write(f"**LC50 (mg/L):** {lc}")
+            if ec is not None:
+                st.write(f"**EC50 (mg/L):** {ec}")
             if eco_entries:
                 # Split into quantitative vs text-only entries
                 quant_rows = []
@@ -363,12 +369,6 @@ if current_query:
                 if text_rows:
                     st.markdown("**Aquatic toxicity – text-only PubChem excerpts**")
                     st.dataframe(pd.DataFrame(text_rows), width="stretch", hide_index=True)
-            lc = eco.get("aquatic_lc50_mg_l")
-            ec = eco.get("aquatic_ec50_mg_l")
-            if lc is not None:
-                st.write(f"**LC50 (mg/L):** {lc}")
-            if ec is not None:
-                st.write(f"**EC50 (mg/L):** {ec}")
 
         # --- GHS Classification (filtered, user-controlled) ---
         st.subheader("⚠️ GHS Classification")
