@@ -74,6 +74,33 @@ To get DTXSID on the deployed app:
 - **Local runs:** With `git lfs pull`, the 13 `.xlsx` files are real and the app uses them (or the CSV if present).  
 - **Cloud:** Only the non-LFS CSV is available; the app loads it and skips LFS pointer files.
 
+## 📋 Enhanced DSSTox fields
+
+The app now extracts several DSSTox fields when present in your mapping file, including:
+
+| Field             | Description              | Display location                |
+| ----------------- | ------------------------ | ------------------------------- |
+| DTXSID            | Substance identifier     | Main view (highlighted)         |
+| Preferred name    | Common chemical name     | “DSSTox names” expander         |
+| Systematic name   | IUPAC-style name         | “DSSTox names” expander         |
+| Molecular formula | Chemical formula         | “DSSTox molecular data” expander|
+| Average mass      | Average molecular mass   | “DSSTox molecular data” expander|
+| Monoisotopic mass | Exact mass               | “DSSTox molecular data” expander|
+| InChI             | Structure identifier     | “DSSTox structure identifiers”  |
+| InChI Key         | Hashed InChI             | “DSSTox structure identifiers”  |
+| SMILES            | Structure line notation  | “DSSTox structure identifiers”  |
+
+If a column is not present in your file, that field is simply omitted from the UI.
+
+### 📊 Database statistics
+
+When a DSSTox file is loaded, the app sidebar shows:
+
+- Total compounds in the local DSSTox file  
+- How many have DTXSID  
+- How many have preferred names  
+- How many have formulas and structure identifiers  
+
 ## If the file is missing
 
-The app runs in **PubChem-only mode**: hazard data still comes from PubChem, but DTXSID will not be shown. No DSSTox file or API key is required for basic use.
+The app runs in **PubChem-only mode**: hazard data still comes from PubChem, but DSSTox-specific fields (DTXSID, DSSTox names, etc.) will not be shown. No DSSTox file or API key is required for basic use.
