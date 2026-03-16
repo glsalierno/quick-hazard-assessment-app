@@ -24,8 +24,7 @@ COMPTOX_MYSQL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data MySQL Dump Fil
 
 # App
 APP_TITLE = "Quick Hazard Assessment"
-ZENODO_DOI = "10.5281/zenodo.14636704"
-OPERA_NOTE = "Enhanced predictions with OPERA QSAR available in the command-line version."
+ZENODO_DOI = "10.5281/zenodo.19056294"
 
 # Example chemicals for quick buttons (CAS, label)
 EXAMPLE_CHEMICALS = [
