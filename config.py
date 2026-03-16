@@ -6,9 +6,11 @@ from __future__ import annotations
 
 import os
 
-# Paths (relative to project root when running streamlit run app.py)
+# Repo root (directory containing config.py / app.py) — use for DSS so it works on Streamlit Cloud
+REPO_ROOT = os.path.dirname(os.path.abspath(__file__))
 # DSSTox database lives in DSS/ (Git LFS–tracked when publishing to GitHub)
 DSS_DIR = "DSS"
+DSS_PATH = os.path.join(REPO_ROOT, DSS_DIR)
 # Preferred mapping filename; loader also accepts any .csv or .xlsx in DSS/
 DSSTOX_MAPPING_FILENAMES = ("cas_dtxsid_mapping.csv",)
 
