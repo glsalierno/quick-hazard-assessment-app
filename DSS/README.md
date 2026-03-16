@@ -50,6 +50,30 @@ The DSSTox file can be large. This repo is set up to track it with **Git LFS** s
 2. Replace the file in `DSS/` (same name or update the file you use).
 3. Commit and push; LFS will store the new version.
 
+## Streamlit Community Cloud (no LFS)
+
+**Streamlit Cloud does not run `git lfs pull`**, so the `.xlsx` files in the repo are only LFS pointers there — the app cannot read them and shows "No local database loaded."
+
+To get DTXSID on the deployed app:
+
+1. **Build a single CSV** (stored in Git, not LFS) from the Excel dumps:
+   ```bash
+   python scripts/build_dss_csv.py
+   ```
+   This creates `DSS/cas_dtxsid_mapping.csv`. The repo is set up so this file is **not** in LFS (see `.gitattributes`), so Cloud gets the real file.
+
+2. **Commit and push** the generated CSV:
+   ```bash
+   git add DSS/cas_dtxsid_mapping.csv
+   git commit -m "Add cas_dtxsid_mapping.csv for Streamlit Cloud (non-LFS)"
+   git push
+   ```
+
+3. Redeploy the app on Streamlit Cloud; it will load the CSV and show DTXSID.
+
+- **Local runs:** With `git lfs pull`, the 13 `.xlsx` files are real and the app uses them (or the CSV if present).  
+- **Cloud:** Only the non-LFS CSV is available; the app loads it and skips LFS pointer files.
+
 ## If the file is missing
 
 The app runs in **PubChem-only mode**: hazard data still comes from PubChem, but DTXSID will not be shown. No DSSTox file or API key is required for basic use.

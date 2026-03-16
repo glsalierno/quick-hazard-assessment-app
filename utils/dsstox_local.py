@@ -2,6 +2,10 @@
 DSSTox local mapping loader with Streamlit caching.
 Loads CAS → DTXSID from the DSS/ folder (CSV or Excel). No API key required.
 Returns None if no file is found (PubChem-only mode).
+
+Note: On Streamlit Community Cloud, Git LFS files are not pulled by default,
+so .xlsx in the repo may be LFS pointers. The loader skips pointer files and
+can use a non-LFS CSV (e.g. cas_dtxsid_mapping.csv) if committed without LFS.
 """
 
 from __future__ import annotations
@@ -15,20 +19,40 @@ import streamlit as st
 from config import DSS_DIR, DSSTOX_MAPPING_FILENAMES
 
 
+def _dss_dir_resolved() -> str:
+    """Resolve DSS directory: try cwd first, then relative to this file (for Streamlit Cloud)."""
+    for base in (os.getcwd(), os.path.dirname(os.path.dirname(os.path.abspath(__file__)))):
+        candidate = os.path.join(base, DSS_DIR) if base else DSS_DIR
+        if os.path.isdir(candidate):
+            return os.path.abspath(candidate)
+    return os.path.abspath(DSS_DIR)
+
+
+def _is_lfs_pointer(path: str) -> bool:
+    """Return True if the file is a Git LFS pointer (not real content)."""
+    try:
+        with open(path, "rb") as f:
+            head = f.read(200).decode("utf-8", errors="ignore")
+        return "git-lfs" in head or "oid sha256" in head
+    except Exception:
+        return False
+
+
 def _find_mapping_files() -> list[str]:
     """Return paths to all DSSTox mapping files in DSS/ (CSV and Excel), sorted by name."""
-    if not os.path.isdir(DSS_DIR):
+    dss = _dss_dir_resolved()
+    if not os.path.isdir(dss):
         return []
     paths = []
-    # Prefer configured filenames first
+    # Prefer configured filenames first (e.g. cas_dtxsid_mapping.csv – often committed without LFS for Cloud)
     for name in DSSTOX_MAPPING_FILENAMES:
-        path = os.path.join(DSS_DIR, name)
+        path = os.path.join(dss, name)
         if os.path.isfile(path):
             paths.append(path)
     # Then any .csv or .xlsx in DSS/ (sorted so order is deterministic)
-    for name in sorted(os.listdir(DSS_DIR)):
+    for name in sorted(os.listdir(dss)):
         if name.lower().endswith(".csv") or name.lower().endswith(".xlsx"):
-            path = os.path.join(DSS_DIR, name)
+            path = os.path.join(dss, name)
             if path not in paths:
                 paths.append(path)
     return sorted(paths)
@@ -37,6 +61,9 @@ def _find_mapping_files() -> list[str]:
 def _load_one_mapping(path: str) -> dict[str, str] | None:
     """Load a single CSV/Excel file into CAS -> DTXSID dict. Returns None on skip/error."""
     try:
+        # Skip Git LFS pointer files (Streamlit Cloud doesn't run git lfs pull)
+        if _is_lfs_pointer(path):
+            return None
         if path.lower().endswith(".xlsx"):
             df = pd.read_excel(path)
         else:
