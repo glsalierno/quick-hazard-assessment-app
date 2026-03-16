@@ -79,6 +79,22 @@ def _get_string_from_value(val: Any) -> str:
     return ""
 
 
+def _get_reference_urls(val: Any) -> list[str]:
+    """Extract reference URLs from PUG View Value markup."""
+    urls = []
+    if not isinstance(val, dict):
+        return urls
+    swm = val.get("StringWithMarkup", [])
+    if isinstance(swm, dict):
+        swm = [swm]
+    for item in (swm or []):
+        if isinstance(item, dict):
+            for m in (item.get("Markup") or []):
+                if isinstance(m, dict) and m.get("URL"):
+                    urls.append(m["URL"])
+    return urls
+
+
 def _extract_ghs_codes(data: dict) -> dict[str, Any]:
     """Extract GHS H/P codes and related from PUG View record."""
     result = {"h_codes": [], "p_codes": [], "signal_word": "", "pictograms": []}
@@ -167,10 +183,18 @@ def _extract_hazard_metrics(data: dict) -> dict[str, Any]:
     return result
 
 
+# Patterns for structured toxicity extraction (from quick_hazard_assessment/hazard_query_structured)
+_UNIT_PATTERN = re.compile(r"(mg/kg|mg/m³|ppm|g/kg|mL/kg|mg/L|µg/kg|mg/m3|ppb)\b", re.I)
+_SPECIES_ROUTE_PATTERN = re.compile(
+    r"\b(rat|mouse|rabbit|dog|guinea pig|human|oral|dermal|inhalation|ip|iv|sc|ld50|lc50|fish|trout|daphnia|algae|aquatic)\b",
+    re.I,
+)
+
+
 def _extract_toxicities(data: dict) -> list[dict[str, Any]]:
-    """Extract toxicity entries (LD50, LC50, etc.) from PUG View for endpoints of interest."""
+    """Extract toxicity entries with type, value, unit, species_route, source_section (full QHA-style)."""
     tox_entries: list[dict[str, Any]] = []
-    tox_keywords = ["tox", "safety", "hazard", "health", "exposure", "carcinogen"]
+    tox_keywords = ["tox", "safety", "hazard", "health", "exposure", "pharmacokinetics", "carcinogen"]
 
     def process_section(section: dict, parent_heading: str = "") -> None:
         if not isinstance(section, dict):
@@ -186,7 +210,18 @@ def _extract_toxicities(data: dict) -> list[dict[str, Any]]:
             text = _get_string_from_value(val)
             if not text:
                 continue
-            tox_entries.append({"type": name or "Toxicity", "value": text[:300]})
+            units = _UNIT_PATTERN.findall(text)
+            species_route = _SPECIES_ROUTE_PATTERN.findall(text)
+            refs = _get_reference_urls(val)
+            entry = {
+                "type": name or "Toxicity",
+                "value": text[:400],
+                "unit": units[0] if units else None,
+                "species_route": list(dict.fromkeys(species_route)) if species_route else None,
+                "source_section": heading or parent_heading,
+                "reference_urls": refs[:5] if refs else None,
+            }
+            tox_entries.append(entry)
         for sub in section.get("Section", []) or []:
             process_section(sub, heading)
 
@@ -194,6 +229,156 @@ def _extract_toxicities(data: dict) -> list[dict[str, Any]]:
     for section in record.get("Section", []) or []:
         process_section(section)
     return tox_entries
+
+
+_SPECIES_TOKENS = {"rat", "mouse", "rabbit", "dog", "guinea pig", "human", "fish", "trout", "daphnia", "algae"}
+_ROUTE_TOKENS = {"oral", "dermal", "inhalation", "ip", "iv", "sc"}
+
+
+def _classify_route_and_species(entry: dict[str, Any]) -> tuple[str, str]:
+    """Infer exposure pathway and species from toxicity entry. Returns (route, species)."""
+    val = (entry.get("value") or "").lower()
+    sr = [s.strip().lower() for s in (entry.get("species_route") or []) if s]
+    # Split tokens into species vs route
+    species_parts = [x for x in sr if x in _SPECIES_TOKENS or (x not in _ROUTE_TOKENS and x not in ("ld50", "lc50"))]
+    route_parts = [x for x in sr if x in _ROUTE_TOKENS]
+    species = ", ".join(dict.fromkeys(species_parts)) if species_parts else "—"
+    route = "Other"
+
+    if "fish" in val or "trout" in val or "daphnia" in val or "algae" in val or "aquatic" in val:
+        route = "Ecotoxicity (aquatic)"
+        if not species_parts:
+            species = "fish" if "fish" in val or "trout" in val else "Daphnia" if "daphnia" in val else "algae" if "algae" in val else "aquatic"
+    elif "dermal" in val or "skin" in val or "dermal" in route_parts:
+        route = "Dermal"
+        if not species_parts and "rabbit" in val:
+            species = "rabbit"
+        elif not species_parts and "rat" in val:
+            species = "rat"
+    elif "inhalation" in val or "inhaled" in val or "mg/m" in val or "ppm" in val or "inhalation" in route_parts:
+        route = "Inhalation"
+        if not species_parts and "rat" in val:
+            species = "rat"
+    elif "oral" in val or "po " in val or "oral" in route_parts or ("rat" in val and "dermal" not in val and "inhalation" not in val):
+        route = "Oral"
+        if not species_parts and "rat" in val:
+            species = "rat"
+        elif not species_parts and "mouse" in val:
+            species = "mouse"
+
+    if species == "—" and species_parts:
+        species = ", ".join(dict.fromkeys(species_parts))
+    return (route, species)
+
+
+def _extract_ecotoxicity(ghs: dict, toxicities: list[dict]) -> dict[str, Any]:
+    """Extract ecotoxicity endpoints (aquatic LC50/EC50, species, H4xx codes). From QHA ecotoxicity.py."""
+    out = {
+        "aquatic_lc50_mg_l": None,
+        "aquatic_ec50_mg_l": None,
+        "aquatic_species": None,
+        "aquatic_value_raw": None,
+        "h_codes_aquatic": [],
+        "entries": [],  # list of {value, species, unit} for display
+    }
+    h_codes = ghs.get("h_codes") or []
+    out["h_codes_aquatic"] = [h for h in h_codes if h.startswith("H4")]
+    for t in toxicities:
+        val = (t.get("value") or "").lower()
+        if "fish" in val or "trout" in val or "daphnia" in val or "algae" in val or "aquatic" in val:
+            raw = t.get("value", "")
+            m = re.search(r"(?:LC50|EC50)\s*[=:]?\s*([0-9.,]+)\s*mg\s*/\s*L", raw, re.I) or re.search(
+                r"([0-9.,]+)\s*mg\s*/\s*L", raw, re.I
+            )
+            species = "fish" if "fish" in val or "trout" in val else "Daphnia" if "daphnia" in val else "algae" if "algae" in val else "aquatic"
+            if m:
+                try:
+                    num = float(m.group(1).replace(",", ""))
+                    if "ec50" in val:
+                        out["aquatic_ec50_mg_l"] = num
+                    else:
+                        out["aquatic_lc50_mg_l"] = out["aquatic_lc50_mg_l"] or num
+                    out["aquatic_value_raw"] = raw[:250]
+                    out["aquatic_species"] = out["aquatic_species"] or species
+                    out["entries"].append({"value": raw[:200], "species": species, "unit": "mg/L"})
+                except ValueError:
+                    out["entries"].append({"value": raw[:200], "species": species, "unit": "mg/L"})
+    if not out["entries"]:
+        for t in toxicities:
+            if "LC50" in (t.get("value") or "").upper() and "mg" in (t.get("value") or "").lower() and "L" in (t.get("value") or ""):
+                out["entries"].append({"value": (t.get("value") or "")[:200], "species": "—", "unit": t.get("unit") or "mg/L"})
+                if out["aquatic_lc50_mg_l"] is None:
+                    out["aquatic_value_raw"] = (t.get("value") or "")[:250]
+                break
+    return out
+
+
+def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
+    """Compute GHS-style exposure bands for oral, dermal, inhalation (from QHA exposure_bands.py)."""
+    oral_bands = [(5, 1), (50, 2), (300, 3), (2000, 4), (5000, 5)]
+    dermal_bands = [(50, 1), (200, 2), (1000, 3), (2000, 4), (5000, 5)]
+
+    def band_from_value(value: float, bands: list[tuple[float, int]]) -> int:
+        for threshold, band in bands:
+            if value <= threshold:
+                return band
+        return 5
+
+    def extract_ld50_oral():
+        for t in toxicities or []:
+            v = (t.get("value") or "").lower()
+            if "ld50" not in v or "mg" not in v or "kg" not in v:
+                continue
+            if "dermal" in v or "skin" in v:
+                continue
+            m = re.search(r"(\d+(?:\.\d+)?)\s*mg\s*/\s*kg", v)
+            if m:
+                try:
+                    return float(m.group(1))
+                except ValueError:
+                    pass
+        return None
+
+    def extract_ld50_dermal():
+        for t in toxicities or []:
+            v = (t.get("value") or "").lower()
+            if "dermal" not in v and "skin" not in v:
+                continue
+            if "ld50" not in v:
+                continue
+            m = re.search(r"(\d+(?:\.\d+)?)\s*mg\s*/\s*kg", v)
+            if m:
+                try:
+                    return float(m.group(1))
+                except ValueError:
+                    pass
+        return None
+
+    def extract_lc50_inhalation():
+        for t in toxicities or []:
+            v = (t.get("value") or "").lower()
+            if "lc50" not in v:
+                continue
+            m = re.search(r"(\d+(?:[.,]\d+)*)\s*mg\s*/\s*m", v) or re.search(r"(\d+(?:[.,]\d+)*)\s*mg/m3", v, re.I)
+            if m:
+                try:
+                    return float(m.group(1).replace(",", ""))
+                except ValueError:
+                    pass
+        return None
+
+    out = {"oral": {}, "dermal": {}, "inhalation": {}}
+    lo = extract_ld50_oral()
+    if lo is not None:
+        out["oral"] = {"ld50_mg_kg": lo, "band": band_from_value(lo, oral_bands), "source": "PubChem"}
+    ld_ = extract_ld50_dermal()
+    if ld_ is not None:
+        out["dermal"] = {"ld50_mg_kg": ld_, "band": band_from_value(ld_, dermal_bands), "source": "PubChem"}
+    li = extract_lc50_inhalation()
+    if li is not None:
+        b = 1 if li <= 100 else 2 if li <= 500 else 3 if li <= 2500 else 4 if li <= 20000 else 5
+        out["inhalation"] = {"lc50_mg_m3": li, "band": b, "source": "PubChem"}
+    return out
 
 
 def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dict[str, Any]]:
@@ -233,9 +418,11 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
         "ghs": {"h_codes": [], "p_codes": [], "signal_word": "", "pictograms": []},
         "flash_point": [],  # list of strings, one per value
         "vapor_pressure": [],  # list of strings
-        "toxicities": [],  # list of {type, value} for LD50/LC50 etc.
+        "toxicities": [],  # list of {type, value, unit, species_route, route, species} for LD50/LC50 etc.
         "ld50": [],  # subset of toxicities containing LD50
         "lc50": [],  # subset of toxicities containing LC50
+        "ecotoxicity": {"aquatic_lc50_mg_l": None, "aquatic_ec50_mg_l": None, "aquatic_species": None, "h_codes_aquatic": [], "entries": []},
+        "exposure_bands": {"oral": {}, "dermal": {}, "inhalation": {}},
         "nfpa": None,
         "iarc": None,
         "prop65": None,
@@ -253,4 +440,11 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
         out["toxicities"] = tox
         out["ld50"] = [t["value"] for t in tox if "LD50" in (t.get("value") or "").upper()]
         out["lc50"] = [t["value"] for t in tox if "LC50" in (t.get("value") or "").upper()]
+        out["ecotoxicity"] = _extract_ecotoxicity(out["ghs"], tox)
+        out["exposure_bands"] = _compute_exposure_bands(tox)
+        # Add route/species for each toxicity for display
+        for t in out["toxicities"]:
+            route, species = _classify_route_and_species(t)
+            t["route"] = route
+            t["species"] = species
     return out

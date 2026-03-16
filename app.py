@@ -164,23 +164,69 @@ if current_query:
             else:
                 st.write("**Vapor Pressure:** N/A")
 
-        # --- Endpoints of interest (LD50, LC50 from PubChem) ---
-        ld50_list = pubchem_data.get("ld50") or []
-        lc50_list = pubchem_data.get("lc50") or []
-        if ld50_list or lc50_list:
-            st.subheader("📌 Endpoints of interest")
-            if ld50_list:
-                st.markdown("**LD50 (PubChem):**")
-                for v in ld50_list[:10]:
-                    st.write(f"- {v}")
-                if len(ld50_list) > 10:
-                    st.caption(f"*… and {len(ld50_list) - 10} more*")
-            if lc50_list:
-                st.markdown("**LC50 (PubChem):**")
-                for v in lc50_list[:10]:
-                    st.write(f"- {v}")
-                if len(lc50_list) > 10:
-                    st.caption(f"*… and {len(lc50_list) - 10} more*")
+        # --- Toxic doses (route, species, value, unit) ---
+        toxicities = pubchem_data.get("toxicities") or []
+        if toxicities:
+            st.subheader("📌 Toxic doses & toxicity endpoints")
+            st.caption("Exposure pathway and species are inferred from PubChem text where available.")
+            rows = []
+            for t in toxicities[:30]:
+                route = t.get("route") or "—"
+                species = t.get("species") or "—"
+                endpoint = (t.get("type") or "Toxicity").strip()
+                value = (t.get("value") or "")[:180]
+                unit = t.get("unit") or "—"
+                rows.append({"Exposure pathway": route, "Species": species, "Endpoint": endpoint, "Value": value, "Unit": unit})
+            if rows:
+                st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            if len(toxicities) > 30:
+                st.caption(f"*Showing 30 of {len(toxicities)} entries. Full list in raw data.*")
+
+        # --- Ecotoxicity (aquatic LC50/EC50, species, H4xx) ---
+        eco = pubchem_data.get("ecotoxicity") or {}
+        eco_entries = eco.get("entries") or []
+        h_aquatic = eco.get("h_codes_aquatic") or []
+        if eco_entries or h_aquatic:
+            st.subheader("🐟 Ecotoxicity")
+            if h_aquatic:
+                st.markdown("**Aquatic hazard (GHS):** " + ", ".join(h_aquatic))
+            if eco_entries:
+                st.markdown("**Aquatic toxicity (PubChem):**")
+                for e in eco_entries:
+                    sp = e.get("species") or "—"
+                    val = e.get("value") or ""
+                    u = e.get("unit") or ""
+                    st.write(f"- **Species:** {sp} — {val}" + (f" ({u})" if u else ""))
+            lc = eco.get("aquatic_lc50_mg_l")
+            ec = eco.get("aquatic_ec50_mg_l")
+            if lc is not None:
+                st.write(f"**LC50 (mg/L):** {lc}")
+            if ec is not None:
+                st.write(f"**EC50 (mg/L):** {ec}")
+
+        # --- Exposure bands (oral, dermal, inhalation) ---
+        bands = pubchem_data.get("exposure_bands") or {}
+        has_bands = any(bands.get(k) for k in ("oral", "dermal", "inhalation"))
+        if has_bands:
+            st.subheader("📊 Exposure bands (GHS-style)")
+            st.caption("Band 1 = most hazardous, 5 = least. Based on LD50/LC50 from PubChem.")
+            o, d, i = bands.get("oral") or {}, bands.get("dermal") or {}, bands.get("inhalation") or {}
+            band_cols = st.columns(3)
+            with band_cols[0]:
+                if o:
+                    st.metric("Oral", f"Band {o.get('band', '—')}", f"LD50 {o.get('ld50_mg_kg')} mg/kg" if o.get("ld50_mg_kg") else None)
+                else:
+                    st.write("**Oral:** —")
+            with band_cols[1]:
+                if d:
+                    st.metric("Dermal", f"Band {d.get('band', '—')}", f"LD50 {d.get('ld50_mg_kg')} mg/kg" if d.get("ld50_mg_kg") else None)
+                else:
+                    st.write("**Dermal:** —")
+            with band_cols[2]:
+                if i:
+                    st.metric("Inhalation", f"Band {i.get('band', '—')}", f"LC50 {i.get('lc50_mg_m3')} mg/m³" if i.get("lc50_mg_m3") else None)
+                else:
+                    st.write("**Inhalation:** —")
 
         # --- GHS Classification (filtered, user-controlled) ---
         st.subheader("⚠️ GHS Classification")
@@ -301,6 +347,9 @@ if current_query:
             vp = pubchem_data.get("vapor_pressure")
             fp_str = "; ".join(fp) if isinstance(fp, list) else (fp or "")
             vp_str = "; ".join(vp) if isinstance(vp, list) else (vp or "")
+            eco = pubchem_data.get("ecotoxicity") or {}
+            bands = pubchem_data.get("exposure_bands") or {}
+            o, d, i = bands.get("oral") or {}, bands.get("dermal") or {}, bands.get("inhalation") or {}
             return {
                 "CAS": clean_cas,
                 "DTXSID": dtxsid or "",
@@ -312,6 +361,15 @@ if current_query:
                 "Vapor Pressure": vp_str,
                 "GHS H-codes": " | ".join(h_codes),
                 "GHS P-codes": " | ".join(p_codes),
+                "Aquatic H-codes": " | ".join(eco.get("h_codes_aquatic") or []),
+                "Aquatic LC50 (mg/L)": eco.get("aquatic_lc50_mg_l") or "",
+                "Aquatic EC50 (mg/L)": eco.get("aquatic_ec50_mg_l") or "",
+                "Oral band": o.get("band") or "",
+                "Oral LD50 (mg/kg)": o.get("ld50_mg_kg") or "",
+                "Dermal band": d.get("band") or "",
+                "Dermal LD50 (mg/kg)": d.get("ld50_mg_kg") or "",
+                "Inhalation band": i.get("band") or "",
+                "Inhalation LC50 (mg/m3)": i.get("lc50_mg_m3") or "",
             }
 
         df_report = pd.DataFrame([_report_row()])
