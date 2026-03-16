@@ -494,7 +494,7 @@ if current_query:
             **Data sources**
             - **PubChem**: identifiers, properties, GHS, toxicity text from PUG View.
             - **DSSTox (local)**: DTXSID, preferred/systematic names, formula, InChI/SMILES when present in your mapping file.
-            - **ToxValDB** (optional): quantitative toxicity values from EPA; set `COMPTOX_API_KEY` in secrets or environment to enable.
+            - **ToxValDB (local, optional)**: quantitative toxicity values loaded from the local COMPTOX Excel files into the SQLite database (no API key required).
             """)
     else:
         st.error(f"No data found for '{current_query}'. Please check the input.")
