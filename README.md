@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Quick Hazard Assessment — Streamlit App
 
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox local** (no API key required). Part of the [quick_hazard_assessment](https://github.com/glsalierno/quick_hazard_assessment) ecosystem.
