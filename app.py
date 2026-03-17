@@ -390,24 +390,38 @@ if current_query:
             experiments = carc_potency_data.get("experiments") or []
             doses = carc_potency_data.get("doses") or []
             if experiments:
-                # Build a readable table: species, sex, strain, route, tissue, tumor, td50, lc, uc, opinion, source
+                # Experiments: use decoded labels (species_name, route_name, etc.) and opinion_label
                 exp_rows = []
                 for e in experiments[:200]:
                     exp_rows.append({
-                        "Species": e.get("species") or "—",
+                        "Species": e.get("species_name") or e.get("species") or "—",
                         "Sex": e.get("sex") or "—",
-                        "Strain": e.get("strain") or "—",
-                        "Route": e.get("route") or "—",
-                        "Tissue": e.get("tissue") or "—",
-                        "Tumor": e.get("tumor") or "—",
+                        "Strain": e.get("strain_name") or e.get("strain") or "—",
+                        "Route": e.get("route_name") or e.get("route") or "—",
+                        "Target tissue": e.get("tissue_name") or e.get("tissue") or "—",
+                        "Tumor type": e.get("tumor_name") or e.get("tumor") or "—",
                         "TD50 (mg/kg/day)": e.get("td50") or "—",
                         "Lower conf.": e.get("lc") or "—",
                         "Upper conf.": e.get("uc") or "—",
-                        "Opinion": e.get("opinion") or "—",
-                        "Source": e.get("source") or "—",
+                        "Author's opinion": e.get("opinion_label") or "—",
+                        "Source": "NCI/NTP" if (e.get("source") or "") == "ncintp" else "Literature",
                     })
                 st.dataframe(pd.DataFrame(exp_rows), width="stretch", hide_index=True, height=300)
-                st.caption(f"{len(experiments)} experiment(s) | {len(doses)} dose–response row(s). TD50 = dose rate (mg/kg/day) to induce tumors in half of test animals.")
+                st.caption("TD50 = dose rate (mg/kg/day) to induce tumors in half of test animals. Lower TD50 = more potent. Author's opinion = published author's assessment of carcinogenicity at this site.")
+                # Dose–response: sorted low to high (client already returns sorted), show with clear headers
+                if doses:
+                    st.markdown("**Dose–response data** (doses ordered low → high)")
+                    dose_rows = []
+                    for d in doses[:500]:
+                        dose_rows.append({
+                            "Experiment ID": d.get("idnum") or "—",
+                            "Dose (mg/kg/day)": d.get("dose") or "—",
+                            "Dose group": d.get("dose_order") or "—",
+                            "Tumors": d.get("tumors") or "—",
+                            "Total animals": d.get("total") or "—",
+                        })
+                    st.dataframe(pd.DataFrame(dose_rows), width="stretch", hide_index=True, height=250)
+                    st.caption(f"{len(doses)} dose–response row(s). Each row = one dose group within an experiment (Experiment ID links to the table above).")
             else:
                 st.info(f"No experiments found in the {_carc_name} for this chemical.")
         elif carcinogenic_potency_client and carcinogenic_potency_client.is_available():
