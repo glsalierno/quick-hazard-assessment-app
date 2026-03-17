@@ -3,6 +3,25 @@
 
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox local** (no API key required). Part of the [quick_hazard_assessment](https://github.com/glsalierno/quick_hazard_assessment) ecosystem.
 
+## Version 1.3 — Expanded toxicity databases
+
+This release adds **three major toxicological databases** (QSAR Toolbox–style) to the local SQLite stack:
+
+| Database   | Records   | Endpoints |
+|-----------|-----------|-----------|
+| **ECOTOX** | 1.2M+     | Aquatic/terrestrial toxicity (fish, daphnia, algae) |
+| **ToxRefDB** | 3,600+  | Chronic, cancer, developmental studies |
+| **CPDB**   | 1,500+    | Carcinogenic potency (TD50 values) |
+
+**New features:**
+- **ECOTOX integration:** Search by species, endpoint, duration (expandable section in report).
+- **ToxRefDB:** NOAEL/LOAEL values with study details (expandable section).
+- **CPDB:** TD50 values with confidence intervals (expandable section).
+- **Sidebar:** Database coverage at a glance (ECOTOX, ToxRefDB, CPDB loaded or not).
+- **Unified lookup:** All databases queried by CAS/DTXSID when a chemical is assessed.
+
+**Coming in v2.0:** OPERA QSAR predictions, read-across suggestions, regulatory report generation.
+
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app)
 
 ---
@@ -87,21 +106,26 @@ See **`DSS/README.md`** for download links and update instructions.
 
 ## Local SQLite database (optional, faster)
 
-For **faster lookups**, you can build a single SQLite database that combines DSSTox identifiers and ToxValDB toxicity data.
+For **faster lookups**, you can build a single SQLite database that combines DSSTox, ToxValDB, and (v1.3) ECOTOX, ToxRefDB, and CPDB.
 
 1. **One-time setup**
    - Ensure **DSS** has a CAS–DTXSID CSV (e.g. `DSS/cas_dtxsid_mapping.csv`).
-   - Optionally place the **COMPTOX ToxValDB Excel** files in  
-     `COMPTOX_Public (Data Excel Files Folder)/Data Excel Files/` (each `.xlsx` will be read).
+   - Optionally place **COMPTOX ToxValDB Excel** files in  
+     `COMPTOX_Public (Data Excel Files Folder)/Data Excel Files/`.
+   - **(v1.3)** Optional: download ECOTOX, ToxRefDB, CPDB into `data/raw_databases/`:
+     ```bash
+     python scripts/download_databases.py
+     ```
+     ToxRefDB and CPDB are fetched from EPA/ToxPlanet; ECOTOX may require manual download from [EPA ECOTOX](https://cfpub.epa.gov/ecotox/) and placement in `data/raw_databases/ecotox/`.
 2. **Build the database**
    ```bash
    python scripts/setup_chemical_db.py
    ```
-   This creates **`data/chemical_db.sqlite`** (DSSTox table and, if Excel files are present, ToxValDB table).
+   This creates **`data/chemical_db.sqlite`** with DSSTox, ToxValDB (if Excel present), and ECOTOX/ToxRefDB/CPDB (if raw files are present).
 3. **Run the app**  
-   If `data/chemical_db.sqlite` exists, the app uses it for DSSTox (and ToxValDB when the table is present) and falls back to CSV/API otherwise.
+   If `data/chemical_db.sqlite` exists, the app uses it for all loaded tables and shows **Database coverage** in the sidebar. Expandable sections (ECOTOX, ToxRefDB, CPDB) appear in the report when data exists for the queried chemical.
 
-**Performance:** DSSTox lookups drop from seconds (CSV) to milliseconds (SQLite). ToxValDB queries are also served from SQLite when the table is built.
+**Performance:** DSSTox lookups drop from seconds (CSV) to milliseconds (SQLite). ToxValDB and v1.3 tables are all served from SQLite when built.
 
 ---
 
@@ -119,11 +143,13 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 │   └── Data Excel Files/*.xlsx
 ├── COMPTOX_Public (Data MySQL Dump File Folder)/   # MySQL dump (optional)
 ├── data/                  # Built SQLite DB (after setup_chemical_db.py)
-│   └── chemical_db.sqlite
+│   ├── chemical_db.sqlite
+│   └── raw_databases/     # (v1.3) ECOTOX, ToxRefDB, CPDB downloads
 ├── scripts/
-│   └── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
+│   ├── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX + raw DBs
+│   └── download_databases.py  # (v1.3) Download ToxRefDB, CPDB; ECOTOX instructions
 └── utils/
-    ├── chemical_db.py     # SQLite DSSTox + ToxValDB (fast lookups)
+    ├── chemical_db.py     # SQLite DSSTox + ToxValDB + ECOTOX/ToxRefDB/CPDB (fast lookups)
     ├── dsstox_local.py    # DSSTox loader from DSS/ (CSV/Excel fallback)
     ├── cas_validator.py    # CAS validation/normalization
     ├── pubchem_client.py   # PubChem API wrapper

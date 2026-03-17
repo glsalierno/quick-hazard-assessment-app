@@ -1,7 +1,7 @@
 """
 Unified SQLite database for chemical information.
-Combines DSSTox identifiers and ToxValDB toxicity data for fast local lookups.
-Use scripts/setup_chemical_db.py to build the DB from DSS CSV and COMPTOX Excel folder.
+Combines DSSTox identifiers, ToxValDB, ECOTOX, ToxRefDB, and CPDB for fast local lookups.
+Use scripts/setup_chemical_db.py to build the DB from DSS CSV, COMPTOX Excel, and raw database files.
 """
 
 from __future__ import annotations
@@ -234,24 +234,250 @@ def get_toxicity_summary(dtxsid: str) -> list[dict[str, Any]]:
 
 
 # ----------------------------------------------------------------------
+# ECOTOX (Aquatic / terrestrial toxicity)
+# ----------------------------------------------------------------------
+
+
+def _ensure_ecotox_schema(conn: sqlite3.Connection) -> None:
+    """Create ECOTOX table and indexes if they do not exist."""
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS ecotox (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cas TEXT,
+            dtxsid TEXT,
+            species TEXT,
+            endpoint TEXT,
+            value_numeric REAL,
+            units TEXT,
+            duration_days REAL,
+            media TEXT,
+            organism_group TEXT,
+            effect TEXT,
+            reference TEXT,
+            quality_score INTEGER
+        );
+        CREATE INDEX IF NOT EXISTS idx_ecotox_cas ON ecotox(cas);
+        CREATE INDEX IF NOT EXISTS idx_ecotox_dtxsid ON ecotox(dtxsid);
+    """)
+
+
+def create_ecotox_table(df: pd.DataFrame, db_path: Optional[str] = None) -> int:
+    """
+    Load ECOTOX DataFrame into SQLite. Creates table if not exists.
+    df should have columns: cas, dtxsid (optional), species, endpoint, value_numeric, units,
+    duration_days, media, organism_group, effect, reference, quality_score (optional).
+    """
+    db_path = db_path or _db_path() or os.path.join(REPO_ROOT, "data", "chemical_db.sqlite")
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
+    _ensure_ecotox_schema(conn)
+    schema_cols = ["cas", "dtxsid", "species", "endpoint", "value_numeric", "units",
+                   "duration_days", "media", "organism_group", "effect", "reference", "quality_score"]
+    out = df.copy()
+    out.columns = [str(c).lower().strip().replace(" ", "_") for c in out.columns]
+    keep = [c for c in schema_cols if c in out.columns]
+    out[keep].to_sql("ecotox", conn, if_exists="replace", index=False)
+    count = conn.execute("SELECT COUNT(*) FROM ecotox").fetchone()[0]
+    conn.close()
+    return count
+
+
+def get_ecotox_data(cas: Optional[str] = None, dtxsid: Optional[str] = None, organism_group: Optional[str] = None) -> list[dict[str, Any]]:
+    """Retrieve ECOTOX data for a chemical. Filter by organism_group if provided."""
+    with get_cursor() as cursor:
+        if cursor is None:
+            return []
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='ecotox'")
+        if not cursor.fetchone():
+            return []
+        query = "SELECT * FROM ecotox WHERE "
+        params: list[Any] = []
+        if dtxsid:
+            query += "dtxsid = ?"
+            params.append(dtxsid)
+        elif cas:
+            query += "cas = ?"
+            params.append(cas)
+        else:
+            return []
+        if organism_group:
+            query += " AND organism_group = ?"
+            params.append(organism_group)
+        query += " ORDER BY endpoint, species LIMIT 100"
+        cursor.execute(query, params)
+        columns = [d[0] for d in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+
+# ----------------------------------------------------------------------
+# ToxRefDB (Chronic / cancer studies)
+# ----------------------------------------------------------------------
+
+
+def _ensure_toxrefdb_schema(conn: sqlite3.Connection) -> None:
+    """Create ToxRefDB table and indexes if they do not exist."""
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS toxrefdb (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cas TEXT,
+            dtxsid TEXT,
+            study_type TEXT,
+            species TEXT,
+            route TEXT,
+            critical_effect TEXT,
+            NOAEL REAL,
+            NOAEL_units TEXT,
+            LOAEL REAL,
+            LOAEL_units TEXT,
+            study_duration TEXT,
+            tumor_site TEXT,
+            reference TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_toxrefdb_cas ON toxrefdb(cas);
+        CREATE INDEX IF NOT EXISTS idx_toxrefdb_dtxsid ON toxrefdb(dtxsid);
+    """)
+
+
+def create_toxrefdb_table(df: pd.DataFrame, db_path: Optional[str] = None) -> int:
+    """Load ToxRefDB DataFrame into SQLite. Creates table if not exists."""
+    db_path = db_path or _db_path() or os.path.join(REPO_ROOT, "data", "chemical_db.sqlite")
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
+    _ensure_toxrefdb_schema(conn)
+    out = df.copy()
+    out.columns = [str(c).lower().strip() for c in out.columns]
+    out.to_sql("toxrefdb", conn, if_exists="replace", index=False)
+    count = conn.execute("SELECT COUNT(*) FROM toxrefdb").fetchone()[0]
+    conn.close()
+    return count
+
+
+def get_toxrefdb_data(cas: Optional[str] = None, dtxsid: Optional[str] = None) -> list[dict[str, Any]]:
+    """Get ToxRefDB chronic/cancer data for a chemical."""
+    with get_cursor() as cursor:
+        if cursor is None:
+            return []
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='toxrefdb'")
+        if not cursor.fetchone():
+            return []
+        query = "SELECT * FROM toxrefdb WHERE "
+        params: list[Any] = []
+        if dtxsid:
+            query += "dtxsid = ?"
+            params.append(dtxsid)
+        elif cas:
+            query += "cas = ?"
+            params.append(cas)
+        else:
+            return []
+        cursor.execute(query, params)
+        columns = [d[0] for d in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+
+# ----------------------------------------------------------------------
+# CPDB (Carcinogenic Potency Database)
+# ----------------------------------------------------------------------
+
+
+def _ensure_cpdb_schema(conn: sqlite3.Connection) -> None:
+    """Create CPDB table and indexes if they do not exist."""
+    conn.executescript("""
+        CREATE TABLE IF NOT EXISTS cpdb (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cas TEXT,
+            name TEXT,
+            species TEXT,
+            strain TEXT,
+            sex TEXT,
+            route TEXT,
+            tumor_site TEXT,
+            TD50_mg_per_kg REAL,
+            TD50_lower REAL,
+            TD50_upper REAL,
+            carcinogenicity_rating TEXT,
+            reference TEXT
+        );
+        CREATE INDEX IF NOT EXISTS idx_cpdb_cas ON cpdb(cas);
+    """)
+
+
+def create_cpdb_table(df: pd.DataFrame, db_path: Optional[str] = None) -> int:
+    """Load CPDB DataFrame into SQLite. Creates table if not exists."""
+    db_path = db_path or _db_path() or os.path.join(REPO_ROOT, "data", "chemical_db.sqlite")
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
+    _ensure_cpdb_schema(conn)
+    out = df.copy()
+    out.columns = [str(c).lower().strip() for c in out.columns]
+    out.to_sql("cpdb", conn, if_exists="replace", index=False)
+    count = conn.execute("SELECT COUNT(*) FROM cpdb").fetchone()[0]
+    conn.close()
+    return count
+
+
+def get_cpdb_data(cas: Optional[str] = None) -> list[dict[str, Any]]:
+    """Get CPDB carcinogenicity data for a chemical."""
+    if not cas:
+        return []
+    with get_cursor() as cursor:
+        if cursor is None:
+            return []
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='cpdb'")
+        if not cursor.fetchone():
+            return []
+        cursor.execute("SELECT * FROM cpdb WHERE cas = ?", (cas.strip(),))
+        columns = [d[0] for d in cursor.description]
+        return [dict(zip(columns, row)) for row in cursor.fetchall()]
+
+
+def get_all_toxicity_data(cas: Optional[str] = None, dtxsid: Optional[str] = None) -> dict[str, Any]:
+    """
+    Unified function to get all toxicity data from ToxValDB, ECOTOX, ToxRefDB, and CPDB.
+    Resolves DTXSID from CAS if only CAS is provided.
+    """
+    if not cas and not dtxsid:
+        return {}
+    if cas and not dtxsid:
+        dsstox = get_dsstox_by_cas(cas)
+        dtxsid = dsstox.get("dtxsid") if dsstox else None
+    return {
+        "toxvaldb": get_toxicity_by_dtxsid(dtxsid or "", numeric_only=False) if dtxsid else [],
+        "ecotox": get_ecotox_data(cas=cas, dtxsid=dtxsid),
+        "toxrefdb": get_toxrefdb_data(cas=cas, dtxsid=dtxsid),
+        "cpdb": get_cpdb_data(cas=cas),
+        "sources": {
+            "toxvaldb": bool(dtxsid),
+            "ecotox": bool(cas or dtxsid),
+            "toxrefdb": bool(cas or dtxsid),
+            "cpdb": bool(cas),
+        },
+    }
+
+
+# ----------------------------------------------------------------------
 # Status
 # ----------------------------------------------------------------------
 
 
 def get_db_stats() -> dict[str, Any]:
-    """Database table existence and row counts."""
-    stats = {"dsstox": {"exists": False, "records": 0}, "toxvaldb": {"exists": False, "records": 0, "chemicals": 0}}
+    """Database table existence and row counts (including ECOTOX, ToxRefDB, CPDB)."""
+    stats = {
+        "dsstox": {"exists": False, "records": 0},
+        "toxvaldb": {"exists": False, "records": 0, "chemicals": 0},
+        "ecotox": {"exists": False, "records": 0},
+        "toxrefdb": {"exists": False, "records": 0},
+        "cpdb": {"exists": False, "records": 0},
+    }
     with get_cursor() as cursor:
         if cursor is None:
             return stats
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='dsstox'")
-        if cursor.fetchone():
-            stats["dsstox"]["exists"] = True
-            stats["dsstox"]["records"] = cursor.execute("SELECT COUNT(*) FROM dsstox").fetchone()[0]
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='toxvaldb'")
-        if cursor.fetchone():
-            stats["toxvaldb"]["exists"] = True
-            stats["toxvaldb"]["records"] = cursor.execute("SELECT COUNT(*) FROM toxvaldb").fetchone()[0]
+        for table, key in [("dsstox", "dsstox"), ("toxvaldb", "toxvaldb"), ("ecotox", "ecotox"), ("toxrefdb", "toxrefdb"), ("cpdb", "cpdb")]:
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table,))
+            if cursor.fetchone():
+                stats[key]["exists"] = True
+                stats[key]["records"] = cursor.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+        if stats["toxvaldb"]["exists"]:
             stats["toxvaldb"]["chemicals"] = cursor.execute("SELECT COUNT(DISTINCT dtxsid) FROM toxvaldb").fetchone()[0]
     return stats
 

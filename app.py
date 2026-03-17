@@ -70,6 +70,14 @@ with st.sidebar:
         st.caption(f"{tox_chems:,} chemicals")
     else:
         st.error("ToxValDB (SQLite) not found. Build it locally with `scripts/setup_chemical_db.py`.")
+    # v1.3: expanded database coverage
+    st.header("📚 Database coverage")
+    for table, label in [("ecotox", "ECOTOX"), ("toxrefdb", "ToxRefDB"), ("cpdb", "CPDB")]:
+        tbl = db_stats.get(table, {})
+        if tbl.get("exists") and (tbl.get("records") or 0) > 0:
+            st.success(f"✅ {label}: {tbl['records']:,} records")
+        else:
+            st.warning(f"⚠️ {label}: not loaded")
 
 # Input form
 with st.form("cas_input"):
@@ -315,6 +323,60 @@ if current_query:
                     st.json(toxval_data)
                 else:
                     st.write("No ToxValDB data (optional: set COMPTOX_API_KEY for EPA ToxValDB).")
+
+        # --- Expanded toxicity databases (v1.3: ECOTOX, ToxRefDB, CPDB) ---
+        if clean_cas or dtxsid:
+            with st.expander("🌊 ECOTOX — Aquatic & terrestrial toxicity", expanded=False):
+                ecotox_data = chemical_db.get_ecotox_data(cas=clean_cas, dtxsid=dtxsid)
+                if ecotox_data:
+                    df_ecotox = pd.DataFrame(ecotox_data)
+                    if "organism_group" in df_ecotox.columns:
+                        for group in df_ecotox["organism_group"].dropna().unique():
+                            st.markdown(f"**{group}**")
+                            group_df = df_ecotox[df_ecotox["organism_group"] == group]
+                            display_cols = [c for c in ["species", "endpoint", "value_numeric", "units", "duration_days", "effect"] if c in group_df.columns]
+                            if display_cols:
+                                st.dataframe(group_df[display_cols], use_container_width=True, hide_index=True)
+                    else:
+                        display_cols = [c for c in ["species", "endpoint", "value_numeric", "units", "duration_days", "effect"] if c in df_ecotox.columns]
+                        if display_cols:
+                            st.dataframe(df_ecotox[display_cols], use_container_width=True, hide_index=True)
+                        else:
+                            st.dataframe(df_ecotox, use_container_width=True, hide_index=True)
+                else:
+                    st.info("No ECOTOX data found for this chemical.")
+
+            with st.expander("🔬 ToxRefDB — Chronic & cancer studies", expanded=False):
+                toxref_data = chemical_db.get_toxrefdb_data(cas=clean_cas, dtxsid=dtxsid)
+                if toxref_data:
+                    df_toxref = pd.DataFrame(toxref_data)
+                    if "study_type" in df_toxref.columns:
+                        for study in df_toxref["study_type"].dropna().unique():
+                            st.markdown(f"**{study}**")
+                            study_df = df_toxref[df_toxref["study_type"] == study]
+                            display_cols = [c for c in ["species", "route", "noael", "loael", "critical_effect", "tumor_site"] if c in study_df.columns]
+                            if display_cols:
+                                st.dataframe(study_df[display_cols], use_container_width=True, hide_index=True)
+                    else:
+                        st.dataframe(df_toxref, use_container_width=True, hide_index=True)
+                else:
+                    st.info("No ToxRefDB data found for this chemical.")
+
+            with st.expander("📊 CPDB — Carcinogenic potency", expanded=False):
+                cpdb_data = chemical_db.get_cpdb_data(cas=clean_cas)
+                if cpdb_data:
+                    df_cpdb = pd.DataFrame(cpdb_data)
+                    display_cols = [c for c in ["species", "route", "tumor_site", "td50_mg_per_kg", "carcinogenicity_rating"] if c in df_cpdb.columns]
+                    if display_cols:
+                        st.dataframe(df_cpdb[display_cols], use_container_width=True, hide_index=True)
+                    else:
+                        st.dataframe(df_cpdb, use_container_width=True, hide_index=True)
+                    if "carcinogenicity_rating" in df_cpdb.columns:
+                        positive = (df_cpdb["carcinogenicity_rating"].astype(str).str.lower() == "positive").sum()
+                        if positive:
+                            st.metric("Positive studies", int(positive))
+                else:
+                    st.info("No CPDB data found for this chemical.")
 
         # --- Ecotoxicity (aquatic LC50/EC50, species, H4xx) ---
         eco = pubchem_data.get("ecotoxicity") or {}
