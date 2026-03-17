@@ -14,7 +14,7 @@ import streamlit as st
 
 import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
-from utils import toxvaldb_client
+from utils import carcinogenic_potency_client, toxvaldb_client
 
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
@@ -70,6 +70,10 @@ with st.sidebar:
         st.caption(f"{tox_chems:,} chemicals")
     else:
         st.error("ToxValDB (SQLite) not found. Build it locally with `scripts/setup_chemical_db.py`.")
+    if carcinogenic_potency_client.is_available():
+        st.success(f"✅ {carcinogenic_potency_client.DISPLAY_NAME} (SQLite)")
+    else:
+        st.caption(f"{carcinogenic_potency_client.DISPLAY_NAME} not loaded.")
 
 # Input form
 with st.form("cas_input"):
@@ -145,6 +149,8 @@ if current_query:
                 except Exception:
                     toxval_data = None
 
+            carc_potency_data = carcinogenic_potency_client.get_data_by_cas(clean_cas) if carcinogenic_potency_client.is_available() else None
+
             st.session_state["result_for"] = clean_cas
             st.session_state["result_data"] = {
                 "pubchem": pubchem_data,
@@ -153,6 +159,7 @@ if current_query:
                 "preferred_name": preferred_name,
                 "clean_cas": clean_cas,
                 "toxval_data": toxval_data,
+                "carc_potency_data": carc_potency_data,
             }
 
     result = st.session_state.get("result_data")
@@ -163,6 +170,7 @@ if current_query:
         preferred_name = result.get("preferred_name")
         clean_cas = result["clean_cas"]
         toxval_data = result.get("toxval_data")
+        carc_potency_data = result.get("carc_potency_data")
 
         # --- Molecular structure at top ---
         if pubchem_data.get("smiles"):
@@ -370,6 +378,36 @@ if current_query:
                     st.markdown("**Aquatic toxicity – text-only PubChem excerpts**")
                     st.dataframe(pd.DataFrame(text_rows), width="stretch", hide_index=True)
 
+        # --- Carcinogenic Potency Database ---
+        if carcinogenic_potency_client.is_available() and carc_potency_data and carc_potency_data.get("found"):
+            st.subheader(f"📊 {carcinogenic_potency_client.DISPLAY_NAME}")
+            experiments = carc_potency_data.get("experiments") or []
+            doses = carc_potency_data.get("doses") or []
+            if experiments:
+                # Build a readable table: species, sex, strain, route, tissue, tumor, td50, lc, uc, opinion, source
+                exp_rows = []
+                for e in experiments[:200]:
+                    exp_rows.append({
+                        "Species": e.get("species") or "—",
+                        "Sex": e.get("sex") or "—",
+                        "Strain": e.get("strain") or "—",
+                        "Route": e.get("route") or "—",
+                        "Tissue": e.get("tissue") or "—",
+                        "Tumor": e.get("tumor") or "—",
+                        "TD50 (mg/kg/day)": e.get("td50") or "—",
+                        "Lower conf.": e.get("lc") or "—",
+                        "Upper conf.": e.get("uc") or "—",
+                        "Opinion": e.get("opinion") or "—",
+                        "Source": e.get("source") or "—",
+                    })
+                st.dataframe(pd.DataFrame(exp_rows), width="stretch", hide_index=True, height=300)
+                st.caption(f"{len(experiments)} experiment(s) | {len(doses)} dose–response row(s). TD50 = dose rate (mg/kg/day) to induce tumors in half of test animals.")
+            else:
+                st.info(f"No experiments found in the {carcinogenic_potency_client.DISPLAY_NAME} for this chemical.")
+        elif carcinogenic_potency_client.is_available():
+            st.subheader(f"📊 {carcinogenic_potency_client.DISPLAY_NAME}")
+            st.info(f"No data for this chemical in the {carcinogenic_potency_client.DISPLAY_NAME}.")
+
         # --- GHS Classification (filtered, user-controlled) ---
         st.subheader("⚠️ GHS Classification")
         ghs = pubchem_data.get("ghs") or {}
@@ -521,6 +559,7 @@ if current_query:
             - **PubChem**: identifiers, properties, GHS, toxicity text from PUG View.
             - **DSSTox (local)**: DTXSID, preferred/systematic names, formula, InChI/SMILES when present in your mapping file.
             - **ToxValDB (local)**: quantitative toxicity values loaded from the local COMPTOX Excel files into the SQLite database (no API key required).
+            - **Carcinogenic Potency Database (local)**: TD50 and experiment data from the CPDB SQLite (built from CPDB tab files via `scripts/build_carcinogenic_potency_from_cpdb_tabs.py`).
             """)
     else:
         st.error(f"No data found for '{current_query}'. Please check the input.")
