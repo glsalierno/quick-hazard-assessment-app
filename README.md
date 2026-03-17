@@ -116,7 +116,14 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
      ```bash
      python scripts/download_databases.py
      ```
-     ToxRefDB and CPDB are fetched from EPA/ToxPlanet; ECOTOX may require manual download from [EPA ECOTOX](https://cfpub.epa.gov/ecotox/) and placement in `data/raw_databases/ecotox/`.
+     - **ToxRefDB:** Manual download required (403 via script). See `data/DOWNLOAD_SOURCES.md` and the official ToxRefDB repo [`USEPA/CompTox-ToxRefDB`](https://github.com/USEPA/CompTox-ToxRefDB) for DOI/Clowder links. Place the Excel as `data/raw_databases/toxrefdb_v2_0.xlsx` *or* rely on the v3.0 POD CSV at `../GHhaz3/ToxRefDB/toxrefdb_3_0_pod.csv` (auto-detected as fallback).
+     - **CPDB:** Automatically downloaded from the CPDB project (`CPDBChemical.xls`) into `data/raw_databases/` when possible; see `data/DOWNLOAD_SOURCES.md` if the script fails.
+     - **ECOTOX:** Use the ASCII export and ECOTOXr (R package) to build a local ECOTOX SQLite and a flattened CSV:
+       ```bash
+       # From GHhaz2 root, in an R-enabled environment
+       Rscript scripts/build_ecotox_flat.R
+       ```
+       This expects the ECOTOX ASCII folder at `../GHhaz3/ECOTOX/ecotox_ascii_03_12_2026` and writes `data/raw_databases/ecotox/ecotox_results.csv`.
 2. **Build the database**
    ```bash
    python scripts/setup_chemical_db.py

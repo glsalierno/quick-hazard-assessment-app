@@ -316,7 +316,8 @@ def get_ecotox_data(cas: Optional[str] = None, dtxsid: Optional[str] = None, org
 
 def _ensure_toxrefdb_schema(conn: sqlite3.Connection) -> None:
     """Create ToxRefDB table and indexes if they do not exist."""
-    conn.executescript("""
+    conn.executescript(
+        """
         CREATE TABLE IF NOT EXISTS toxrefdb (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             cas TEXT,
@@ -335,17 +336,87 @@ def _ensure_toxrefdb_schema(conn: sqlite3.Connection) -> None:
         );
         CREATE INDEX IF NOT EXISTS idx_toxrefdb_cas ON toxrefdb(cas);
         CREATE INDEX IF NOT EXISTS idx_toxrefdb_dtxsid ON toxrefdb(dtxsid);
-    """)
+        """
+    )
 
 
 def create_toxrefdb_table(df: pd.DataFrame, db_path: Optional[str] = None) -> int:
-    """Load ToxRefDB DataFrame into SQLite. Creates table if not exists."""
+    """
+    Load a ToxRefDB-like DataFrame into SQLite. Creates table if not exists.
+    The DataFrame may come from the original Excel (v2.x) or from the v3.0 POD CSV.
+    Expected columns (where available): cas, dtxsid, study_type, species, route,
+    critical_effect, NOAEL, NOAEL_units, LOAEL, LOAEL_units, study_duration,
+    tumor_site, reference.
+    """
     db_path = db_path or _db_path() or os.path.join(REPO_ROOT, "data", "chemical_db.sqlite")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
     conn = sqlite3.connect(db_path)
     _ensure_toxrefdb_schema(conn)
     out = df.copy()
-    out.columns = [str(c).lower().strip() for c in out.columns]
+    # Normalize column names
+    out.columns = [str(c).strip().lower() for c in out.columns]
+    # If coming from v3.0 POD CSV, derive our schema columns
+    if "calc_pod_type" in out.columns and "mg_kg_day_value" in out.columns:
+        # Map DSSTox substance ID to dtxsid
+        if "dsstox_substance_id" in out.columns and "dtxsid" not in out.columns:
+            out["dtxsid"] = out["dsstox_substance_id"]
+        # NOAEL / LOAEL from calc_pod_type
+        out["noael"] = out.apply(
+            lambda r: r.get("mg_kg_day_value")
+            if str(r.get("calc_pod_type") or "").upper() == "NOAEL"
+            else None,
+            axis=1,
+        )
+        out["loael"] = out.apply(
+            lambda r: r.get("mg_kg_day_value")
+            if str(r.get("calc_pod_type") or "").upper() == "LOAEL"
+            else None,
+            axis=1,
+        )
+        out["noael_units"] = out.get("mg_kg_day_value").map(lambda _: "mg/kg-day")
+        out["loael_units"] = out.get("mg_kg_day_value").map(lambda _: "mg/kg-day")
+        # Critical effect from toxval_effect_list (string of endpoints)
+        if "toxval_effect_list" in out.columns and "critical_effect" not in out.columns:
+            out["critical_effect"] = out["toxval_effect_list"]
+        # Species and route columns already present in v3.0 POD
+        # Study duration as a simple text range
+        def _duration(row: pd.Series) -> str:
+            start = row.get("dose_start")
+            start_unit = row.get("dose_start_unit")
+            end = row.get("dose_end")
+            end_unit = row.get("dose_end_unit")
+            if pd.isna(start) and pd.isna(end):
+                return ""
+            parts = []
+            if pd.notna(start):
+                parts.append(f"{start} {start_unit or ''}".strip())
+            if pd.notna(end):
+                parts.append(f"{end} {end_unit or ''}".strip())
+            return " – ".join(parts)
+
+        out["study_duration"] = out.apply(_duration, axis=1)
+        # Reference from study_citation
+        if "study_citation" in out.columns and "reference" not in out.columns:
+            out["reference"] = out["study_citation"]
+
+    # Keep only schema columns
+    keep_cols = [
+        "cas",
+        "dtxsid",
+        "study_type",
+        "species",
+        "route",
+        "critical_effect",
+        "noael",
+        "noael_units",
+        "loael",
+        "loael_units",
+        "study_duration",
+        "tumor_site",
+        "reference",
+    ]
+    present = [c for c in keep_cols if c in out.columns]
+    out = out[present]
     out.to_sql("toxrefdb", conn, if_exists="replace", index=False)
     count = conn.execute("SELECT COUNT(*) FROM toxrefdb").fetchone()[0]
     conn.close()

@@ -80,6 +80,7 @@ def main() -> None:
 
     # ECOTOX, ToxRefDB, CPDB from raw_databases (optional)
     if parse_ecotox_to_dataframe and raw_dir.is_dir():
+        # ECOTOX: prefer a flattened CSV/Excel (possibly produced by ECOTOXr)
         ecotox_path = raw_dir / "ecotox"
         if ecotox_path.is_dir():
             for p in list(ecotox_path.glob("*.xlsx")) + list(ecotox_path.glob("*.csv")):
@@ -89,25 +90,53 @@ def main() -> None:
                     n = create_ecotox_table(df, db_path=db_path)
                     print(f"  -> {n} ECOTOX records")
                     break
+
+        # ToxRefDB: v2.0 Excel (if present) or v3.0 POD CSV from GHhaz3/ToxRefDB
         toxref_file = raw_dir / "toxrefdb_v2_0.xlsx"
+        toxref_loaded = False
         if toxref_file.is_file():
             df = parse_toxrefdb_to_dataframe(toxref_file)
             if not df.empty:
-                print(f"ToxRefDB: {toxref_file.name}")
+                print(f"ToxRefDB (v2.0 Excel): {toxref_file.name}")
                 n = create_toxrefdb_table(df, db_path=db_path)
                 print(f"  -> {n} ToxRefDB records")
+                toxref_loaded = True
+        if not toxref_loaded:
+            # Fallback: v3.0 POD CSV living in GHhaz3/ToxRefDB
+            ghhaz3_pod = Path(repo).parent / "GHhaz3" / "ToxRefDB" / "toxrefdb_3_0_pod.csv"
+            if ghhaz3_pod.is_file():
+                try:
+                    import pandas as _pd  # local import to avoid unused at module level
+
+                    df_pod = _pd.read_csv(ghhaz3_pod)
+                    if not df_pod.empty:
+                        print(f"ToxRefDB (v3.0 POD CSV): {ghhaz3_pod.name}")
+                        n = create_toxrefdb_table(df_pod, db_path=db_path)
+                        print(f"  -> {n} ToxRefDB records")
+                        toxref_loaded = True
+                except Exception as e:
+                    print(f"  ToxRefDB v3.0 POD CSV load failed: {e}")
+
+        # CPDB: files in raw_databases/cpdb or CPDB*.xls/xlsx in raw_databases root
         cpdb_dir = raw_dir / "cpdb"
+        cpdb_loaded = False
         if cpdb_dir.is_dir():
-            for p in list(cpdb_dir.glob("*.xlsx")) + list(cpdb_dir.glob("*.csv")):
+            for p in list(cpdb_dir.glob("*.xlsx")) + list(cpdb_dir.glob("*.xls")) + list(cpdb_dir.glob("*.csv")):
+                df = parse_cpdb_to_dataframe(p)
+                if not df.empty:
+                    print(f"CPDB: {p.name}")
+                    n = create_cpdb_table(df, db_path=db_path)
+                    print(f"  -> {n} CPDB records")
+                    cpdb_loaded = True
+                    break
+        if not cpdb_loaded:
+            for p in list(raw_dir.glob("CPDB*.xls")) + list(raw_dir.glob("CPDB*.xlsx")):
                 df = parse_cpdb_to_dataframe(p)
                 if not df.empty:
                     print(f"CPDB: {p.name}")
                     n = create_cpdb_table(df, db_path=db_path)
                     print(f"  -> {n} CPDB records")
                     break
-        elif (raw_dir / "cpdb.zip").is_file():
-            # Already extracted by download script
-            pass
 
     stats = get_db_stats()
     print()

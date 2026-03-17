@@ -24,38 +24,54 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def download_toxrefdb() -> Path | None:
-    """Download ToxRefDB from EPA. Returns path to saved file or None on failure."""
+    """Download ToxRefDB from EPA. Returns path to saved file or None on failure (often 403)."""
     url = "https://www.epa.gov/sites/default/files/2016-10/toxrefdb_v2_0.xlsx"
     out_path = DATA_DIR / "toxrefdb_v2_0.xlsx"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0"}
     print("Downloading ToxRefDB...")
     try:
-        resp = requests.get(url, timeout=120)
+        resp = requests.get(url, timeout=120, headers=headers)
         resp.raise_for_status()
         out_path.write_bytes(resp.content)
         print(f"  -> {out_path}")
         return out_path
     except Exception as e:
-        print(f"  Failed: {e}")
+        print(f"  Failed: {e}. See data/DOWNLOAD_SOURCES.md for manual download URL.")
         return None
 
 
 def download_cpdb() -> Path | None:
-    """Download CPDB from ToxPlanet (or fallback). Returns path to extracted folder or None."""
-    url = "https://files.toxplanet.com/cpdb/cpdb_excel.zip"
-    zip_path = DATA_DIR / "cpdb.zip"
+    """Download CPDB: try Thomas Slone Excel first, then ToxPlanet zip. Returns path to file or folder."""
+    # Thomas Slone (CPDB project) – single Excel summary by chemical
+    url_xls = "https://cpdb.thomas-slone.org/xls/CPDBChemical.xls"
+    out_xls = DATA_DIR / "CPDBChemical.xls"
     out_dir = DATA_DIR / "cpdb"
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0"}
     print("Downloading CPDB...")
     try:
-        resp = requests.get(url, timeout=120)
+        resp = requests.get(url_xls, timeout=60, headers=headers)
+        if resp.status_code == 200 and len(resp.content) > 1000:
+            out_xls.write_bytes(resp.content)
+            out_dir.mkdir(parents=True, exist_ok=True)
+            (out_dir / "CPDBChemical.xls").write_bytes(resp.content)
+            print(f"  -> {out_xls}")
+            return out_xls
+    except Exception as e:
+        print(f"  Thomas Slone: {e}")
+    # Fallback: ToxPlanet zip (often 403 when requested by script)
+    url_zip = "https://files.toxplanet.com/cpdb/cpdb_excel.zip"
+    try:
+        resp = requests.get(url_zip, timeout=120, headers=headers)
         resp.raise_for_status()
+        zip_path = DATA_DIR / "cpdb.zip"
         zip_path.write_bytes(resp.content)
         with zipfile.ZipFile(zip_path, "r") as z:
             z.extractall(out_dir)
         print(f"  -> {out_dir}")
         return out_dir
     except Exception as e:
-        print(f"  Failed: {e}")
-        return None
+        print(f"  ToxPlanet zip: {e}")
+    return None
 
 
 def download_ecotox() -> Path | None:
