@@ -14,7 +14,12 @@ import streamlit as st
 
 import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
-from utils import carcinogenic_potency_client, toxvaldb_client
+from utils import toxvaldb_client
+
+try:
+    from utils import carcinogenic_potency_client
+except ImportError:
+    carcinogenic_potency_client = None  # optional: not present in some deployments
 
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
@@ -70,9 +75,9 @@ with st.sidebar:
         st.caption(f"{tox_chems:,} chemicals")
     else:
         st.error("ToxValDB (SQLite) not found. Build it locally with `scripts/setup_chemical_db.py`.")
-    if carcinogenic_potency_client.is_available():
+    if carcinogenic_potency_client and carcinogenic_potency_client.is_available():
         st.success(f"✅ {carcinogenic_potency_client.DISPLAY_NAME} (SQLite)")
-    else:
+    elif carcinogenic_potency_client:
         st.caption(f"{carcinogenic_potency_client.DISPLAY_NAME} not loaded.")
 
 # Input form
@@ -149,7 +154,7 @@ if current_query:
                 except Exception:
                     toxval_data = None
 
-            carc_potency_data = carcinogenic_potency_client.get_data_by_cas(clean_cas) if carcinogenic_potency_client.is_available() else None
+            carc_potency_data = carcinogenic_potency_client.get_data_by_cas(clean_cas) if (carcinogenic_potency_client and carcinogenic_potency_client.is_available()) else None
 
             st.session_state["result_for"] = clean_cas
             st.session_state["result_data"] = {
@@ -379,8 +384,9 @@ if current_query:
                     st.dataframe(pd.DataFrame(text_rows), width="stretch", hide_index=True)
 
         # --- Carcinogenic Potency Database ---
-        if carcinogenic_potency_client.is_available() and carc_potency_data and carc_potency_data.get("found"):
-            st.subheader(f"📊 {carcinogenic_potency_client.DISPLAY_NAME}")
+        _carc_name = carcinogenic_potency_client.DISPLAY_NAME if carcinogenic_potency_client else "Carcinogenic Potency Database"
+        if carcinogenic_potency_client and carcinogenic_potency_client.is_available() and carc_potency_data and carc_potency_data.get("found"):
+            st.subheader(f"📊 {_carc_name}")
             experiments = carc_potency_data.get("experiments") or []
             doses = carc_potency_data.get("doses") or []
             if experiments:
@@ -403,10 +409,10 @@ if current_query:
                 st.dataframe(pd.DataFrame(exp_rows), width="stretch", hide_index=True, height=300)
                 st.caption(f"{len(experiments)} experiment(s) | {len(doses)} dose–response row(s). TD50 = dose rate (mg/kg/day) to induce tumors in half of test animals.")
             else:
-                st.info(f"No experiments found in the {carcinogenic_potency_client.DISPLAY_NAME} for this chemical.")
-        elif carcinogenic_potency_client.is_available():
-            st.subheader(f"📊 {carcinogenic_potency_client.DISPLAY_NAME}")
-            st.info(f"No data for this chemical in the {carcinogenic_potency_client.DISPLAY_NAME}.")
+                st.info(f"No experiments found in the {_carc_name} for this chemical.")
+        elif carcinogenic_potency_client and carcinogenic_potency_client.is_available():
+            st.subheader(f"📊 {_carc_name}")
+            st.info(f"No data for this chemical in the {_carc_name}.")
 
         # --- GHS Classification (filtered, user-controlled) ---
         st.subheader("⚠️ GHS Classification")
