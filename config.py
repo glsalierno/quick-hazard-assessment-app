@@ -18,6 +18,11 @@ DSSTOX_MAPPING_FILENAMES = ("cas_dtxsid_mapping.csv",)
 DATA_DIR = os.path.join(REPO_ROOT, "data")
 CHEMICAL_DB_PATH = os.path.join(DATA_DIR, "chemical_db.sqlite")
 
+# P2OASys hazard scoring matrix (TURI). Place "Hazard Matrix Group Review 9-19-23.xlsx" in data/ or set path.
+# See https://p2oasys.turi.org/chemical/hazard-score-matrix
+P2OASYS_MATRIX_FILENAME = "Hazard Matrix Group Review 9-19-23.xlsx"
+P2OASYS_MATRIX_PATH = os.path.join(DATA_DIR, P2OASYS_MATRIX_FILENAME)
+
 # COMPTOX public data folders (Excel and MySQL dump) — used by setup script
 COMPTOX_EXCEL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data Excel Files Folder)", "Data Excel Files")
 COMPTOX_MYSQL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data MySQL Dump File Folder)")
@@ -25,6 +30,14 @@ COMPTOX_MYSQL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data MySQL Dump Fil
 # App
 APP_TITLE = "Quick Hazard Assessment"
 ZENODO_DOI = "10.5281/zenodo.19056294"
+
+# SDS example PDFs (sibling folder when running from GHhaz4/quick-hazard-assessment-app)
+SDS_EXAMPLES_DIR = os.environ.get("SDS_EXAMPLES_DIR", os.path.join(REPO_ROOT, "..", "sds examples"))
+
+# Local LLM (Ollama) — for SDS extraction/summarization when running locally (no API key).
+# Not used on Streamlit Cloud. See docs/OLLAMA_SETUP.md.
+OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2:0.5b")  # alternative: gemma2:2b
 
 # Example chemicals for quick buttons (CAS, label)
 EXAMPLE_CHEMICALS = [
