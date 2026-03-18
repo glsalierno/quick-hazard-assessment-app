@@ -5,3 +5,4 @@ pubchempy>=1.0.4
 openpyxl>=3.1.0
 rdkit>=2023.9.6
 Pillow>=10.0.0
+openai>=1.0.0

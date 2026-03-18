@@ -14,7 +14,7 @@ import streamlit as st
 
 import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
-from utils import toxvaldb_client
+from utils import summary_utils, toxvaldb_client
 
 try:
     from utils import carcinogenic_potency_client
@@ -359,21 +359,27 @@ if current_query:
                     ci_str = ""
                     if ci_low is not None and ci_high is not None:
                         ci_str = f"{ci_low}–{ci_high}"
-                    base = {
-                        "Species": sp,
-                        "Endpoint": endpoint,
-                        "Duration": duration,
-                        "Unit": unit,
-                        "CI (low–high)": ci_str,
-                        "Conditions / notes": e.get("conditions") or "",
-                    }
                     if val_num is not None:
-                        row = dict(base)
-                        row["Value"] = val_num
+                        row = {
+                            "Species": sp,
+                            "Endpoint": endpoint,
+                            "Duration": duration,
+                            "Value": val_num,
+                            "Unit": unit,
+                            "CI (low–high)": ci_str,
+                            "Conditions / notes": e.get("conditions") or "",
+                        }
                         quant_rows.append(row)
                     else:
-                        row = dict(base)
-                        row["Value / excerpt"] = raw
+                        row = {
+                            "Species": sp,
+                            "Endpoint": endpoint,
+                            "Duration": duration,
+                            "Value / excerpt": raw,
+                            "Unit": unit,
+                            "CI (low–high)": ci_str,
+                            "Conditions / notes": e.get("conditions") or "",
+                        }
                         text_rows.append(row)
 
                 if quant_rows:
@@ -382,6 +388,19 @@ if current_query:
                 if text_rows:
                     st.markdown("**Aquatic toxicity – text-only PubChem excerpts**")
                     st.dataframe(pd.DataFrame(text_rows), width="stretch", hide_index=True)
+                    # Optional: summarize excerpts with mini-LLM if API key is set
+                    api_key = (st.secrets.get("OPENAI_API_KEY") or "").strip() if hasattr(st, "secrets") else ""
+                    if api_key:
+                        if st.button("Summarize excerpts with AI", key="summarize_eco_text"):
+                            combined = " ".join((r.get("Value / excerpt") or "") for r in text_rows)[:3000]
+                            with st.spinner("Summarizing…"):
+                                summary = summary_utils.summarize_text_with_llm(combined, api_key)
+                            if summary:
+                                st.caption("**AI summary:** " + summary)
+                            else:
+                                st.caption("Summary unavailable (check API key or try again).")
+                    else:
+                        st.caption("Add `OPENAI_API_KEY` in app secrets (Manage app → Secrets) to enable **Summarize excerpts with AI** (gpt-4o-mini).")
 
         # --- Carcinogenic Potency Database ---
         _carc_name = carcinogenic_potency_client.DISPLAY_NAME if carcinogenic_potency_client else "Carcinogenic Potency Database"
@@ -390,6 +409,16 @@ if current_query:
             experiments = carc_potency_data.get("experiments") or []
             doses = carc_potency_data.get("doses") or []
             if experiments:
+                # Rule-based summary (no LLM)
+                cpdb_summary = summary_utils.summarize_cpdb_experiments(experiments)
+                summary_paragraph = summary_utils.format_cpdb_summary(cpdb_summary)
+                st.info("**Summary:** " + summary_paragraph)
+                api_key = (st.secrets.get("OPENAI_API_KEY") or "").strip() if hasattr(st, "secrets") else ""
+                if api_key and st.button("One-sentence AI summary", key="summarize_cpdb_ai"):
+                    with st.spinner("Summarizing…"):
+                        one_liner = summary_utils.summarize_cpdb_with_llm(summary_paragraph, api_key)
+                    if one_liner:
+                        st.caption("**AI:** " + one_liner)
                 # Experiments: use decoded labels (species_name, route_name, etc.) and opinion_label
                 exp_rows = []
                 for e in experiments[:200]:
