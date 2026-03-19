@@ -19,6 +19,8 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 *Enhanced predictions with OPERA QSAR are available in the [command-line version](https://github.com/glsalierno/quick_hazard_assessment); OPERA is not included in this Streamlit deployment.*
 
+**v1.4:** SDS PDF upload, regex extraction, and optional **local LLM** (Ollama + Qwen or Gemma) for improved SDS parsing — see [Local LLM setup (Ollama)](docs/OLLAMA_SETUP.md).
+
 ---
 
 ## Run locally
@@ -48,6 +50,25 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
    streamlit run app.py
    ```
    Open the URL shown in the terminal (usually http://localhost:8501).
+
+5. **Optional — Local LLM (Qwen / Gemma) for SDS extraction**
+   - Install [Ollama](https://ollama.com) on your machine.
+   - In a terminal: `ollama pull qwen2:0.5b` and/or `ollama pull gemma2:2b`.
+   - The app uses `OLLAMA_HOST` and `OLLAMA_MODEL` (see [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md)). Nothing is pushed to GitHub except instructions; models stay local.
+
+6. **Run SDS examples (batch)**
+   - If you have a folder of SDS PDFs (e.g. `sds examples` next to the app), from the repo root run:
+     ```bash
+     python scripts/run_sds_examples.py [--limit N] [--compare]
+     ```
+   - `--limit N` processes at most N PDFs; `--compare` runs SDS vs PubChem for each extracted CAS.
+   - Override the folder: `SDS_EXAMPLES_DIR` or `python scripts/run_sds_examples.py --dir "path/to/sds examples"`.
+   - Test readers (OCR + extraction): `python scripts/test_sds_readers.py [--limit N]` to print text length, CAS, GHS, and quantitative fields per PDF.
+
+7. **OCR for scanned SDS PDFs**
+   - If embedded text is short (< 250 chars), the app runs **Tesseract** OCR automatically (via `pdf2image` + `pytesseract`). **EasyOCR** is used as a fallback for pages where Tesseract returns little text.
+   - Install **Tesseract** and **Poppler** on your system, then `pip install pdf2image pytesseract easyocr`. See [docs/OCR_SETUP.md](docs/OCR_SETUP.md).
+   - Optional: **ocrmypdf** to produce searchable PDFs: `pip install ocrmypdf`, then `python scripts/make_searchable_pdf.py input.pdf [output.pdf]`.
 
 ---
 
@@ -120,15 +141,23 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 ├── COMPTOX_Public (Data MySQL Dump File Folder)/   # MySQL dump (optional)
 ├── data/                  # Built SQLite DB (after setup_chemical_db.py)
 │   └── chemical_db.sqlite
+├── docs/
+│   └── OLLAMA_SETUP.md    # How to install Ollama + Qwen/Gemma locally (models stay on your machine)
 ├── scripts/
-│   └── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
+│   ├── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
+│   ├── run_sds_examples.py   # Batch run SDS extraction on PDFs in sds examples folder
+│   ├── make_searchable_pdf.py # Add text layer to a PDF (ocrmypdf + Tesseract)
+│   └── test_sds_readers.py   # Test SDS extraction + OCR on example PDFs
 └── utils/
     ├── chemical_db.py     # SQLite DSSTox + ToxValDB (fast lookups)
     ├── dsstox_local.py    # DSSTox loader from DSS/ (CSV/Excel fallback)
-    ├── cas_validator.py    # CAS validation/normalization
-    ├── pubchem_client.py   # PubChem API wrapper
-    ├── ghs_formatter.py    # GHS H/P phrase formatting
-    └── smiles_drawer.py    # 2D structure (smiles-drawer)
+    ├── cas_validator.py   # CAS validation/normalization
+    ├── pubchem_client.py  # PubChem API wrapper
+    ├── ghs_formatter.py   # GHS H/P phrase formatting
+    ├── smiles_drawer.py   # 2D structure (smiles-drawer)
+    ├── sds_pdf_utils.py   # PDF text extraction for SDS uploads
+    ├── sds_regex_extractor.py  # SDS field extraction (regex, Phase 1)
+    └── sds_compare.py     # SDS vs PubChem comparison report
 ```
 
 ---

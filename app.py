@@ -188,7 +188,7 @@ if current_query:
             clean_cas = result["clean_cas"]
             toxval_data = result.get("toxval_data")
             carc_potency_data = result.get("carc_potency_data")
-
+    
             # --- Molecular structure at top ---
             if pubchem_data.get("smiles"):
                 st.subheader("Molecular Structure")
@@ -224,7 +224,7 @@ if current_query:
                 if mol_img is not None:
                     st.image(mol_img, width="stretch")
                 # If mol_img is None, draw_smiles already rendered the JS fallback
-
+    
             # --- Identifiers and properties in columns ---
             col1, col2 = st.columns(2)
             with col1:
@@ -235,21 +235,21 @@ if current_query:
                 if smiles_val:
                     st.write("**SMILES:**")
                     st.code(smiles_val, language="text")
-            else:
+                else:
                     st.write("**SMILES:** N/A")
                 if preferred_name:
                     st.write(f"**Preferred name (DSSTox):** {preferred_name}")
-
+    
                 # Enhanced DSSTox display
                 display_data = dsstox_local.format_dsstox_display(dsstox_info) if dsstox_info else {}
                 if display_data.get("DTXSID"):
                     st.success(f"**DTXSID:** {display_data['DTXSID']} *(from DSSTox local)*")
-            else:
+                else:
                     if dsstox_data is None:
                         st.write("**DTXSID:** DSSTox local database not loaded.")
-                else:
+                    else:
                         st.write("**DTXSID:** This CAS was not found in the local DSSTox file.")
-
+    
                 if display_data.get("Names"):
                     with st.expander("📋 DSSTox names", expanded=False):
                         for label, value in display_data["Names"]:
@@ -280,23 +280,23 @@ if current_query:
                     {"Property": "Vapor Pressure", "Value": " | ".join(vp_list) if vp_list else "—", "Unit": "mmHg (typical)", "Observations": "Multiple values" if len(vp_list) > 1 else ""},
                 ]
                 st.dataframe(pd.DataFrame(prop_rows), width="stretch", hide_index=True)
-
+    
             # --- Toxic doses & toxicity endpoints (no truncation; prioritized + full table + raw) ---
             toxicities = pubchem_data.get("toxicities") or []
             prioritized = data_formatter.prioritize_toxicity_data(pubchem_data, toxval_data)
-
+    
             st.markdown("---")
             st.subheader("📌 Toxic doses & toxicity endpoints")
             tab_prioritized, tab_complete, tab_raw = st.tabs(["📊 Prioritized view", "📋 Complete table", "🔬 Raw data"])
-
+    
             with tab_prioritized:
                 st.caption("Quantitative values (with units) first, then categorical. All data shown.")
                 if prioritized["quantitative"] or prioritized["categorical"]:
                     df_pri = data_formatter.build_toxicity_display_df(prioritized)
                     st.dataframe(df_pri, width="stretch", hide_index=True, height=400)
-            else:
+                else:
                     st.info("No toxicity endpoints found in current data sources.")
-
+    
             with tab_complete:
                 st.caption("All endpoints from PubChem and ToxValDB (if available). No truncation.")
                 rows = []
@@ -322,9 +322,9 @@ if current_query:
                             })
                 if rows:
                     st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True, height=400)
-            else:
+                else:
                     st.info("No toxicity data available for this compound.")
-
+    
             with tab_raw:
                 st.caption("Unmodified data from APIs (for advanced use).")
                 raw_sub = st.tabs(["PubChem", "DSSTox", "ToxValDB"])
@@ -333,14 +333,14 @@ if current_query:
                 with raw_sub[1]:
                     if dsstox_info:
                         st.json(dsstox_info)
-                else:
+                    else:
                         st.write("No DSSTox record for this compound.")
                 with raw_sub[2]:
                     if toxval_data:
                         st.json(toxval_data)
-                else:
+                    else:
                         st.write("No ToxValDB data (optional: set COMPTOX_API_KEY for EPA ToxValDB).")
-
+    
             # --- Ecotoxicity (aquatic LC50/EC50, species, H4xx) ---
             eco = pubchem_data.get("ecotoxicity") or {}
             eco_entries = eco.get("entries") or []
@@ -382,7 +382,7 @@ if current_query:
                                 "Conditions / notes": e.get("conditions") or "",
                             }
                             quant_rows.append(row)
-                    else:
+                        else:
                             row = {
                                 "Species": sp,
                                 "Endpoint": endpoint,
@@ -393,7 +393,7 @@ if current_query:
                                 "Conditions / notes": e.get("conditions") or "",
                             }
                             text_rows.append(row)
-
+    
                     if quant_rows:
                         st.markdown("**Aquatic toxicity – quantitative endpoints**")
                         st.dataframe(pd.DataFrame(quant_rows), width="stretch", hide_index=True)
@@ -409,11 +409,11 @@ if current_query:
                                     summary = summary_utils.summarize_text_with_llm(combined, api_key)
                                 if summary:
                                     st.caption("**AI summary:** " + summary)
-                            else:
+                                else:
                                     st.caption("Summary unavailable (check API key or try again).")
-                    else:
+                        else:
                             st.caption("Add `OPENAI_API_KEY` in app secrets (Manage app → Secrets) to enable **Summarize excerpts with AI** (gpt-4o-mini).")
-
+    
             # --- Carcinogenic Potency Database ---
             _carc_name = carcinogenic_potency_client.DISPLAY_NAME if carcinogenic_potency_client else "Carcinogenic Potency Database"
             if carcinogenic_potency_client and carcinogenic_potency_client.is_available() and carc_potency_data and carc_potency_data.get("found"):
@@ -463,19 +463,19 @@ if current_query:
                             })
                         st.dataframe(pd.DataFrame(dose_rows), width="stretch", hide_index=True, height=250)
                         st.caption(f"{len(doses)} dose–response row(s). Each row = one dose group within an experiment (Experiment ID links to the table above).")
-            else:
+                else:
                     st.info(f"No experiments found in the {_carc_name} for this chemical.")
             elif carcinogenic_potency_client and carcinogenic_potency_client.is_available():
                 st.subheader(f"📊 {_carc_name}")
                 st.info(f"No data for this chemical in the {_carc_name}.")
-
+    
             # --- GHS Classification (filtered, user-controlled) ---
             st.subheader("⚠️ GHS Classification")
             ghs = pubchem_data.get("ghs") or {}
             h_codes = ghs.get("h_codes") or []
             p_codes = ghs.get("p_codes") or []
             signal_word = (ghs.get("signal_word") or "").strip()
-
+    
             # Build code -> phrase only for phrases that exist (filter out "(phrase not found)")
             def _filter_found_phrases(codes: list[str], expand_fn) -> dict[str, str]:
                 out = {}
@@ -484,12 +484,12 @@ if current_query:
                     if phrase and "(phrase not found)" not in phrase.lower():
                         out[code.strip()] = phrase
                 return out
-
+    
             h_phrases_dict = _filter_found_phrases(h_codes, ghs_formatter.get_h_phrase)
             p_phrases_dict = _filter_found_phrases(p_codes, ghs_formatter.get_p_phrase)
             has_signal = signal_word and signal_word.lower() not in ("none", "n/a", "")
             has_any_ghs = bool(h_phrases_dict or p_phrases_dict or has_signal)
-
+    
             if has_any_ghs:
                 with st.expander("⚙️ GHS display options", expanded=False):
                     c1, c2, c3 = st.columns(3)
@@ -524,12 +524,12 @@ if current_query:
                     st.session_state["ghs_layout"] = (
                         "two_columns" if layout_choice.startswith("Two") else "single_column"
                     )
-
+    
                 if h_phrases_dict or p_phrases_dict:
                     st.caption(
                         f"📊 Found {len(h_phrases_dict)} hazard and {len(p_phrases_dict)} precautionary statements"
                     )
-
+    
                 if st.session_state["ghs_layout"] == "two_columns":
                     col_left, col_right = st.columns(2)
                     with col_left:
@@ -538,9 +538,9 @@ if current_query:
                             if h_phrases_dict:
                                 for code, phrase in h_phrases_dict.items():
                                     st.write(f"**{code}:** {phrase}")
-                        else:
+                            else:
                                 st.write("*No hazard statements found*")
-                    else:
+                        else:
                             st.write("*Hidden*")
                     with col_right:
                         st.markdown("**Precautionary Statements**")
@@ -548,17 +548,17 @@ if current_query:
                             if p_phrases_dict:
                                 for code, phrase in p_phrases_dict.items():
                                     st.write(f"**{code}:** {phrase}")
-                        else:
+                            else:
                                 st.write("*No precautionary statements found*")
-                    else:
+                        else:
                             st.write("*Hidden*")
-            else:
+                else:
                     if st.session_state["show_h_phrases"]:
                         st.markdown("**Hazard Statements**")
                         if h_phrases_dict:
                             for code, phrase in h_phrases_dict.items():
                                 st.write(f"**{code}:** {phrase}")
-                    else:
+                        else:
                             st.write("*No hazard statements found*")
                         st.write("")
                     if st.session_state["show_p_phrases"]:
@@ -566,28 +566,28 @@ if current_query:
                         if p_phrases_dict:
                             for code, phrase in p_phrases_dict.items():
                                 st.write(f"**{code}:** {phrase}")
-                    else:
+                        else:
                             st.write("*No precautionary statements found*")
-
+    
                 if st.session_state["show_signal_word"] and has_signal:
                     st.write(f"**Signal word:** {signal_word}")
-        else:
-                st.write("No GHS classification data available from PubChem.")
-
+                else:
+                    st.write("No GHS classification data available from PubChem.")
+    
             # --- Citation ---
             st.markdown("---")
             st.caption(
                 f"📝 **For research use:** If this tool contributes to your work, "
                 f"please cite the Zenodo DOI: {config.ZENODO_DOI}"
             )
-
+    
             # --- Download: full report (no truncation) ---
             st.markdown("---")
             st.subheader("📥 Download report")
             eco = pubchem_data.get("ecotoxicity") or {}
             h_codes = (pubchem_data.get("ghs") or {}).get("h_codes") or []
             p_codes = (pubchem_data.get("ghs") or {}).get("p_codes") or []
-
+    
             st.caption("Full report includes all identifiers, properties, GHS, and every toxicity endpoint (no truncation).")
             col_dl1, col_dl2 = st.columns(2)
             with col_dl1:
@@ -613,7 +613,7 @@ if current_query:
                     mime="application/json",
                     key="download_json",
                 )
-
+    
             with st.expander("📚 Data sources"):
                 st.markdown("""
                 **Data sources**
