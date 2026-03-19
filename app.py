@@ -16,7 +16,7 @@ import streamlit as st
 
 import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
-from utils import atmo_gwp, hazard_for_p2oasys, iarc_lookup, lookup_tables, p2oasys_aggregate, p2oasys_scorer
+from utils import atmo_gwp, hazard_for_p2oasys, hazard_report_utils, iarc_lookup, lookup_tables, p2oasys_aggregate, p2oasys_scorer
 from utils import summary_utils, toxvaldb_client
 
 try:
@@ -205,7 +205,37 @@ if current_query:
             clean_cas = result["clean_cas"]
             toxval_data = result.get("toxval_data")
             carc_potency_data = result.get("carc_potency_data")
-    
+
+            # --- Summary dashboard (source tabs concept; clean display) ---
+            st.subheader("📊 Summary dashboard")
+            col1, col2, col3, col4, col5 = st.columns(5)
+            with col1:
+                st.metric("CAS", hazard_report_utils.clean_text(clean_cas))
+            with col2:
+                pn = hazard_report_utils.clean_text(preferred_name or "—")
+                st.metric("Preferred name", (pn[:18] + "…") if len(pn) > 18 else pn)
+            with col3:
+                formula = (pubchem_data.get("formula") or "—")
+                st.metric("Formula", hazard_report_utils.clean_text(str(formula)))
+            with col4:
+                mw = pubchem_data.get("mw") or "—"
+                st.metric("MW", f"{hazard_report_utils.clean_text(str(mw))} g/mol" if mw != "—" else "—")
+            with col5:
+                st.metric("DTXSID", hazard_report_utils.clean_text(dtxsid or "—"))
+            ghs_summary = hazard_report_utils.build_ghs_summary_df(result)
+            if not ghs_summary.empty:
+                st.markdown("**GHS classifications**")
+                st.dataframe(hazard_report_utils.clean_dataframe(ghs_summary), use_container_width=True, hide_index=True)
+            prop_summary = hazard_report_utils.build_property_summary_df(result)
+            if not prop_summary.empty:
+                st.markdown("**Physical properties**")
+                st.dataframe(hazard_report_utils.clean_dataframe(prop_summary), use_container_width=True, hide_index=True)
+            coverage = hazard_report_utils.get_source_coverage(result)
+            if coverage:
+                st.markdown("**Data coverage by source**")
+                st.dataframe(hazard_report_utils.clean_dataframe(pd.DataFrame(coverage)), use_container_width=True, hide_index=True)
+            st.markdown("---")
+
             # --- Molecular structure at top ---
             if pubchem_data.get("smiles"):
                 st.subheader("Molecular Structure")
@@ -247,7 +277,7 @@ if current_query:
             with col1:
                 st.subheader("Identifiers")
                 st.write(f"**CAS:** {clean_cas}")
-                st.write(f"**IUPAC Name:** {pubchem_data.get('iupac_name') or 'N/A'}")
+                st.write(f"**IUPAC Name:** {hazard_report_utils.clean_text(pubchem_data.get('iupac_name') or 'N/A')}")
                 smiles_val = pubchem_data.get("smiles")
                 if smiles_val:
                     st.write("**SMILES:**")
@@ -291,12 +321,12 @@ if current_query:
                 if not vp_list and vp and not isinstance(vp, list):
                     vp_list = [x.strip() for x in str(vp).split(";") if x.strip()]
                 prop_rows = [
-                    {"Property": "Molecular Formula", "Value": pubchem_data.get("formula") or "—", "Unit": "—", "Observations": ""},
-                    {"Property": "Molecular Weight", "Value": pubchem_data.get("mw") or "—", "Unit": "g/mol", "Observations": ""},
-                    {"Property": "Flash Point", "Value": " | ".join(fp_list) if fp_list else "—", "Unit": "°C (typical)", "Observations": "Multiple values" if len(fp_list) > 1 else ""},
-                    {"Property": "Vapor Pressure", "Value": " | ".join(vp_list) if vp_list else "—", "Unit": "mmHg (typical)", "Observations": "Multiple values" if len(vp_list) > 1 else ""},
+                    {"Property": "Molecular Formula", "Value": hazard_report_utils.clean_text(pubchem_data.get("formula") or "—"), "Unit": "—", "Observations": ""},
+                    {"Property": "Molecular Weight", "Value": hazard_report_utils.clean_text(str(pubchem_data.get("mw") or "—")), "Unit": "g/mol", "Observations": ""},
+                    {"Property": "Flash Point", "Value": hazard_report_utils.clean_text(" | ".join(fp_list) if fp_list else "—"), "Unit": "°C (typical)", "Observations": "Multiple values" if len(fp_list) > 1 else ""},
+                    {"Property": "Vapor Pressure", "Value": hazard_report_utils.clean_text(" | ".join(vp_list) if vp_list else "—"), "Unit": "mmHg (typical)", "Observations": "Multiple values" if len(vp_list) > 1 else ""},
                 ]
-                st.dataframe(pd.DataFrame(prop_rows), width="stretch", hide_index=True)
+                st.dataframe(hazard_report_utils.clean_dataframe(pd.DataFrame(prop_rows)), width="stretch", hide_index=True)
     
             # --- Toxic doses & toxicity endpoints (no truncation; prioritized + full table + raw) ---
             toxicities = pubchem_data.get("toxicities") or []
@@ -310,7 +340,7 @@ if current_query:
                 st.caption("Quantitative values (with units) first, then categorical. All data shown.")
                 if prioritized["quantitative"] or prioritized["categorical"]:
                     df_pri = data_formatter.build_toxicity_display_df(prioritized)
-                    st.dataframe(df_pri, width="stretch", hide_index=True, height=400)
+                    st.dataframe(hazard_report_utils.clean_dataframe(df_pri), width="stretch", hide_index=True, height=400)
                 else:
                     st.info("No toxicity endpoints found in current data sources.")
     
@@ -338,7 +368,7 @@ if current_query:
                                 "Unit": r.get("units", ""),
                             })
                 if rows:
-                    st.dataframe(pd.DataFrame(rows), width="stretch", hide_index=True, height=400)
+                    st.dataframe(hazard_report_utils.clean_dataframe(hazard_report_utils.deduplicate_hazard_data(pd.DataFrame(rows), subset=["Source", "Endpoint", "Value", "Species", "Exposure pathway"])), width="stretch", hide_index=True, height=400)
                 else:
                     st.info("No toxicity data available for this compound.")
     
@@ -413,10 +443,10 @@ if current_query:
     
                     if quant_rows:
                         st.markdown("**Aquatic toxicity – quantitative endpoints**")
-                        st.dataframe(pd.DataFrame(quant_rows), width="stretch", hide_index=True)
+                        st.dataframe(hazard_report_utils.clean_dataframe(pd.DataFrame(quant_rows)), width="stretch", hide_index=True)
                     if text_rows:
                         st.markdown("**Aquatic toxicity – text-only PubChem excerpts**")
-                        st.dataframe(pd.DataFrame(text_rows), width="stretch", hide_index=True)
+                        st.dataframe(hazard_report_utils.clean_dataframe(pd.DataFrame(text_rows)), width="stretch", hide_index=True)
                         # Prefer local Ollama (no API key); fallback to OpenAI if key is set
                         ollama_ok = summary_utils.is_ollama_available(
                             getattr(config, "OLLAMA_HOST", "http://localhost:11434")
@@ -486,7 +516,7 @@ if current_query:
                             "Author's opinion": e.get("opinion_label") or "—",
                             "Source": "NCI/NTP" if (e.get("source") or "") == "ncintp" else "Literature",
                         })
-                    st.dataframe(pd.DataFrame(exp_rows), width="stretch", hide_index=True, height=300)
+                    st.dataframe(hazard_report_utils.clean_dataframe(pd.DataFrame(exp_rows)), width="stretch", hide_index=True, height=300)
                     st.caption("TD50 = dose rate (mg/kg/day) to induce tumors in half of test animals. Lower TD50 = more potent. Author's opinion = published author's assessment of carcinogenicity at this site.")
                     # Dose–response: sorted low to high (client already returns sorted), show with clear headers
                     if doses:
@@ -500,7 +530,7 @@ if current_query:
                                 "Tumors": d.get("tumors") or "—",
                                 "Total animals": d.get("total") or "—",
                             })
-                        st.dataframe(pd.DataFrame(dose_rows), width="stretch", hide_index=True, height=250)
+                        st.dataframe(hazard_report_utils.clean_dataframe(pd.DataFrame(dose_rows)), width="stretch", hide_index=True, height=250)
                         st.caption(f"{len(doses)} dose–response row(s). Each row = one dose group within an experiment (Experiment ID links to the table above).")
                 else:
                     st.info(f"No experiments found in the {_carc_name} for this chemical.")
@@ -576,7 +606,7 @@ if current_query:
                         if st.session_state["show_h_phrases"]:
                             if h_phrases_dict:
                                 for code, phrase in h_phrases_dict.items():
-                                    st.write(f"**{code}:** {phrase}")
+                                    st.write(f"**{code}:** {hazard_report_utils.clean_text(phrase)}")
                             else:
                                 st.write("*No hazard statements found*")
                         else:
@@ -586,7 +616,7 @@ if current_query:
                         if st.session_state["show_p_phrases"]:
                             if p_phrases_dict:
                                 for code, phrase in p_phrases_dict.items():
-                                    st.write(f"**{code}:** {phrase}")
+                                    st.write(f"**{code}:** {hazard_report_utils.clean_text(phrase)}")
                             else:
                                 st.write("*No precautionary statements found*")
                         else:
@@ -596,7 +626,7 @@ if current_query:
                         st.markdown("**Hazard Statements**")
                         if h_phrases_dict:
                             for code, phrase in h_phrases_dict.items():
-                                st.write(f"**{code}:** {phrase}")
+                                st.write(f"**{code}:** {hazard_report_utils.clean_text(phrase)}")
                         else:
                             st.write("*No hazard statements found*")
                         st.write("")
@@ -604,7 +634,7 @@ if current_query:
                         st.markdown("**Precautionary Statements**")
                         if p_phrases_dict:
                             for code, phrase in p_phrases_dict.items():
-                                st.write(f"**{code}:** {phrase}")
+                                st.write(f"**{code}:** {hazard_report_utils.clean_text(phrase)}")
                         else:
                             st.write("*No precautionary statements found*")
     
@@ -668,7 +698,7 @@ if current_query:
                         _qtb_df = pd.DataFrame(_qtb_rows)[
                             ["endpoint", "value", "unit", "position_endpoint"]
                         ].rename(columns={"position_endpoint": "Toolbox category"})
-                        st.dataframe(_qtb_df, use_container_width=True, hide_index=True)
+                        st.dataframe(hazard_report_utils.clean_dataframe(_qtb_df), use_container_width=True, hide_index=True)
                 else:
                     with st.expander("🧪 QSAR Toolbox (VEGA)", expanded=False):
                         st.caption("Toolbox is running but no endpoint data returned for this CAS. Try SMILES search or check Toolbox databases.")
