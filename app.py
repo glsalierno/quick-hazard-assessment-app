@@ -856,15 +856,59 @@ if current_query:
         else:
             st.info("Run a hazard assessment above (enter CAS or name and click Assess) to see P2OASys scores here.")
 
-# --- SDS Intelligence Platform (Prompts 1–6: structured extraction, tabbed display, comparison) ---
+# --- SDS Intelligence Platform (unified: structured extraction + CAS extraction) ---
 st.markdown("---")
 st.markdown("## Safety Data Sheet (SDS) Intelligence Platform")
-st.caption("**Extract, validate, and compare chemical hazard data.** Upload an SDS PDF to extract GHS classifications, physical properties, and toxicological data. Results are presented in structured tables for comparison with regulatory databases.")
+st.caption("**Extract, validate, and compare chemical hazard data.** Upload an SDS PDF to extract GHS classifications, physical properties, toxicological data, and CAS numbers. Results are presented in structured tables for comparison with regulatory databases.")
 if sds_compare and sds_pdf_utils and sds_regex_extractor:
+    # Optional: Smart CAS extractor (AI-assisted) for enhanced CAS extraction
+    _smart_cas = None
+    try:
+        from utils.smart_cas_extractor import SmartCASExtractor
+        from utils.hf_model_manager import HFModelManager
+        if "smart_cas_extractor" not in st.session_state:
+            st.session_state.smart_cas_extractor = SmartCASExtractor(
+                use_llm=True,
+                model_manager=HFModelManager(),
+            )
+        _smart_cas = st.session_state.smart_cas_extractor
+    except ImportError:
+        pass
+
     with st.expander("## Document upload", expanded=True):
         st.markdown("**Supported format:** PDF (SDS compliant with ANSI Z400.1/Z129.1 or REACH Annex II)")
-        st.markdown("The parser identifies all 16 SDS sections and extracts: GHS hazard classifications (H/P codes, pictograms), physical and chemical properties, toxicological and ecotoxicological data.")
+        st.markdown("The parser identifies all 16 SDS sections and extracts: GHS hazard classifications (H/P codes, pictograms), physical and chemical properties, toxicological and ecotoxicological data, and CAS numbers.")
         uploaded = st.file_uploader("Drag and drop or click to upload", type=["pdf"], key="sds_upload")
+
+        # AI-assisted CAS option (when SmartCAS available)
+        use_ai_cas = False
+        if _smart_cas is not None:
+            with st.expander("🤖 AI-assisted CAS extraction", expanded=False):
+                mm = _smart_cas.model_manager
+                if mm and mm.is_available():
+                    st.success(f"✅ Model loaded: {mm.current_model}")
+                    mem = mm.get_memory_usage()
+                    st.caption(f"RAM: {mem.get('ram_gb', 0):.1f}/{mem.get('ram_total_gb', 0):.1f} GB")
+                    if st.button("🔄 Unload model", key="sds_unload_ai"):
+                        mm.model_loaded = False
+                        st.rerun()
+                else:
+                    st.warning("⚠️ No AI model loaded")
+                    sz = st.selectbox("Model size", ["tiny (4GB RAM)", "small (6GB RAM)", "medium (10GB RAM)"], key="sds_ai_model")
+                    sz_map = {"tiny (4GB RAM)": "tiny", "small (6GB RAM)": "small", "medium (10GB RAM)": "medium"}
+                    if st.button("🚀 Load model", type="primary", key="sds_load_ai"):
+                        with st.spinner("Loading model…"):
+                            if mm and mm.load_model(sz_map.get(sz, "small")):
+                                st.success("Model loaded!")
+                                st.rerun()
+                            else:
+                                st.error("Failed to load model")
+                use_ai_cas = st.checkbox(
+                    "Use AI-assisted CAS extraction",
+                    value=bool(mm and mm.is_available()) if mm else False,
+                    key="sds_use_ai_cas",
+                )
+                st.caption("Improves CAS discovery in poorly formatted SDS documents. 100% local.")
 
         if uploaded is not None:
             if st.button("Extract from SDS", key="sds_extract_compare_btn"):
@@ -884,6 +928,20 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
                 else:
                     with st.spinner("Extracting structured SDS fields…"):
                         sds_result = sds_regex_extractor.extract_sds_structured(raw_text)
+                    # Optionally enhance CAS with SmartCAS
+                    if _smart_cas and use_ai_cas:
+                        _smart_cas.use_llm = True
+                        smart_res = _smart_cas.extract_all_cas(raw_text)
+                        if smart_res and smart_res.get("cas_numbers"):
+                            legacy = sds_result.get("legacy") or {}
+                            existing = set(legacy.get("cas_numbers") or [])
+                            merged = list(legacy.get("cas_numbers") or [])
+                            for c in smart_res["cas_numbers"]:
+                                if c and c not in existing:
+                                    existing.add(c)
+                                    merged.append(c)
+                            if merged:
+                                sds_result["legacy"] = {**legacy, "cas_numbers": merged}
                     st.session_state["sds_result"] = sds_result
                     st.session_state["sds_compare_cas"] = None
                     st.session_state["sds_comparison"] = None
@@ -898,8 +956,9 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
             n_ghs = _row_count(tables.get("hazard_classifications"))
             n_phys = _row_count(tables.get("physical_properties"))
             n_eco = _row_count(tables.get("ecotoxicity"))
+            n_cas = len(legacy.get("cas_numbers") or [])
             st.markdown("**Results preview**")
-            st.markdown(f"✅ Hazard classifications: **{n_ghs}** · ✅ Physical properties: **{n_phys}** · ✅ Ecotoxicity: **{n_eco}**")
+            st.markdown(f"✅ Hazard classifications: **{n_ghs}** · ✅ Physical properties: **{n_phys}** · ✅ Ecotoxicity: **{n_eco}** · ✅ CAS numbers: **{n_cas}**")
             with st.expander("Extraction quality metrics", expanded=False):
                 st.markdown("| Confidence | Meaning | Action |")
                 st.markdown("|------------|---------|--------|")
@@ -1015,23 +1074,7 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
                     else:
                         st.info("Select a CAS and run comparison to see SDS vs database.")
         else:
-            st.caption("Upload a PDF to extract GHS H/P codes, physical properties, and ecotoxicity in structured tables.")
-
-    # Smart CAS Extractor (multi-method + optional local LLM)
-    st.markdown("---")
-    st.markdown("## 🔬 Smart CAS Number Extraction (AI-Assisted)")
-    st.caption("**Multi-method extraction with local Hugging Face models** – Finds CAS numbers even in poorly formatted SDS documents. 100% private.")
-    try:
-        from utils.smart_cas_extractor import SmartCASExtractor
-        from utils.hf_model_manager import HFModelManager
-        if "smart_extractor" not in st.session_state:
-            st.session_state.smart_extractor = SmartCASExtractor(
-                use_llm=True,
-                model_manager=HFModelManager(),
-            )
-        st.session_state.smart_extractor.render_smart_cas_extractor_ui()
-    except ImportError as e:
-        st.info("Smart CAS extractor requires `utils.smart_cas_extractor` and `utils.hf_model_manager`. Install optional HF deps: `pip install -r requirements_hf.txt`.")
+            st.caption("Upload a PDF to extract GHS H/P codes, physical properties, ecotoxicity, and CAS numbers in structured tables.")
 else:
     st.caption("SDS PDF extraction and comparison are available when the SDS modules (sds_pdf_utils, sds_regex_extractor, sds_compare) are installed (v1.4).")
 
