@@ -22,6 +22,13 @@ CHEMICAL_DB_PATH = os.path.join(DATA_DIR, "chemical_db.sqlite")
 # See https://p2oasys.turi.org/chemical/hazard-score-matrix
 P2OASYS_MATRIX_FILENAME = "Hazard Matrix Group Review 9-19-23.xlsx"
 P2OASYS_MATRIX_PATH = os.path.join(DATA_DIR, P2OASYS_MATRIX_FILENAME)
+# Optional lookup CSVs for P2OASys (see docs/P2OASYS_LOOKUP_SOURCES.md). Set to None to disable.
+P2OASYS_IARC_CSV_PATH = os.environ.get("P2OASYS_IARC_CSV", os.path.join(DATA_DIR, "iarc_by_cas.csv"))
+P2OASYS_ODP_GWP_CSV_PATH = os.environ.get("P2OASYS_ODP_GWP_CSV", os.path.join(DATA_DIR, "odp_gwp_by_cas.csv"))
+# IPCC GWP 100-year from atmo folder (Federal LCA Commons parquet). Default: fastP2OASys/atmo.
+ATMO_DIR = os.environ.get("ATMO_DIR", os.path.join(REPO_ROOT, "..", "..", "fastP2OASys", "atmo"))
+# IARC classifications from iarc folder (CSV or Excel with CAS No. and Group). Default: fastP2OASys/iarc.
+IARC_DIR = os.environ.get("IARC_DIR", os.path.join(REPO_ROOT, "..", "..", "fastP2OASys", "iarc"))
 
 # COMPTOX public data folders (Excel and MySQL dump) — used by setup script
 COMPTOX_EXCEL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data Excel Files Folder)", "Data Excel Files")
