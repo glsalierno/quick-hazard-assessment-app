@@ -57,3 +57,19 @@ Goal: maximize the chance of extracting **at least one CAS** from every SDS (or 
 - **Order/deduplication:** Section 3 candidates first, then full-text; merged without duplicates. Final list order favors Section 3 and label-sourced CAS.
 
 **Status:** Code in `utils/sds_regex_extractor.py`. Run `python scripts/run_sds_examples.py --limit N` to verify on your SDS set.
+
+---
+
+## 7. **Focused CAS extraction (CAS recognition essential)**
+
+To make CAS recognition **essential** and always prompt database lookup when a CAS-like value appears in the SDS:
+
+| Option | Description | Status |
+|--------|-------------|--------|
+| **Multi-section blocks** | Run CAS patterns on Section 1, 2, 3, and 15 (not only Section 3), then full text. | Implemented: `_extract_section_block()`, `_ordered_cas_candidates_focused()`. |
+| **Extra SDS-specific patterns** | "Chemical Abstracts Service", "CAS Registry Number", table-style "CAS" column header, "Product identifier" / "Substance" / "Trade name" + N-N-N, "Item No." / "Article No." / "Reach No." | Implemented: `_CAS_CHEMICAL_ABSTRACTS_RE`, `_CAS_COLUMN_HEADER_RE`, `_CAS_PRODUCT_IDENTIFIER_RE`, `_CAS_ITEM_ARTICLE_RE`; used in `_cas_candidates_from_text_focused()`. |
+| **Format-valid fallback** | If no checksum-valid CAS is found, return format-valid N-N-N so the app still shows the CAS dropdown and allows database lookup. | Implemented: `extract_cas_focused(..., include_format_valid_fallback=True)`. |
+| **Run when standard finds nothing** | After `_extract_cas_numbers()`, if the list is empty, call `extract_cas_focused()` and use its result so `legacy["cas_numbers"]` is set whenever any CAS-like string exists. | Implemented in `extract_sds_fields_from_text()`. |
+| **UI hint for extended extraction** | When CAS came from focused extraction, show a caption so the user knows they can still run lookup and that check digit may be unverified. | Implemented: `legacy["meta"]["cas_from_focused_extraction"]` and app caption in Comparison tab. |
+
+**Usage:** No API change. Upload an SDS PDF as before; if the standard extractor finds no CAS, the focused extractor runs automatically and the "CAS for PubChem comparison" dropdown appears when any CAS-like value is found. Run `python scripts/run_sds_examples.py --limit N` or use the app to verify.

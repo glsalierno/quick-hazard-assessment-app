@@ -958,6 +958,9 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
                 if not cas_numbers:
                     st.info("No CAS numbers were extracted from the SDS. Comparison requires at least one CAS (e.g. from Section 3).")
                 else:
+                    meta = legacy.get("meta") or {}
+                    if meta.get("cas_from_focused_extraction"):
+                        st.caption("CAS came from extended extraction (Sections 1–3, 15 + extra patterns). You can still run database lookup; if a CAS check digit was unverified, PubChem may not find it.")
                     cas_options = [c for c in cas_numbers if cas_validator.is_valid_cas_format(c)] or list(cas_numbers)
                     selected_cas = st.selectbox(
                         "CAS for PubChem comparison",

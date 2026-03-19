@@ -74,6 +74,28 @@ _CAS_SAME_LINE_RE = re.compile(
 # Spaces or dots as separators (no "CAS" required): 67 64 1 or 67.64.1
 _CAS_SPACE_DOT_RE = re.compile(r"\b(\d{1,9})[\s.]+(\d{2})[\s.]+(\d)\b")
 
+# --- Focused CAS: extra patterns for SDS-specific wording ---
+# "Chemical Abstracts Service" / "CAS Registry Number" (same or next line)
+_CAS_CHEMICAL_ABSTRACTS_RE = re.compile(
+    r"(?:Chemical\s+Abstracts\s+Service\s*(?:No\.?|Number|#|Registry)?|CAS\s*Registry\s*Number)\s*[:\-]?\s*(\d{1,9})[\-.\s\u2010-\u2015]+(\d{2})[\-.\s\u2010-\u2015]+(\d)\b",
+    re.IGNORECASE,
+)
+# Table-style: "CAS" or "CAS No." as column header then number on same line (after tab/space)
+_CAS_COLUMN_HEADER_RE = re.compile(
+    r"(?:^|\n)\s*(?:CAS\s*(?:No\.?|Number|#)?|Registry\s*No\.?)\s*[\t\s]+(\d{1,9})[\-.\s\u2010-\u2015]+(\d{2})[\-.\s\u2010-\u2015]+(\d)\b",
+    re.IGNORECASE | re.MULTILINE,
+)
+# "Product identifier" / "Substance" / "Trade name" followed within 200 chars by N-N-N
+_CAS_PRODUCT_IDENTIFIER_RE = re.compile(
+    r"(?:Product\s+identifier|Substance\s*name|Trade\s*name|Chemical\s+name)\s*[:\s]*.{0,200}?(\d{1,9})[\-.\s\u2010-\u2015]+(\d{2})[\-.\s\u2010-\u2015]+(\d)\b",
+    re.IGNORECASE | re.DOTALL,
+)
+# "Item number" / "Article number" sometimes used for CAS in some SDS
+_CAS_ITEM_ARTICLE_RE = re.compile(
+    r"(?:Item\s*No\.?|Article\s*No\.?|Reach\s*No\.?)\s*[:\-]?\s*(\d{1,9})[\-.\s\u2010-\u2015]+(\d{2})[\-.\s\u2010-\u2015]+(\d)\b",
+    re.IGNORECASE,
+)
+
 # GHS codes: capture combined forms like "P305+P351+P338" as a whole, then split later.
 _H_CODE_COMBO_RE = re.compile(r"\bH\d{3}(?:\s*\+\s*H\d{3})*\b", re.I)
 _P_CODE_COMBO_RE = re.compile(r"\bP\d{3}(?:\s*\+\s*P\d{3})*\b", re.I)
@@ -176,6 +198,29 @@ def _normalize_text_for_cas(text: str) -> str:
     return t
 
 
+def _extract_section_block(text: str, section_num: int, next_section_num: int | None) -> str:
+    """Extract text block for a given section (e.g. 1, 2, 3, 15). next_section_num ends the block."""
+    if not text:
+        return ""
+    t = _normalize_text_for_cas(text)
+    start_re = re.compile(
+        rf"(?:Section\s*{section_num}\b|{section_num}\.\s|{section_num}\.\d+\s)",
+        re.IGNORECASE,
+    )
+    end_num = next_section_num if next_section_num is not None else section_num + 1
+    end_re = re.compile(
+        rf"\bSection\s*{end_num}\b|^\s*{end_num}\.\s",
+        re.IGNORECASE | re.MULTILINE,
+    )
+    m_start = start_re.search(t)
+    if not m_start:
+        return ""
+    start = m_start.end()
+    m_end = end_re.search(t[start:])
+    end = start + m_end.start() if m_end else len(t)
+    return t[start:end]
+
+
 def _extract_section3_block(text: str) -> str:
     """Extract Section 3 (Composition/identity) block where CAS often appears. Returns block or empty."""
     if not text:
@@ -220,6 +265,29 @@ def _cas_candidates_from_text(text: str) -> list[tuple[str, str, str]]:
     add(_CAS_DASH_RE.findall(t))
     add(_CAS_SPACE_DOT_RE.findall(t))
     return candidates
+
+
+def _cas_candidates_from_text_focused(text: str) -> list[tuple[str, str, str]]:
+    """Like _cas_candidates_from_text but includes focused SDS patterns (Chemical Abstracts, column header, etc.)."""
+    base = _cas_candidates_from_text(text)
+    t = _normalize_text_for_cas(text)
+    seen: set[tuple[str, str, str]] = set(base)
+    out: list[tuple[str, str, str]] = list(base)
+
+    def add_focused(matches: list[tuple[str, ...]]) -> None:
+        for m in matches:
+            if len(m) >= 3:
+                key = (m[0].strip(), m[1].strip(), m[2].strip())
+                if key not in seen and key[0].isdigit() and key[1].isdigit() and key[2].isdigit():
+                    if len(key[1]) == 2 and len(key[2]) == 1 and (len(key[0]) >= 1):
+                        seen.add(key)
+                        out.append(key)
+
+    add_focused(_CAS_CHEMICAL_ABSTRACTS_RE.findall(t))
+    add_focused(_CAS_COLUMN_HEADER_RE.findall(t))
+    add_focused(_CAS_PRODUCT_IDENTIFIER_RE.findall(t))
+    add_focused(_CAS_ITEM_ARTICLE_RE.findall(t))
+    return out
 
 
 def _try_ocr_normalize_cas_part(part: str) -> str:
@@ -284,6 +352,84 @@ def _extract_cas_numbers(text: str, use_ocr_fallback: bool = True) -> list[str]:
             seen.add(cas_result)
             out.append(cas_result)
     return out
+
+
+def _ordered_cas_candidates_focused(text: str, use_ocr_fallback: bool = True) -> list[tuple[str, str, str]]:
+    """Collect CAS candidates from Section 1, 2, 3, 15 and full text; label patterns first, then generic. Deduplicated."""
+    if not text:
+        return []
+    blocks: list[str] = []
+    for sec, next_sec in [(1, 2), (2, 3), (3, 4), (15, 16)]:
+        blk = _extract_section_block(text, sec, next_sec)
+        if blk and len(blk) > 30:
+            blocks.append(blk)
+    blocks.append(text)
+    get_candidates = _cas_candidates_from_text_focused
+    if use_ocr_fallback:
+        # OCR fallback only on combined text for hyphen-style matches
+        combined = " ".join(blocks)
+        raw_focused = _cas_candidates_from_text_focused(combined)
+        raw_ocr = _cas_candidates_with_ocr_fallback(combined)
+        seen: set[tuple[str, str, str]] = set()
+        ordered: list[tuple[str, str, str]] = []
+        for cand in raw_focused + raw_ocr:
+            if cand not in seen:
+                seen.add(cand)
+                ordered.append(cand)
+        return ordered
+    seen = set()
+    ordered = []
+    for blk in blocks:
+        for cand in get_candidates(blk):
+            if cand not in seen:
+                seen.add(cand)
+                ordered.append(cand)
+    return ordered
+
+
+def extract_cas_focused(
+    text: str,
+    use_ocr_fallback: bool = True,
+    include_format_valid_fallback: bool = True,
+) -> list[str]:
+    """
+    Focused CAS extraction for SDS: multiple sections (1, 2, 3, 15), extra patterns,
+    and optional format-valid fallback so database lookup can still be offered.
+
+    Returns checksum-valid CAS first; if include_format_valid_fallback and no
+    checksum-valid CAS found, appends format-valid N-N-N (check digit may be wrong).
+    """
+    if not text:
+        return []
+    ordered = _ordered_cas_candidates_focused(text, use_ocr_fallback=use_ocr_fallback)
+    valid: list[str] = []
+    format_only: list[str] = []
+    seen_valid: set[str] = set()
+    seen_format: set[str] = set()
+    for first, second, check in ordered:
+        normalized = cas_validator.normalize_to_cas_format(first, second, check)
+        if not normalized:
+            continue
+        if not cas_validator.is_valid_cas_format(normalized):
+            continue
+        try:
+            cas_result, check_ok = cas_validator.validate_cas_relaxed(normalized)
+        except Exception:
+            if include_format_valid_fallback and normalized not in seen_format:
+                seen_format.add(normalized)
+                format_only.append(normalized)
+            continue
+        if cas_result and cas_result not in seen_valid:
+            seen_valid.add(cas_result)
+            valid.append(cas_result)
+        elif include_format_valid_fallback and normalized and normalized not in seen_format:
+            seen_format.add(normalized)
+            format_only.append(normalized)
+    if valid:
+        return valid
+    if include_format_valid_fallback and format_only:
+        return format_only
+    return valid
 
 
 def _extract_ghs_codes(text: str) -> dict[str, Any]:
@@ -488,10 +634,20 @@ def extract_sds_fields_from_text(text: str) -> ParsedSDSResult:
     - Flash point + vapor pressure
     - Aquatic LC50/EC50
 
-    Fields that cannot be found are omitted to keep the result "meaningful-only".
+    CAS is essential for database lookup: we run standard extraction first, then
+    focused CAS extraction (multi-section + extra patterns + format-valid fallback)
+    when no CAS is found, so at least one CAS-like value is returned when present in the SDS.
     """
     cleaned: dict[str, Any] = {}
     cas_numbers = _extract_cas_numbers(text or "")
+    cas_from_focused = False
+    if not cas_numbers:
+        cas_numbers = extract_cas_focused(
+            text or "",
+            use_ocr_fallback=True,
+            include_format_valid_fallback=True,
+        )
+        cas_from_focused = bool(cas_numbers)
     ghs = _extract_ghs_codes(text or "")
     flash_points = _extract_flash_points(text or "")
     vapor_pressures = _extract_vapor_pressures(text or "")
@@ -523,6 +679,7 @@ def extract_sds_fields_from_text(text: str) -> ParsedSDSResult:
     cleaned["meta"] = {
         "extraction_method": "regex_only_phase1",
         "note": "Fields omitted when not found; caller can still ignore empty mandatory fields.",
+        "cas_from_focused_extraction": cas_from_focused,
     }
     return cleaned  # type: ignore[return-value]
 
