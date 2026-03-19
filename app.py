@@ -681,7 +681,7 @@ if current_query:
 
             with st.expander("📚 Information sources"):
                 st.markdown("""
-                **Information sources** used in this app (all acknowledged):
+                **All these information sources are gratefully acknowledged:**
 
                 **Identifiers & structure**
                 - **PubChem**: identifiers, molecular formula, GHS, toxicity text from PUG View.
@@ -826,15 +826,18 @@ if current_query:
         else:
             st.info("Run a hazard assessment above (enter CAS or name and click Assess) to see P2OASys scores here.")
 
-# --- SDS PDF comparison (Phase 1) — optional when sds_* modules present ---
+# --- SDS Intelligence Platform (Prompts 1–6: structured extraction, tabbed display, comparison) ---
 st.markdown("---")
-st.subheader("📄 SDS PDF comparison (Phase 1)")
+st.markdown("## Safety Data Sheet (SDS) Intelligence Platform")
+st.caption("**Extract, validate, and compare chemical hazard data.** Upload an SDS PDF to extract GHS classifications, physical properties, and toxicological data. Results are presented in structured tables for comparison with regulatory databases.")
 if sds_compare and sds_pdf_utils and sds_regex_extractor:
-    with st.expander("Upload SDS PDF and compare extracted fields to v1.3", expanded=False):
-        uploaded = st.file_uploader("Upload Safety Data Sheet (PDF)", type=["pdf"])
+    with st.expander("## Document upload", expanded=True):
+        st.markdown("**Supported format:** PDF (SDS compliant with ANSI Z400.1/Z129.1 or REACH Annex II)")
+        st.markdown("The parser identifies all 16 SDS sections and extracts: GHS hazard classifications (H/P codes, pictograms), physical and chemical properties, toxicological and ecotoxicological data.")
+        uploaded = st.file_uploader("Drag and drop or click to upload", type=["pdf"], key="sds_upload")
 
         if uploaded is not None:
-            if st.button("Extract from SDS (regex) + compare", key="sds_extract_compare_btn"):
+            if st.button("Extract from SDS", key="sds_extract_compare_btn"):
                 with st.spinner("Extracting text from PDF…"):
                     pdf_bytes = uploaded.getvalue()
                     raw_text = sds_pdf_utils.extract_text_from_pdf_bytes(pdf_bytes)
@@ -850,48 +853,136 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
                     st.session_state["sds_comparison"] = None
                 else:
                     with st.spinner("Extracting structured SDS fields…"):
-                        sds_result = sds_regex_extractor.extract_sds_fields_from_text(raw_text)
+                        sds_result = sds_regex_extractor.extract_sds_structured(raw_text)
                     st.session_state["sds_result"] = sds_result
                     st.session_state["sds_compare_cas"] = None
                     st.session_state["sds_comparison"] = None
 
         sds_result = st.session_state.get("sds_result")
-        if sds_result:
-            st.markdown("### Extracted from SDS (meaningful-only)")
-            st.json(sds_result)
+        if sds_result and isinstance(sds_result, dict):
+            tables = sds_result.get("tables") or {}
+            legacy = sds_result.get("legacy") or {}
 
-            cas_numbers = sds_result.get("cas_numbers") or []
-            if cas_numbers:
-                cas_options = [c for c in cas_numbers if cas_validator.is_valid_cas_format(c)] or list(cas_numbers)
+            # Results preview (Prompt 4)
+            def _row_count(df): return len(df) if df is not None and hasattr(df, "__len__") else 0
+            n_ghs = _row_count(tables.get("hazard_classifications"))
+            n_phys = _row_count(tables.get("physical_properties"))
+            n_eco = _row_count(tables.get("ecotoxicity"))
+            st.markdown("**Results preview**")
+            st.markdown(f"✅ Hazard classifications: **{n_ghs}** · ✅ Physical properties: **{n_phys}** · ✅ Ecotoxicity: **{n_eco}**")
+            with st.expander("Extraction quality metrics", expanded=False):
+                st.markdown("| Confidence | Meaning | Action |")
+                st.markdown("|------------|---------|--------|")
+                st.markdown("| ✅ High | Clear pattern match, validated | Ready for use |")
+                st.markdown("| ⚠️ Medium | Ambiguous, needs review | Verify before using |")
+                st.markdown("| ❌ Low | Uncertain extraction | Manual entry recommended |")
 
-                selected_cas = st.selectbox(
-                    "CAS used for PubChem comparison",
-                    options=cas_options,
-                    index=0,
-                    key="sds_compare_cas_select",
-                )
+            # Tabbed results (Prompt 2)
+            tab_ghs, tab_phys, tab_eco, tab_compare = st.tabs([
+                "GHS Classification",
+                "Physical properties",
+                "Ecotoxicity",
+                "Comparison with database",
+            ])
 
-                if st.session_state.get("sds_compare_cas") != selected_cas:
-                    with st.spinner("Fetching PubChem data for comparison…"):
-                        pubchem_data = pubchem_client.get_compound_data(selected_cas, input_type="cas")
+            with tab_ghs:
+                st.markdown("### GHS Classification summary")
+                st.caption("Harmonized hazard communication elements extracted from Section 2.")
+                df_h = tables.get("hazard_classifications")
+                if df_h is not None and not df_h.empty:
+                    display_cols = [c for c in ["h_code", "hazard_class", "category", "confidence", "raw_text"] if c in df_h.columns]
+                    if not display_cols:
+                        display_cols = list(df_h.columns)[:6]
+                    st.dataframe(df_h[display_cols].fillna(""), use_container_width=True, hide_index=True)
+                else:
+                    st.info("No GHS hazard classifications extracted.")
+                df_ghs_info = tables.get("ghs_information")
+                if df_ghs_info is not None and not df_ghs_info.empty:
+                    st.dataframe(df_ghs_info.fillna(""), use_container_width=True, hide_index=True)
 
-                    if not pubchem_data:
-                        st.error("PubChem lookup failed for the selected CAS.")
-                        st.session_state["sds_compare_cas"] = selected_cas
-                        st.session_state["sds_comparison"] = None
+            with tab_phys:
+                st.markdown("### Physical & chemical properties")
+                st.caption("Measured and estimated values from Section 9.")
+                df_p = tables.get("physical_properties")
+                if df_p is not None and not df_p.empty:
+                    display_cols = [c for c in ["property", "value", "unit", "method", "conditions", "extraction_confidence"] if c in df_p.columns]
+                    if not display_cols:
+                        display_cols = list(df_p.columns)[:6]
+                    st.dataframe(df_p[display_cols].fillna(""), use_container_width=True, hide_index=True)
+                else:
+                    st.info("No physical properties extracted.")
+
+            with tab_eco:
+                st.markdown("### Environmental fate & ecotoxicity")
+                st.caption("Aquatic toxicity and related data from Section 11/12.")
+                df_e = tables.get("ecotoxicity")
+                if df_e is not None and not df_e.empty:
+                    st.dataframe(df_e.fillna(""), use_container_width=True, hide_index=True)
+                else:
+                    st.info("No ecotoxicity values extracted.")
+
+            with tab_compare:
+                st.markdown("### Comparison with database")
+                st.caption("Compare SDS-extracted values to PubChem (v1.3) and resolve discrepancies.")
+                cas_numbers = legacy.get("cas_numbers") or []
+                if not cas_numbers:
+                    st.info("No CAS numbers were extracted from the SDS. Comparison requires at least one CAS (e.g. from Section 3).")
+                else:
+                    cas_options = [c for c in cas_numbers if cas_validator.is_valid_cas_format(c)] or list(cas_numbers)
+                    selected_cas = st.selectbox(
+                        "CAS for PubChem comparison",
+                        options=cas_options,
+                        index=0,
+                        key="sds_compare_cas_select",
+                    )
+                    if st.session_state.get("sds_compare_cas") != selected_cas:
+                        with st.spinner("Fetching PubChem data…"):
+                            pubchem_data = pubchem_client.get_compound_data(selected_cas, input_type="cas")
+                        if not pubchem_data:
+                            st.error("PubChem lookup failed for the selected CAS.")
+                            st.session_state["sds_compare_cas"] = selected_cas
+                            st.session_state["sds_comparison"] = None
+                        else:
+                            with st.spinner("Comparing SDS vs database…"):
+                                comparison = sds_compare.compare_sds_to_pubchem(legacy, pubchem_data)
+                            st.session_state["sds_compare_cas"] = selected_cas
+                            st.session_state["sds_comparison"] = comparison
+
+                    comp = st.session_state.get("sds_comparison")
+                    if comp:
+                        # GHS comparison
+                        ghs_comp = comp.get("ghs_comparison") or {}
+                        st.markdown("**GHS**")
+                        col_sds, col_pub = st.columns(2)
+                        with col_sds:
+                            st.markdown("*From SDS*")
+                            sds_ghs = ghs_comp.get("sds") or {}
+                            st.write("H-codes:", sds_ghs.get("h_codes") or "—")
+                            st.write("P-codes:", sds_ghs.get("p_codes") or "—")
+                            st.write("Signal word:", sds_ghs.get("signal_word") or "—")
+                        with col_pub:
+                            st.markdown("*From database*")
+                            pub_ghs = ghs_comp.get("pubchem") or {}
+                            st.write("H-codes:", pub_ghs.get("h_codes") or "—")
+                            st.write("P-codes:", pub_ghs.get("p_codes") or "—")
+                            st.write("Signal word:", pub_ghs.get("signal_word") or "—")
+                        overlap = (ghs_comp.get("overlap") or {})
+                        if overlap.get("h_codes_only_in_sds") or overlap.get("h_codes_missing_in_sds"):
+                            st.warning("Discrepancy: H-codes differ between SDS and database. Verify source or methodology.")
+                        # Quantitative comparison (discrepancy reporting — Prompt 6)
+                        qc = comp.get("quantitative_comparison") or {}
+                        for prop_name, prop_data in qc.items():
+                            if not isinstance(prop_data, dict):
+                                continue
+                            matches_n = prop_data.get("matches_count", 0)
+                            mismatches_n = prop_data.get("mismatches_count", 0)
+                            if mismatches_n > 0:
+                                st.warning(f"**{prop_name}**: {mismatches_n} value(s) from SDS do not closely match database. Review possible different methodology or extraction error.")
+                            st.json(prop_data)
                     else:
-                        with st.spinner("Comparing SDS vs v1.3 (GHS + quantitative)…"):
-                            comparison = sds_compare.compare_sds_to_pubchem(sds_result, pubchem_data)
-                        st.session_state["sds_compare_cas"] = selected_cas
-                        st.session_state["sds_comparison"] = comparison
-
-            if st.session_state.get("sds_comparison"):
-                st.markdown("### SDS vs v1.3 comparison (GHS + quantitative)")
-                st.json(st.session_state["sds_comparison"])
-            else:
-                st.info("Upload an SDS PDF, extract fields, and pick a CAS to show the comparison.")
+                        st.info("Select a CAS and run comparison to see SDS vs database.")
         else:
-            st.caption("Upload a PDF to extract GHS H/P codes and quantitative fields from Section text (Phase 1).")
+            st.caption("Upload a PDF to extract GHS H/P codes, physical properties, and ecotoxicity in structured tables.")
 else:
     st.caption("SDS PDF extraction and comparison are available when the SDS modules (sds_pdf_utils, sds_regex_extractor, sds_compare) are installed (v1.4).")
 

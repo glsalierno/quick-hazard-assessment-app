@@ -2,6 +2,7 @@
 Phase 1 SDS extraction using hybrid principles:
 - Regex for format-stable tokens (CAS numbers, H/P codes, numeric properties)
 - Heuristic parsing for quantitative values from SDS Section 2/3/11/12 text.
+- Section-aware parsing (SDS sections 1–16) and database-style structured tables.
 
 This file intentionally does NOT depend on any embedded LLM (no API key).
 """
@@ -10,6 +11,8 @@ from __future__ import annotations
 
 import re
 from typing import Any, TypedDict
+
+import pandas as pd
 
 from utils import cas_validator
 
@@ -83,6 +86,73 @@ _SIGNAL_WORD_RE = re.compile(
     r"(?:Signal\s*word|GHS\s*signal\s*word)\s*[:\-]?\s*(Danger|Warning)\b",
     re.IGNORECASE,
 )
+
+# --- SDS section detection (Prompt 3: intelligent section parsing) ---
+SECTION_PATTERNS = {
+    1: re.compile(r"(?i)section\s*1[:\s]*(?:identification|product\s+identifier)", re.IGNORECASE),
+    2: re.compile(r"(?i)section\s*2[:\s]*(?:hazards?\s+identification|classification)", re.IGNORECASE),
+    3: re.compile(r"(?i)section\s*3[:\s]*(?:composition|ingredients?)", re.IGNORECASE),
+    4: re.compile(r"(?i)section\s*4[:\s]*(?:first\s+aid)", re.IGNORECASE),
+    5: re.compile(r"(?i)section\s*5[:\s]*(?:fire\s+fighting)", re.IGNORECASE),
+    6: re.compile(r"(?i)section\s*6[:\s]*(?:accidental\s+release)", re.IGNORECASE),
+    7: re.compile(r"(?i)section\s*7[:\s]*(?:handling\s+and\s+storage)", re.IGNORECASE),
+    8: re.compile(r"(?i)section\s*8[:\s]*(?:exposure\s+controls|personal\s+protection)", re.IGNORECASE),
+    9: re.compile(r"(?i)section\s*9[:\s]*(?:physical\s+and\s+chemical\s+properties)", re.IGNORECASE),
+    10: re.compile(r"(?i)section\s*10[:\s]*(?:stability\s+and\s+reactivity)", re.IGNORECASE),
+    11: re.compile(r"(?i)section\s*11[:\s]*(?:toxicological\s+information)", re.IGNORECASE),
+    12: re.compile(r"(?i)section\s*12[:\s]*(?:ecological\s+information)", re.IGNORECASE),
+    13: re.compile(r"(?i)section\s*13[:\s]*(?:disposal\s+considerations)", re.IGNORECASE),
+    14: re.compile(r"(?i)section\s*14[:\s]*(?:transport\s+information)", re.IGNORECASE),
+    15: re.compile(r"(?i)section\s*15[:\s]*(?:regulatory\s+information)", re.IGNORECASE),
+    16: re.compile(r"(?i)section\s*16[:\s]*(?:other\s+information)", re.IGNORECASE),
+}
+
+
+class SDSParser:
+    """
+    Intelligent SDS section parsing with context awareness.
+    Detects sections 1–16 and extracts content per section for context-aware extraction.
+    """
+
+    def __init__(self) -> None:
+        self.section_patterns = dict(SECTION_PATTERNS)
+
+    def get_section_ranges(self, text: str) -> list[tuple[int, int, int]]:
+        """
+        Find (section_num, start, end) for each section in text.
+        end is the start of the next section or len(text).
+        """
+        if not text:
+            return []
+        ranges: list[tuple[int, int, int]] = []
+        for num in sorted(self.section_patterns.keys()):
+            m = self.section_patterns[num].search(text)
+            if m:
+                start = m.start()
+                ranges.append((num, start, len(text)))
+        # Trim each range's end to the next section's start
+        for i in range(len(ranges)):
+            num, start, end = ranges[i]
+            for j in range(i + 1, len(ranges)):
+                if ranges[j][1] > start:
+                    end = ranges[j][1]
+                    break
+            ranges[i] = (num, start, end)
+        return ranges
+
+    def extract_section_content(self, text: str, section_num: int) -> str:
+        """Extract content for a specific section (from its header to the next section)."""
+        ranges = self.get_section_ranges(text)
+        for num, start, end in ranges:
+            if num == section_num:
+                # Skip the section header line for content
+                header_end = text.find("\n", start)
+                if header_end == -1:
+                    header_end = start
+                else:
+                    header_end += 1
+                return text[header_end:end].strip()
+        return ""
 
 
 def _split_codes(combos: list[str], single_re: re.Pattern[str]) -> list[str]:
@@ -455,4 +525,186 @@ def extract_sds_fields_from_text(text: str) -> ParsedSDSResult:
         "note": "Fields omitted when not found; caller can still ignore empty mandatory fields.",
     }
     return cleaned  # type: ignore[return-value]
+
+
+# --- Structured tables (Prompt 1: database-style DataFrames) ---
+
+# Known GHS H-codes for validation (subset; full list can be extended)
+_GHS_H_CODES_SET = frozenset(
+    f"H{i:03d}" for i in range(200, 401)
+)  # H200–H400; extend as needed
+
+
+def _infer_confidence(source_location: str, from_section_specific: bool) -> str:
+    if from_section_specific and "section_2" in source_location:
+        return "high"
+    if from_section_specific:
+        return "medium"
+    return "medium"
+
+
+def build_structured_tables(text: str) -> dict[str, pd.DataFrame]:
+    """
+    Build database-style DataFrames from SDS text.
+    Returns dict with keys: hazard_classifications, physical_properties, ecotoxicity, ghs_information.
+    Empty tables are returned as 0-row DataFrames with correct columns.
+    """
+    parser = SDSParser()
+    section_2 = parser.extract_section_content(text or "", 2)
+    section_9 = parser.extract_section_content(text or "", 9)
+    section_11 = parser.extract_section_content(text or "", 11)
+    section_12 = parser.extract_section_content(text or "", 12)
+    use_s2 = len(section_2) > 50
+    use_s9 = len(section_9) > 30
+    use_s11 = len(section_11) > 30
+    use_s12 = len(section_12) > 30
+
+    # Hazard classifications (from GHS H-codes)
+    ghs = _extract_ghs_codes(section_2 if use_s2 else (text or ""))
+    h_codes = ghs.get("h_codes") or []
+    source_loc = "SDS_section_2" if use_s2 else "SDS_full_text"
+    rows_h = []
+    for h in h_codes:
+        h_upper = h.upper() if h else ""
+        validated = h_upper in _GHS_H_CODES_SET
+        rows_h.append({
+            "source": source_loc,
+            "source_location": source_loc,
+            "hazard_class": "",  # Could map H-code to phrase; leave for later
+            "h_code": h_upper,
+            "category": "",
+            "confidence": "high" if validated else "medium",
+            "extraction_confidence": "high" if validated else "medium",
+            "raw_text": h_upper,
+            "normalized_value": h_upper,
+            "original_value": h_upper,
+        })
+    hazard_classifications = pd.DataFrame(rows_h)
+    if not rows_h:
+        hazard_classifications = pd.DataFrame(columns=[
+            "source", "source_location", "hazard_class", "h_code", "category",
+            "confidence", "extraction_confidence", "raw_text", "normalized_value", "original_value"
+        ])
+    else:
+        hazard_classifications = hazard_classifications.astype(str).replace("nan", "")
+
+    # Physical properties (flash point, vapor pressure)
+    fp_text = section_9 if use_s9 else (text or "")
+    vp_text = section_9 if use_s9 else (text or "")
+    flash_points = _extract_flash_points(fp_text)
+    vapor_pressures = _extract_vapor_pressures(vp_text)
+    prop_loc = "SDS_section_9" if use_s9 else "SDS_full_text"
+    rows_p = []
+    for x in flash_points:
+        val = x.get("value_c") or x.get("value")
+        unit = (x.get("unit") or "C").replace("C", "°C").replace("F", "°F")
+        rows_p.append({
+            "property": "flash_point",
+            "value": val,
+            "unit": unit,
+            "method": "",
+            "conditions": "",
+            "raw_text": x.get("raw_text") or "",
+            "source_location": prop_loc,
+            "extraction_confidence": "high",
+            "normalized_value": f"{val} {unit}" if val is not None else "",
+            "original_value": x.get("raw_text") or "",
+        })
+    for x in vapor_pressures:
+        val = x.get("value")
+        unit = x.get("unit") or ""
+        temp = x.get("temperature_c")
+        cond = f"at {temp} °C" if temp is not None else ""
+        rows_p.append({
+            "property": "vapor_pressure",
+            "value": val,
+            "unit": unit,
+            "method": "",
+            "conditions": cond,
+            "raw_text": x.get("raw_text") or "",
+            "source_location": prop_loc,
+            "extraction_confidence": "high",
+            "normalized_value": f"{val} {unit}" + (f" at {temp} °C" if temp else "") if val is not None else "",
+            "original_value": x.get("raw_text") or "",
+        })
+    physical_properties = pd.DataFrame(rows_p)
+    if not rows_p:
+        physical_properties = pd.DataFrame(columns=[
+            "property", "value", "unit", "method", "conditions",
+            "raw_text", "source_location", "extraction_confidence", "normalized_value", "original_value"
+        ])
+
+    # Ecotoxicity
+    aq_text = section_12 if use_s12 else (section_11 if use_s11 else (text or ""))
+    aquatic = _extract_aquatic_endpoints(aq_text)
+    eco_loc = "SDS_section_12" if use_s12 else ("SDS_section_11" if use_s11 else "SDS_full_text")
+    rows_e = []
+    for x in aquatic:
+        dur = x.get("duration") or ""
+        dur_h = None
+        if dur:
+            dm = re.search(r"(\d+(?:[.,]\d+)?)\s*(h|hr|hrs|hour)", dur, re.IGNORECASE)
+            if dm:
+                dur_h = float(dm.group(1).replace(",", "."))
+            else:
+                dm = re.search(r"(\d+(?:[.,]\d+)?)\s*(d|day)", dur, re.IGNORECASE)
+                if dm:
+                    dur_h = float(dm.group(1).replace(",", ".")) * 24
+        rows_e.append({
+            "species": x.get("species") or "",
+            "endpoint": x.get("endpoint") or "",
+            "duration_h": dur_h,
+            "value": x.get("value"),
+            "unit": x.get("unit") or "",
+            "raw_text": x.get("raw_text") or "",
+            "source_location": eco_loc,
+            "extraction_confidence": "high",
+        })
+    ecotoxicity = pd.DataFrame(rows_e)
+    if not rows_e:
+        ecotoxicity = pd.DataFrame(columns=[
+            "species", "endpoint", "duration_h", "value", "unit",
+            "raw_text", "source_location", "extraction_confidence"
+        ])
+
+    # GHS information (signal word, H/P statements, pictogram placeholder)
+    ghs_info_rows = []
+    if ghs.get("signal_word"):
+        ghs_info_rows.append({
+            "element_type": "signal_word",
+            "value": ghs["signal_word"],
+            "source_section": "section_2",
+        })
+    if ghs.get("h_codes"):
+        ghs_info_rows.append({
+            "element_type": "h_statement",
+            "value": ", ".join(ghs["h_codes"]),
+            "source_section": "section_2",
+        })
+    if ghs.get("p_codes"):
+        ghs_info_rows.append({
+            "element_type": "p_statement",
+            "value": ", ".join(ghs["p_codes"]),
+            "source_section": "section_2",
+        })
+    ghs_information = pd.DataFrame(ghs_info_rows)
+    if not ghs_info_rows:
+        ghs_information = pd.DataFrame(columns=["element_type", "value", "source_section"])
+
+    return {
+        "hazard_classifications": hazard_classifications,
+        "physical_properties": physical_properties,
+        "ecotoxicity": ecotoxicity,
+        "ghs_information": ghs_information,
+    }
+
+
+def extract_sds_structured(text: str) -> dict[str, Any]:
+    """
+    Extract SDS data and return both structured tables (DataFrames) and legacy dict
+    for comparison. Keys: "tables" (dict of DataFrames), "legacy" (ParsedSDSResult).
+    """
+    legacy = extract_sds_fields_from_text(text)
+    tables = build_structured_tables(text)
+    return {"tables": tables, "legacy": legacy}
 
