@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 from typing import Any
 
 import pandas as pd
@@ -14,9 +15,13 @@ import streamlit as st
 
 import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
-from utils import hazard_for_p2oasys, p2oasys_aggregate, p2oasys_scorer
-from utils import sds_compare, sds_pdf_utils, sds_regex_extractor
+from utils import atmo_gwp, hazard_for_p2oasys, iarc_lookup, lookup_tables, p2oasys_aggregate, p2oasys_scorer
 from utils import summary_utils, toxvaldb_client
+
+try:
+    from utils import sds_compare, sds_pdf_utils, sds_regex_extractor
+except ImportError:
+    sds_compare = sds_pdf_utils = sds_regex_extractor = None  # optional: SDS PDF flow (v1.4)
 
 try:
     from utils import carcinogenic_potency_client
@@ -639,7 +644,50 @@ if current_query:
                 st.caption("Path checked: `" + str(matrix_path) + "`")
             else:
                 with st.spinner("Computing P2OASys scores…"):
-                    hazard_data = hazard_for_p2oasys.pubchem_to_hazard_data(pubchem_data)
+                    extra_sources = None
+                    iarc_by_cas = None
+                    odp_gwp_by_cas = None
+                    ipcc_gwp_by_cas = None
+                    # IARC: prefer iarc folder (fastP2OASys/iarc), else optional CSV
+                    iarc_dir = getattr(config, "IARC_DIR", None)
+                    if iarc_dir and os.path.isdir(iarc_dir):
+                        cache_key_iarc = "p2oasys_iarc_from_folder"
+                        if cache_key_iarc not in st.session_state:
+                            st.session_state[cache_key_iarc] = iarc_lookup.load_iarc_from_iarc_folder(iarc_dir)
+                        iarc_by_cas = st.session_state[cache_key_iarc]
+                    if not iarc_by_cas and getattr(config, "P2OASYS_IARC_CSV_PATH", None):
+                        iarc_path = config.P2OASYS_IARC_CSV_PATH
+                        if iarc_path and os.path.isfile(iarc_path):
+                            cache_key_iarc_csv = "p2oasys_iarc_lookup"
+                            if cache_key_iarc_csv not in st.session_state:
+                                st.session_state[cache_key_iarc_csv] = lookup_tables.load_iarc_csv(iarc_path)
+                            iarc_by_cas = st.session_state[cache_key_iarc_csv]
+                    if getattr(config, "P2OASYS_ODP_GWP_CSV_PATH", None):
+                        odp_path = config.P2OASYS_ODP_GWP_CSV_PATH
+                        if odp_path and os.path.isfile(odp_path):
+                            cache_key_odp = "p2oasys_odp_gwp_lookup"
+                            if cache_key_odp not in st.session_state:
+                                st.session_state[cache_key_odp] = lookup_tables.load_odp_gwp_csv(odp_path)
+                            odp_gwp_by_cas = st.session_state[cache_key_odp]
+                    atmo_dir = getattr(config, "ATMO_DIR", None)
+                    if atmo_dir and os.path.isdir(atmo_dir):
+                        cache_key_atmo = "p2oasys_ipcc_gwp_100"
+                        if cache_key_atmo not in st.session_state:
+                            st.session_state[cache_key_atmo] = atmo_gwp.load_ipcc_gwp_100_from_atmo(atmo_dir)
+                        ipcc_gwp_by_cas = st.session_state[cache_key_atmo]
+                    if iarc_by_cas or odp_gwp_by_cas or ipcc_gwp_by_cas:
+                        extra_sources = lookup_tables.get_lookup_extra_sources(
+                            result["clean_cas"],
+                            iarc_by_cas=iarc_by_cas,
+                            odp_gwp_by_cas=odp_gwp_by_cas,
+                            ipcc_gwp_by_cas=ipcc_gwp_by_cas,
+                        )
+                    hazard_data = hazard_for_p2oasys.build_hazard_data(
+                        pubchem_data,
+                        toxval_data=result.get("toxval_data"),
+                        carc_potency_data=result.get("carc_potency_data"),
+                        extra_sources=extra_sources,
+                    )
                     matrix = p2oasys_scorer.load_p2oasys_matrix(matrix_path)
                     scores = p2oasys_scorer.compute_p2oasys_scores(hazard_data, matrix)
                 overall_max = p2oasys_aggregate.aggregate_category_scores(scores, "max")
@@ -648,7 +696,7 @@ if current_query:
                 n_cat, cat_names = p2oasys_aggregate.count_scored_categories(scores)
                 st.subheader("P2OASys itemized scoring")
                 st.caption(
-                    "Scores 2–10 (higher = more hazardous). From TURI P2OASys matrix; data from PubChem."
+                    "Scores 2–10 (higher = more hazardous). From TURI P2OASys matrix; data from PubChem, ToxValDB, and CPDB when available."
                 )
                 st.metric("Categories scored", n_cat)
                 col1, col2, col3 = st.columns(3)
@@ -687,71 +735,74 @@ if current_query:
         else:
             st.info("Run a hazard assessment above (enter CAS or name and click Assess) to see P2OASys scores here.")
 
-# --- SDS PDF comparison (Phase 1) ---
+# --- SDS PDF comparison (Phase 1) — optional when sds_* modules present ---
 st.markdown("---")
 st.subheader("📄 SDS PDF comparison (Phase 1)")
-with st.expander("Upload SDS PDF and compare extracted fields to v1.3", expanded=False):
-    uploaded = st.file_uploader("Upload Safety Data Sheet (PDF)", type=["pdf"])
+if sds_compare and sds_pdf_utils and sds_regex_extractor:
+    with st.expander("Upload SDS PDF and compare extracted fields to v1.3", expanded=False):
+        uploaded = st.file_uploader("Upload Safety Data Sheet (PDF)", type=["pdf"])
 
-    if uploaded is not None:
-        if st.button("Extract from SDS (regex) + compare", key="sds_extract_compare_btn"):
-            with st.spinner("Extracting text from PDF…"):
-                pdf_bytes = uploaded.getvalue()
-                raw_text = sds_pdf_utils.extract_text_from_pdf_bytes(pdf_bytes)
-                raw_text = sds_pdf_utils.normalize_whitespace(raw_text)
+        if uploaded is not None:
+            if st.button("Extract from SDS (regex) + compare", key="sds_extract_compare_btn"):
+                with st.spinner("Extracting text from PDF…"):
+                    pdf_bytes = uploaded.getvalue()
+                    raw_text = sds_pdf_utils.extract_text_from_pdf_bytes(pdf_bytes)
+                    raw_text = sds_pdf_utils.normalize_whitespace(raw_text)
 
-            if not raw_text.strip():
-                st.warning(
-                    "No readable text was found. For scanned PDFs, install Tesseract and Poppler and ensure "
-                    "`pdf2image` and `pytesseract` are installed — see [OCR setup](docs/OCR_SETUP.md)."
-                )
-                st.session_state["sds_result"] = None
-                st.session_state["sds_compare_cas"] = None
-                st.session_state["sds_comparison"] = None
-            else:
-                with st.spinner("Extracting structured SDS fields…"):
-                    sds_result = sds_regex_extractor.extract_sds_fields_from_text(raw_text)
-                st.session_state["sds_result"] = sds_result
-                st.session_state["sds_compare_cas"] = None
-                st.session_state["sds_comparison"] = None
-
-    sds_result = st.session_state.get("sds_result")
-    if sds_result:
-        st.markdown("### Extracted from SDS (meaningful-only)")
-        st.json(sds_result)
-
-        cas_numbers = sds_result.get("cas_numbers") or []
-        if cas_numbers:
-            cas_options = [c for c in cas_numbers if cas_validator.is_valid_cas_format(c)] or list(cas_numbers)
-
-            selected_cas = st.selectbox(
-                "CAS used for PubChem comparison",
-                options=cas_options,
-                index=0,
-                key="sds_compare_cas_select",
-            )
-
-            if st.session_state.get("sds_compare_cas") != selected_cas:
-                with st.spinner("Fetching PubChem data for comparison…"):
-                    pubchem_data = pubchem_client.get_compound_data(selected_cas, input_type="cas")
-
-                if not pubchem_data:
-                    st.error("PubChem lookup failed for the selected CAS.")
-                    st.session_state["sds_compare_cas"] = selected_cas
+                if not raw_text.strip():
+                    st.warning(
+                        "No readable text was found. For scanned PDFs, install Tesseract and Poppler and ensure "
+                        "`pdf2image` and `pytesseract` are installed — see [OCR setup](docs/OCR_SETUP.md)."
+                    )
+                    st.session_state["sds_result"] = None
+                    st.session_state["sds_compare_cas"] = None
                     st.session_state["sds_comparison"] = None
                 else:
-                    with st.spinner("Comparing SDS vs v1.3 (GHS + quantitative)…"):
-                        comparison = sds_compare.compare_sds_to_pubchem(sds_result, pubchem_data)
-                    st.session_state["sds_compare_cas"] = selected_cas
-                    st.session_state["sds_comparison"] = comparison
+                    with st.spinner("Extracting structured SDS fields…"):
+                        sds_result = sds_regex_extractor.extract_sds_fields_from_text(raw_text)
+                    st.session_state["sds_result"] = sds_result
+                    st.session_state["sds_compare_cas"] = None
+                    st.session_state["sds_comparison"] = None
 
-        if st.session_state.get("sds_comparison"):
-            st.markdown("### SDS vs v1.3 comparison (GHS + quantitative)")
-            st.json(st.session_state["sds_comparison"])
+        sds_result = st.session_state.get("sds_result")
+        if sds_result:
+            st.markdown("### Extracted from SDS (meaningful-only)")
+            st.json(sds_result)
+
+            cas_numbers = sds_result.get("cas_numbers") or []
+            if cas_numbers:
+                cas_options = [c for c in cas_numbers if cas_validator.is_valid_cas_format(c)] or list(cas_numbers)
+
+                selected_cas = st.selectbox(
+                    "CAS used for PubChem comparison",
+                    options=cas_options,
+                    index=0,
+                    key="sds_compare_cas_select",
+                )
+
+                if st.session_state.get("sds_compare_cas") != selected_cas:
+                    with st.spinner("Fetching PubChem data for comparison…"):
+                        pubchem_data = pubchem_client.get_compound_data(selected_cas, input_type="cas")
+
+                    if not pubchem_data:
+                        st.error("PubChem lookup failed for the selected CAS.")
+                        st.session_state["sds_compare_cas"] = selected_cas
+                        st.session_state["sds_comparison"] = None
+                    else:
+                        with st.spinner("Comparing SDS vs v1.3 (GHS + quantitative)…"):
+                            comparison = sds_compare.compare_sds_to_pubchem(sds_result, pubchem_data)
+                        st.session_state["sds_compare_cas"] = selected_cas
+                        st.session_state["sds_comparison"] = comparison
+
+            if st.session_state.get("sds_comparison"):
+                st.markdown("### SDS vs v1.3 comparison (GHS + quantitative)")
+                st.json(st.session_state["sds_comparison"])
+            else:
+                st.info("Upload an SDS PDF, extract fields, and pick a CAS to show the comparison.")
         else:
-            st.info("Upload an SDS PDF, extract fields, and pick a CAS to show the comparison.")
-    else:
-        st.caption("Upload a PDF to extract GHS H/P codes and quantitative fields from Section text (Phase 1).")
+            st.caption("Upload a PDF to extract GHS H/P codes and quantitative fields from Section text (Phase 1).")
+else:
+    st.caption("SDS PDF extraction and comparison are available when the SDS modules (sds_pdf_utils, sds_regex_extractor, sds_compare) are installed (v1.4).")
 
 # Footer when no query yet
 if not current_query:
