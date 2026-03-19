@@ -46,6 +46,15 @@ SDS_EXAMPLES_DIR = os.environ.get("SDS_EXAMPLES_DIR", os.path.join(REPO_ROOT, ".
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
 OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2:0.5b")  # alternative: gemma2:2b
 
+# QSAR Toolbox (OECD + VEGA/OPERA) — local WebSuite must be running. Windows only.
+# Set port (e.g. 51946) or leave None to disable. See https://github.com/glsalierno/PyQSARToolbox
+QSAR_TOOLBOX_PORT = os.environ.get("QSAR_TOOLBOX_PORT", None)
+if QSAR_TOOLBOX_PORT is not None:
+    try:
+        QSAR_TOOLBOX_PORT = int(QSAR_TOOLBOX_PORT)
+    except (TypeError, ValueError):
+        QSAR_TOOLBOX_PORT = None
+
 # Example chemicals for quick buttons (CAS, label)
 EXAMPLE_CHEMICALS = [
     ("67-64-1", "67-64-1 (Acetone)"),

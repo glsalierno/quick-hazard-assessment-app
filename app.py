@@ -8,6 +8,7 @@ from __future__ import annotations
 import io
 import json
 import os
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -27,6 +28,11 @@ try:
     from utils import carcinogenic_potency_client
 except ImportError:
     carcinogenic_potency_client = None  # optional: not present in some deployments
+
+try:
+    from utils import qsar_toolbox_client
+except ImportError:
+    qsar_toolbox_client = None  # optional: OECD QSAR Toolbox + VEGA (Windows, PyQSARToolbox)
 
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
@@ -95,9 +101,15 @@ with st.sidebar:
     elif carcinogenic_potency_client:
         st.caption(f"{carcinogenic_potency_client.DISPLAY_NAME} not loaded.")
 
-# Input form
+st.info(
+    "**Get started:** Either **enter a CAS number** (or chemical name) below for **database lookup and predictions** "
+    "(PubChem, ToxValDB, CPDB, IARC, QSAR Toolbox/VEGA, etc.), or **upload an SDS PDF** in the **SDS PDF comparison** section "
+    "further down — that flow also **reads and extracts information** from the Safety Data Sheet (GHS, CAS, quantitative values)."
+)
+
+# Input form: CAS or name → database lookup and prediction
 with st.form("cas_input"):
-    cas_label = "Enter CAS number or chemical name:"
+    cas_label = "Enter CAS number or chemical name (for database lookup and predictions):"
     # Prefill from session state if we have a previous query
     default = st.session_state.get("query") or ""
     cas = st.text_input(cas_label, value=default, placeholder="e.g., 67-64-1 or acetone")
@@ -405,19 +417,29 @@ if current_query:
                     if text_rows:
                         st.markdown("**Aquatic toxicity – text-only PubChem excerpts**")
                         st.dataframe(pd.DataFrame(text_rows), width="stretch", hide_index=True)
-                        # Optional: summarize excerpts with mini-LLM if API key is set
+                        # Prefer local Ollama (no API key); fallback to OpenAI if key is set
+                        ollama_ok = summary_utils.is_ollama_available(
+                            getattr(config, "OLLAMA_HOST", "http://localhost:11434")
+                        )
                         api_key = (st.secrets.get("OPENAI_API_KEY") or "").strip() if hasattr(st, "secrets") else ""
-                        if api_key:
+                        if ollama_ok or api_key:
                             if st.button("Summarize excerpts with AI", key="summarize_eco_text"):
                                 combined = " ".join((r.get("Value / excerpt") or "") for r in text_rows)[:3000]
                                 with st.spinner("Summarizing…"):
-                                    summary = summary_utils.summarize_text_with_llm(combined, api_key)
+                                    if ollama_ok:
+                                        summary = summary_utils.summarize_text_with_ollama(
+                                            combined,
+                                            host=getattr(config, "OLLAMA_HOST", "http://localhost:11434"),
+                                            model=getattr(config, "OLLAMA_MODEL", "qwen2:0.5b"),
+                                        )
+                                    else:
+                                        summary = summary_utils.summarize_text_with_llm(combined, api_key)
                                 if summary:
                                     st.caption("**AI summary:** " + summary)
                                 else:
-                                    st.caption("Summary unavailable (check API key or try again).")
+                                    st.caption("Summary unavailable (try again or check Ollama/API key).")
                         else:
-                            st.caption("Add `OPENAI_API_KEY` in app secrets (Manage app → Secrets) to enable **Summarize excerpts with AI** (gpt-4o-mini).")
+                            st.caption("**Summarize excerpts with AI** uses a local LLM (no API key): run [Ollama](https://ollama.ai) and pull a small model (e.g. `ollama pull qwen2:0.5b`). Or add `OPENAI_API_KEY` in app secrets for cloud option.")
     
             # --- Carcinogenic Potency Database ---
             _carc_name = carcinogenic_potency_client.DISPLAY_NAME if carcinogenic_potency_client else "Carcinogenic Potency Database"
@@ -430,12 +452,24 @@ if current_query:
                     cpdb_summary = summary_utils.summarize_cpdb_experiments(experiments)
                     summary_paragraph = summary_utils.format_cpdb_summary(cpdb_summary)
                     st.info("**Summary:** " + summary_paragraph)
-                    api_key = (st.secrets.get("OPENAI_API_KEY") or "").strip() if hasattr(st, "secrets") else ""
-                    if api_key and st.button("One-sentence AI summary", key="summarize_cpdb_ai"):
+                    ollama_ok_cpdb = summary_utils.is_ollama_available(
+                        getattr(config, "OLLAMA_HOST", "http://localhost:11434")
+                    )
+                    api_key_cpdb = (st.secrets.get("OPENAI_API_KEY") or "").strip() if hasattr(st, "secrets") else ""
+                    if (ollama_ok_cpdb or api_key_cpdb) and st.button("One-sentence AI summary", key="summarize_cpdb_ai"):
                         with st.spinner("Summarizing…"):
-                            one_liner = summary_utils.summarize_cpdb_with_llm(summary_paragraph, api_key)
+                            if ollama_ok_cpdb:
+                                one_liner = summary_utils.summarize_cpdb_with_ollama(
+                                    summary_paragraph,
+                                    host=getattr(config, "OLLAMA_HOST", "http://localhost:11434"),
+                                    model=getattr(config, "OLLAMA_MODEL", "qwen2:0.5b"),
+                                )
+                            else:
+                                one_liner = summary_utils.summarize_cpdb_with_llm(summary_paragraph, api_key_cpdb)
                         if one_liner:
                             st.caption("**AI:** " + one_liner)
+                    elif not (ollama_ok_cpdb or api_key_cpdb):
+                        st.caption("Run [Ollama](https://ollama.ai) locally (e.g. `ollama pull qwen2:0.5b`) or set `OPENAI_API_KEY` to enable one-sentence AI summary.")
                     # Experiments: use decoded labels (species_name, route_name, etc.) and opinion_label
                     exp_rows = []
                     for e in experiments[:200]:
@@ -619,13 +653,60 @@ if current_query:
                     key="download_json",
                 )
     
-            with st.expander("📚 Data sources"):
+            # QSAR Toolbox (VEGA) — show when local WebSuite is running and we have data
+            _qtb_port = getattr(config, "QSAR_TOOLBOX_PORT", None)
+            if _qtb_port and qsar_toolbox_client and qsar_toolbox_client.is_available(_qtb_port):
+                _qtb_cache = "qsar_toolbox_rows_" + clean_cas
+                if _qtb_cache not in st.session_state:
+                    st.session_state[_qtb_cache] = qsar_toolbox_client.fetch_by_cas(
+                        clean_cas, _qtb_port
+                    )
+                _qtb_rows = st.session_state.get(_qtb_cache) or []
+                if _qtb_rows:
+                    with st.expander("🧪 QSAR Toolbox (VEGA)", expanded=True):
+                        st.caption("Local OECD QSAR Toolbox with VEGA/OPERA add-ons (no API key). Windows only.")
+                        _qtb_df = pd.DataFrame(_qtb_rows)[
+                            ["endpoint", "value", "unit", "position_endpoint"]
+                        ].rename(columns={"position_endpoint": "Toolbox category"})
+                        st.dataframe(_qtb_df, use_container_width=True, hide_index=True)
+                else:
+                    with st.expander("🧪 QSAR Toolbox (VEGA)", expanded=False):
+                        st.caption("Toolbox is running but no endpoint data returned for this CAS. Try SMILES search or check Toolbox databases.")
+            elif qsar_toolbox_client and _qtb_port and not qsar_toolbox_client.is_available(_qtb_port):
+                with st.expander("🧪 QSAR Toolbox (VEGA)", expanded=False):
+                    st.caption("Start **QSAR Toolbox WebSuite** and set `QSAR_TOOLBOX_PORT` (e.g. 51946) to use local VEGA data. Install: `pip install git+https://github.com/glsalierno/PyQSARToolbox.git`")
+            elif qsar_toolbox_client and not _qtb_port:
+                with st.expander("🧪 QSAR Toolbox (VEGA)", expanded=False):
+                    st.caption("Set **QSAR_TOOLBOX_PORT** (e.g. 51946) in env or config and start QSAR Toolbox WebSuite to use local VEGA data (Windows).")
+
+            with st.expander("📚 Information sources"):
                 st.markdown("""
-                **Data sources**
-                - **PubChem**: identifiers, properties, GHS, toxicity text from PUG View.
-                - **DSSTox (local)**: DTXSID, preferred/systematic names, formula, InChI/SMILES when present in your mapping file.
-                - **ToxValDB (local)**: quantitative toxicity values loaded from the local COMPTOX Excel files into the SQLite database (no API key required).
-                - **Carcinogenic Potency Database (local)**: TD50 and experiment data from the CPDB SQLite (built from CPDB tab files via `scripts/build_carcinogenic_potency_from_cpdb_tabs.py`).
+                **Information sources** used in this app (all acknowledged):
+
+                **Identifiers & structure**
+                - **PubChem**: identifiers, molecular formula, GHS, toxicity text from PUG View.
+                - **DSSTox (local)**: DTXSID, preferred/systematic names, formula, InChI/SMILES (SQLite or CSV mapping).
+
+                **Toxicity & hazard data**
+                - **ToxValDB (local)**: quantitative toxicity values from COMPTOX Excel → SQLite (no API key).
+                - **Carcinogenic Potency Database (CPDB, local)**: TD50 and experiment data from CPDB SQLite (built via `scripts/build_carcinogenic_potency_from_cpdb_tabs.py`).
+                - **IARC**: classifications from the **iarc folder** (e.g. `fastP2OASys/iarc`) or optional CSV (`P2OASYS_IARC_CSV_PATH`).
+                - **ODP/GWP**: optional CSV (`P2OASYS_ODP_GWP_CSV_PATH`) for ozone depletion and global warming potential.
+                - **IPCC GWP 100-year**: from **atmo folder** (e.g. `fastP2OASys/atmo`) Federal LCA Commons parquet.
+
+                **Predictions & toolboxes**
+                - **QSAR Toolbox (VEGA/OPERA)**: local OECD Toolbox WebSuite (Windows); PyQSARToolbox; set `QSAR_TOOLBOX_PORT` when WebSuite is running.
+                - **Hazard scrapers** (optional): ECHA CHEM, Danish QSAR, VEGA API, NIH NICEATM ICE — via `utils.hazard_scrapers` and CLI `scripts/run_unified_hazard_scraper.py`.
+
+                **SDS**
+                - **SDS PDF**: regex extraction (GHS, CAS, quantitative values) in the **SDS PDF comparison** section; optional Ollama/LLM extraction when available.
+
+                **P2OASys scoring**
+                - **Hazard matrix**: internal configuration used for mapping endpoints to scores (not user-facing).
+
+                **Summarization (optional)**
+                - **Ollama** (local): one-sentence summaries for ecotoxicity excerpts and CPDB (no API key).
+                - **OpenAI** (optional): `OPENAI_API_KEY` for gpt-4o-mini summarization when set in app secrets.
                 """)
         else:
             st.error(f"No data found for '{current_query}'. Please check the input.")
@@ -634,14 +715,10 @@ if current_query:
         if result and result.get("pubchem"):
             pubchem_data = result["pubchem"]
             clean_cas = result["clean_cas"]
-            matrix_path = p2oasys_scorer.DEFAULT_MATRIX_PATH
+            # P2OASys matrix: internal config for endpoint→score mapping (not shown to user)
+            matrix_path = Path(config.P2OASYS_MATRIX_PATH)
             if not matrix_path.exists():
-                st.info(
-                    "P2OASys matrix file not found. Place **"
-                    + config.P2OASYS_MATRIX_FILENAME
-                    + "** in the `data/` folder (see [TURI P2OASys](https://p2oasys.turi.org/chemical/hazard-score-matrix))."
-                )
-                st.caption("Path checked: `" + str(matrix_path) + "`")
+                st.info("P2OASys scoring is not available.")
             else:
                 with st.spinner("Computing P2OASys scores…"):
                     extra_sources = None
@@ -682,6 +759,20 @@ if current_query:
                             odp_gwp_by_cas=odp_gwp_by_cas,
                             ipcc_gwp_by_cas=ipcc_gwp_by_cas,
                         )
+                    # QSAR Toolbox (VEGA) — local WebSuite, no API key (Windows + PyQSARToolbox)
+                    port = getattr(config, "QSAR_TOOLBOX_PORT", None)
+                    if port and qsar_toolbox_client and qsar_toolbox_client.is_available(port):
+                        cache_key = "qsar_toolbox_rows_" + result["clean_cas"]
+                        if cache_key not in st.session_state:
+                            st.session_state[cache_key] = qsar_toolbox_client.fetch_by_cas(
+                                result["clean_cas"], port
+                            )
+                        qtb_rows = st.session_state.get(cache_key) or []
+                        if qtb_rows:
+                            extra_sources = hazard_for_p2oasys.merge_extra_sources(
+                                extra_sources,
+                                qsar_toolbox_client.toolbox_results_to_extra_sources(qtb_rows),
+                            )
                     hazard_data = hazard_for_p2oasys.build_hazard_data(
                         pubchem_data,
                         toxval_data=result.get("toxval_data"),
@@ -696,7 +787,7 @@ if current_query:
                 n_cat, cat_names = p2oasys_aggregate.count_scored_categories(scores)
                 st.subheader("P2OASys itemized scoring")
                 st.caption(
-                    "Scores 2–10 (higher = more hazardous). From TURI P2OASys matrix; data from PubChem, ToxValDB, and CPDB when available."
+                    "Scores 2–10 (higher = more hazardous). Data from PubChem, ToxValDB, CPDB, IARC/ODP/GWP lookups, and QSAR Toolbox (VEGA) when available."
                 )
                 st.metric("Categories scored", n_cat)
                 col1, col2, col3 = st.columns(3)

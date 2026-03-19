@@ -190,6 +190,31 @@ def build_hazard_data(
     }
 
 
+def merge_extra_sources(base: dict[str, Any] | None, additional: dict[str, Any]) -> dict[str, Any]:
+    """Merge a second extra_sources into the first (toxicities extend; ghs/hazard_metrics merged)."""
+    if not additional:
+        return base or {}
+    out = dict(base) if base else {}
+    for t in additional.get("toxicities") or []:
+        out.setdefault("toxicities", []).append(t)
+    g = additional.get("ghs")
+    if isinstance(g, dict):
+        out.setdefault("ghs", {})
+        for key in ("h_codes", "p_codes"):
+            for c in (g.get(key) or []):
+                if c not in (out["ghs"].get(key) or []):
+                    out["ghs"].setdefault(key, []).append(c)
+        if g.get("signal_word") and not out["ghs"].get("signal_word"):
+            out["ghs"]["signal_word"] = g["signal_word"]
+    hm = additional.get("hazard_metrics")
+    if isinstance(hm, dict):
+        out.setdefault("hazard_metrics", {})
+        for k in ("flash_point", "nfpa", "other_designations"):
+            for v in (hm.get(k) or []):
+                out["hazard_metrics"].setdefault(k, []).append(v)
+    return out
+
+
 def _empty_hazard_data() -> dict[str, Any]:
     return {
         "cid": None,

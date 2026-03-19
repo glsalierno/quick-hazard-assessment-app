@@ -82,11 +82,24 @@ See **utils/iarc_lookup.py**: `load_iarc_from_iarc_folder(iarc_dir)`. **utils/at
 
 ---
 
-## 5. Summary
+## 5. QSAR Toolbox (VEGA) — local, no API key
+
+**Use in P2OASys:** Endpoint data (physicochemical, toxicity, fate) from the **OECD QSAR Toolbox** with **VEGA** (and optionally OPERA) add-ons. All run locally; no cloud API key.
+
+- **Requires:** [QSAR Toolbox](https://qsartoolbox.org/download/) installed (Windows only), **WebSuite** running, and [PyQSARToolbox](https://github.com/glsalierno/PyQSARToolbox):  
+  `pip install git+https://github.com/glsalierno/PyQSARToolbox.git`
+- **Config:** Set `QSAR_TOOLBOX_PORT` to the port shown when WebSuite starts (e.g. `51946`). The app connects to `http://127.0.0.1:<port>`.
+- **Flow:** Search by CAS (or SMILES), retrieve all endpoint data, merge into `extra_sources` for P2OASys and show in the Hazard tab as “QSAR Toolbox (VEGA)”.
+- **Module:** `utils.qsar_toolbox_client` — `is_available(port)`, `fetch_by_cas(cas, port)`, `toolbox_results_to_extra_sources(rows)`.
+
+---
+
+## 6. Summary
 
 | Table | Primary source | Suggested format |
 |-------|----------------|------------------|
 | **IARC** | IARC List of Classifications (online spreadsheet or PDF) | CSV: `cas,iarc` |
 | **ODP/GWP** | NIST refrigerants table, EPA SNAP, CompTox refrigerants list | CSV: `cas,odp,gwp` |
+| **QSAR Toolbox (VEGA)** | Local OECD Toolbox + VEGA/OPERA add-ons (Windows) | PyQSARToolbox + WebSuite running; set `QSAR_TOOLBOX_PORT` |
 
-These tables are **optional**. When present, the app uses them to fill gaps so P2OASys scoring for Chronic and Atmospheric categories is closer to expert assessment.
+These tables and the optional QSAR Toolbox are **optional**. When present, the app uses them to fill gaps so P2OASys scoring is closer to expert assessment.
