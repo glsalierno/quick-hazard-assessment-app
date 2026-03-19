@@ -1,12 +1,18 @@
 """
 Rule-based summarization and optional mini-LLM summarization for hazard data.
 - CPDB: summarize experiments by species, route, author opinion, TD50 range (no LLM).
-- Text excerpts: optional one-line summary via OpenAI gpt-4o-mini when API key is set.
+- Text excerpts / CPDB one-liner: local Ollama (preferred) or OpenAI gpt-4o-mini when API key is set.
+Low-dimensional: short prompts, limited tokens, no commercial API required when Ollama is deployed locally.
 """
 
 from __future__ import annotations
 
 from typing import Any
+
+try:
+    import requests
+except ImportError:
+    requests = None
 
 
 def summarize_cpdb_experiments(experiments: list[dict[str, Any]]) -> dict[str, Any]:
@@ -131,3 +137,84 @@ def summarize_text_with_llm(text: str, api_key: str | None, max_chars: int = 300
     except Exception:
         pass
     return None
+
+
+def _ollama_generate(
+    prompt: str,
+    host: str = "http://localhost:11434",
+    model: str = "qwen2:0.5b",
+    max_tokens: int = 150,
+    timeout: int = 60,
+) -> str | None:
+    """Single prompt completion via Ollama /api/generate. Returns stripped response or None."""
+    if not requests:
+        return None
+    url = host.rstrip("/") + "/api/generate"
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "stream": False,
+        "options": {"num_predict": max_tokens},
+    }
+    try:
+        r = requests.post(url, json=payload, timeout=timeout)
+        if r.status_code != 200:
+            return None
+        data = r.json()
+        out = (data.get("response") or "").strip()
+        return out if out else None
+    except Exception:
+        return None
+
+
+def summarize_text_with_ollama(
+    text: str,
+    host: str = "http://localhost:11434",
+    model: str = "qwen2:0.5b",
+    max_chars: int = 3000,
+    timeout: int = 60,
+) -> str | None:
+    """
+    Summarize toxicity/hazard text using local Ollama. Low-dimensional: short prompt, limited tokens.
+    Returns 1–3 sentences. No API key required. Returns None if Ollama unreachable or error.
+    """
+    if not (text or "").strip():
+        return None
+    text = (text or "").strip()
+    if len(text) > max_chars:
+        text = text[:max_chars] + "..."
+    prompt = (
+        "Summarize this toxicity or hazard text in 1 to 3 short sentences. Be factual and keep numbers and units. Reply with only the summary.\n\n"
+        + text
+    )
+    return _ollama_generate(prompt, host=host, model=model, max_tokens=200, timeout=timeout)
+
+
+def summarize_cpdb_with_ollama(
+    summary_paragraph: str,
+    host: str = "http://localhost:11434",
+    model: str = "qwen2:0.5b",
+    timeout: int = 60,
+) -> str | None:
+    """
+    One-sentence summary of CPDB data using local Ollama. Low-dimensional output.
+    Returns None if Ollama unreachable or error. No API key required.
+    """
+    if not (summary_paragraph or "").strip():
+        return None
+    prompt = (
+        "Reply with exactly one short sentence summarizing this carcinogenicity data. Mention species, positive/negative, and TD50 range if present. Be factual. Only output the sentence.\n\n"
+        + summary_paragraph.strip()
+    )
+    return _ollama_generate(prompt, host=host, model=model, max_tokens=120, timeout=timeout)
+
+
+def is_ollama_available(host: str = "http://localhost:11434", timeout: int = 2) -> bool:
+    """Check if Ollama is reachable (for local LLM summarization)."""
+    if not requests:
+        return False
+    try:
+        r = requests.get(host.rstrip("/") + "/api/tags", timeout=timeout)
+        return r.status_code == 200
+    except Exception:
+        return False
