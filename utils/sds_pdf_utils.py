@@ -188,6 +188,50 @@ def normalize_whitespace(text: str) -> str:
     return " ".join(text.replace("\r", "\n").split())
 
 
+def extract_tables_from_text(text: str) -> list[list[list[str]]]:
+    """
+    Heuristic extraction of table-like structures from plain text.
+    Detects rows by pipe (|) or tab separators; groups consecutive rows with
+    the same cell count into tables. Returns list of tables; each table is
+    list of rows; each row is list of cell strings.
+    """
+    if not text or not text.strip():
+        return []
+    tables: list[list[list[str]]] = []
+    current: list[list[str]] = []
+    prev_len = -1
+    for line in text.replace("\r", "\n").split("\n"):
+        line = line.strip()
+        if not line:
+            if current:
+                tables.append(current)
+                current = []
+            prev_len = -1
+            continue
+        cells: list[str]
+        if "|" in line:
+            cells = [c.strip() for c in line.split("|")]
+        elif "\t" in line:
+            cells = [c.strip() for c in line.split("\t")]
+        else:
+            if current:
+                tables.append(current)
+                current = []
+            prev_len = -1
+            continue
+        if len(cells) < 2:
+            continue
+        if prev_len != -1 and len(cells) != prev_len:
+            if current:
+                tables.append(current)
+                current = []
+        current.append(cells)
+        prev_len = len(cells)
+    if current:
+        tables.append(current)
+    return tables
+
+
 def make_searchable_pdf(
     input_path: str,
     output_path: str,

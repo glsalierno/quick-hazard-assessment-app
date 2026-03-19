@@ -17,3 +17,4 @@ easyocr>=1.7.0
 # ocrmypdf>=16.0.0
 # Optional: OECD QSAR Toolbox + VEGA (Windows only; start WebSuite, set QSAR_TOOLBOX_PORT)
 # pip install git+https://github.com/glsalierno/PyQSARToolbox.git
+# Optional: Smart CAS extraction with local LLM (pip install -r requirements_hf.txt)

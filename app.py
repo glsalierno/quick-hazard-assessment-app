@@ -1016,6 +1016,22 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
                         st.info("Select a CAS and run comparison to see SDS vs database.")
         else:
             st.caption("Upload a PDF to extract GHS H/P codes, physical properties, and ecotoxicity in structured tables.")
+
+    # Smart CAS Extractor (multi-method + optional local LLM)
+    st.markdown("---")
+    st.markdown("## 🔬 Smart CAS Number Extraction (AI-Assisted)")
+    st.caption("**Multi-method extraction with local Hugging Face models** – Finds CAS numbers even in poorly formatted SDS documents. 100% private.")
+    try:
+        from utils.smart_cas_extractor import SmartCASExtractor
+        from utils.hf_model_manager import HFModelManager
+        if "smart_extractor" not in st.session_state:
+            st.session_state.smart_extractor = SmartCASExtractor(
+                use_llm=True,
+                model_manager=HFModelManager(),
+            )
+        st.session_state.smart_extractor.render_smart_cas_extractor_ui()
+    except ImportError as e:
+        st.info("Smart CAS extractor requires `utils.smart_cas_extractor` and `utils.hf_model_manager`. Install optional HF deps: `pip install -r requirements_hf.txt`.")
 else:
     st.caption("SDS PDF extraction and comparison are available when the SDS modules (sds_pdf_utils, sds_regex_extractor, sds_compare) are installed (v1.4).")
 
