@@ -541,12 +541,27 @@ JSON:"""
             with col1:
                 use_llm = st.checkbox(
                     "Use AI assistance",
-                    value=bool(self.model_manager and self.model_manager.is_available()),
+                    value=True,
                     key="smart_cas_use_llm",
                 )
             if st.button(
                 "🔍 Extract CAS Numbers", type="primary", key="smart_cas_extract_btn"
             ):
+                # Auto-load a local model when AI assistance is enabled.
+                # Try Phi-3 first, then SmolLM2 as fallback.
+                if use_llm and self.model_manager and not self.model_manager.is_available():
+                    with st.spinner("Auto-loading local AI model (Phi-3, then SmolLM2 fallback)..."):
+                        loaded = self.model_manager.load_model("small")
+                        if not loaded:
+                            loaded = self.model_manager.load_model("tiny")
+                    if not loaded:
+                        st.warning(
+                            "AI assistance is enabled but no model could be loaded. "
+                            "Continuing with rule-based extraction only."
+                        )
+                        use_llm = False
+                    else:
+                        st.success(f"Model loaded: {self.model_manager.current_model}")
                 with st.spinner("Processing PDF..."):
                     pdf_bytes = uploaded.getvalue()
                     raw = sds_pdf_utils.extract_text_from_pdf_bytes(pdf_bytes)
