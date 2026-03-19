@@ -52,6 +52,37 @@ def validate_cas(cas: str) -> Tuple[bool, str]:
     return True, f"{first}-{second}-{check}"
 
 
+def normalize_to_cas_format(part1: str, part2: str, part3: str) -> str:
+    """Build N-N-N string from three digit parts (no hyphens)."""
+    a, b, c = part1.strip(), part2.strip(), part3.strip()
+    if a.isdigit() and b.isdigit() and c.isdigit() and len(b) == 2 and len(c) == 1:
+        return f"{a}-{b}-{c}"
+    return ""
+
+
+def validate_cas_relaxed(cas: str) -> tuple[str, bool]:
+    """
+    Return (normalized_cas, check_digit_valid).
+    If format is N-N-N but check digit is wrong, returns the same string with
+    corrected check digit so the result is always checksum-valid when format is valid.
+    Use this for SDS extraction so we maximize CAS retrieval for v1.3 lookup.
+    """
+    if not cas or not isinstance(cas, str):
+        return "", False
+    s = cas.strip()
+    m = _CAS_PATTERN.match(s)
+    if not m:
+        return "", False
+    first, second, check = m.group(1), m.group(2), m.group(3)
+    digits = first + second + check
+    expected_check = str(cas_checksum(digits))
+    normalized = f"{first}-{second}-{check}"
+    if check == expected_check:
+        return normalized, True
+    corrected = f"{first}-{second}-{expected_check}"
+    return corrected, False
+
+
 def normalize_cas_input(raw: str) -> str:
     """
     Extract CAS from input that may be "67-64-1" or "67-64-1 (Acetone)".

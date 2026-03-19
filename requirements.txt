@@ -6,3 +6,10 @@ openpyxl>=3.1.0
 rdkit>=2023.9.6
 Pillow>=10.0.0
 openai>=1.0.0
+pypdf>=4.0.0
+# OCR for scanned SDS PDFs (optional: install Tesseract and Poppler on system)
+pdf2image>=1.17.0
+pytesseract>=0.3.10
+easyocr>=1.7.0
+# Optional: add text layer to PDFs (pip install ocrmypdf; needs Tesseract)
+# ocrmypdf>=16.0.0
