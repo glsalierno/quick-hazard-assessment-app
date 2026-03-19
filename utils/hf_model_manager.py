@@ -57,12 +57,6 @@ class HFModelManager:
                 "quantization": None,
                 "description": "Microsoft's efficient Phi-3",
             },
-            "medium": {
-                "name": "Qwen/Qwen2.5-7B-Instruct",
-                "ram_gb": 10,
-                "quantization": "4bit",
-                "description": "Best accuracy for CAS extraction",
-            },
         }
 
     def load_model(self, model_size: str = "small") -> bool:

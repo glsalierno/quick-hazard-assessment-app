@@ -514,13 +514,12 @@ JSON:"""
                 st.warning("⚠️ No AI model loaded")
                 size_label = st.selectbox(
                     "Select model size",
-                    ["tiny (4GB RAM)", "small (6GB RAM)", "medium (10GB RAM)"],
+                    ["tiny (4GB RAM)", "small (6GB RAM)"],
                     key="smart_cas_model_size",
                 )
                 size_map = {
                     "tiny (4GB RAM)": "tiny",
                     "small (6GB RAM)": "small",
-                    "medium (10GB RAM)": "medium",
                 }
                 if st.button("🚀 Load Model", type="primary", key="smart_cas_load"):
                     with st.spinner("Loading model... (first download may take a few minutes)"):
