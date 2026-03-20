@@ -131,6 +131,10 @@ if st.session_state.pop("show_assessment_from_unified", False):
 
 # --- Unified chemical input: typed text OR SDS PDF → same assessment pipeline ---
 st.markdown("### 🔍 Chemical input")
+# Widget key `cas_query_input` must only be updated *before* st.text_input runs (Streamlit rule).
+_pending_cas = st.session_state.pop("_pending_cas_query_input", None)
+if _pending_cas is not None:
+    st.session_state["cas_query_input"] = _pending_cas
 # One file uploader for the whole page (CAS path + SDS Intelligence share these bytes)
 uf_shared = None
 if sds_pdf_utils and sds_regex_extractor:
@@ -223,7 +227,7 @@ if not _hide_examples:
     for i, (example_cas, label) in enumerate(config.EXAMPLE_CHEMICALS):
         if example_cols[i].button(label, key=f"ex_{i}"):
             st.session_state["query"] = example_cas
-            st.session_state["cas_query_input"] = example_cas
+            st.session_state["_pending_cas_query_input"] = example_cas
             st.session_state["result_for"] = None  # force re-fetch
             st.rerun()
     st.caption(
@@ -236,7 +240,7 @@ if submitted and cas:
     clean_cas = cas_validator.normalize_cas_input(cas)
     if clean_cas:
         st.session_state["query"] = clean_cas
-        st.session_state["cas_query_input"] = clean_cas
+        st.session_state["_pending_cas_query_input"] = clean_cas
         st.session_state["result_for"] = None
     st.rerun()
 

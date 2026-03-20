@@ -18,12 +18,18 @@ def apply_assessment_query(
     """
     Set session state so the main `if current_query:` block runs full fetch
     (PubChem + DSSTox + ToxValDB + CPDB + …) exactly like typing in the form.
+
+    Uses ``_pending_cas_query_input`` so the CAS text field can be synced on the
+    next run *before* ``st.text_input(..., key="cas_query_input")`` is created
+    (required on Streamlit Cloud / recent Streamlit versions).
     """
     ident = (identifier or "").strip()
     if not ident:
         return
     st.session_state["query"] = ident
-    st.session_state["cas_query_input"] = ident
+    # Cannot assign cas_query_input after the text_input widget exists (StreamlitAPIException on Cloud).
+    # Apply on next run via app.py before the widget is created.
+    st.session_state["_pending_cas_query_input"] = ident
     st.session_state["result_for"] = None
     if show_banner:
         st.session_state["show_assessment_from_unified"] = True
