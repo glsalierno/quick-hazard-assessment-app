@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import re
 import time
-from typing import Any
+from typing import Any, Optional
 
 from utils import cas_validator, sds_pdf_utils, sds_regex_extractor
 from utils.sds_environment import EnvironmentDetector
@@ -72,30 +72,369 @@ class SDSParserEngine:
             sections[sec] = text[start:end].strip()
         return sections
 
-    def _extract_cas_numbers(self, sections: dict[int, str], legacy: dict[str, Any]) -> list[CASExtraction]:
-        out: list[CASExtraction] = []
-        seen: set[str] = set()
+    # --- Enhanced Section 3 composition / multi-column tables (e.g. FORANE® blends) ---
 
-        # Primary: existing focused extractor output.
-        legacy_cas = legacy.get("cas_numbers") or []
-        for cas in legacy_cas:
-            if cas in seen:
+    def _clean_cas(self, text: str) -> Optional[str]:
+        """First CAS-like token in *text*, optionally checksum-validated."""
+        if not text:
+            return None
+        m = self.patterns["cas"].search(str(text))
+        if not m:
+            return None
+        cas = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+        norm = cas_validator.normalize_cas_input(cas)
+        return norm or cas
+
+    def _extract_concentration_from_text(self, text: str) -> Optional[str]:
+        """Pull concentration / % range strings common on SDS composition tables."""
+        if not text:
+            return None
+        t = text.strip()
+        # ">= 30 - < 60 %" / ">=30 - <60%" / "30 - 60%"
+        range_pct = re.search(
+            r"(?:([<>]=?)\s*)?(\d+(?:\.\d+)?)\s*[-–]\s*(?:([<>]=?)\s*)?(\d+(?:\.\d+)?)\s*[%％]?",
+            t,
+            re.IGNORECASE,
+        )
+        if range_pct:
+            lo, lv, ho, hv = range_pct.group(1) or "", range_pct.group(2), range_pct.group(3) or "", range_pct.group(4)
+            left = f"{lo} {lv}".strip() if lo else lv
+            right = f"{ho} {hv}".strip() if ho else hv
+            return f"{left} - {right}%"
+        simple = re.search(r"(\d+(?:\.\d+)?)\s*[%％]", t)
+        if simple:
+            return f"{simple.group(1)}%"
+        return None
+
+    def _richness(self, c: CASExtraction) -> int:
+        n = 0
+        if (c.chemical_name or "").strip():
+            n += 3
+        if (c.concentration or "").strip():
+            n += 3
+        if c.section == 3:
+            n += 1
+        return n
+
+    def _merge_cas_extractions(self, a: CASExtraction, b: CASExtraction) -> CASExtraction:
+        """Prefer richer row; fill missing name/conc/context; max confidence."""
+        primary, secondary = (a, b) if self._richness(a) >= self._richness(b) else (b, a)
+        out = CASExtraction(
+            cas=primary.cas,
+            chemical_name=(primary.chemical_name or secondary.chemical_name or None),
+            concentration=(primary.concentration or secondary.concentration or None),
+            section=primary.section if primary.section is not None else secondary.section,
+            method=primary.method,
+            confidence=max(primary.confidence, secondary.confidence),
+            context=primary.context or secondary.context,
+            validated=primary.validated or secondary.validated,
+            warnings=list({*primary.warnings, *secondary.warnings}),
+        )
+        return out
+
+    def _put_cas(
+        self,
+        store: dict[str, CASExtraction],
+        order: list[str],
+        item: CASExtraction,
+    ) -> None:
+        if item.cas not in store:
+            store[item.cas] = item
+            order.append(item.cas)
+        else:
+            store[item.cas] = self._merge_cas_extractions(store[item.cas], item)
+
+    def _parse_html_tables_for_cas(self, html_text: str) -> list[CASExtraction]:
+        results: list[CASExtraction] = []
+        if not html_text or "<table" not in html_text.lower():
+            return results
+        try:
+            from bs4 import BeautifulSoup
+
+            soup = BeautifulSoup(html_text, "html.parser")
+            for table in soup.find_all("table"):
+                rows = table.find_all("tr")
+                if len(rows) < 2:
+                    continue
+                header_cells = rows[0].find_all(["td", "th"])
+                headers = [cell.get_text().strip().lower() for cell in header_cells]
+                cas_col = name_col = conc_col = None
+                for i, header in enumerate(headers):
+                    if any(x in header for x in ("cas", "cas-no", "cas no", "cas number", "registry")):
+                        cas_col = i
+                    elif any(x in header for x in ("chemical", "component", "ingredient", "substance", "name")):
+                        name_col = i
+                    elif any(x in header for x in ("wt", "weight", "concentration", "%", "percent", "amount")):
+                        conc_col = i
+                if cas_col is None:
+                    continue
+                _cols = [cas_col]
+                if name_col is not None:
+                    _cols.append(name_col)
+                if conc_col is not None:
+                    _cols.append(conc_col)
+                max_idx = max(_cols)
+                for row in rows[1:]:
+                    cells = row.find_all("td")
+                    if len(cells) <= max_idx:
+                        continue
+                    cas_raw = cells[cas_col].get_text()
+                    cas = self._clean_cas(cas_raw)
+                    if not cas or not self._validate_cas_checksum(cas):
+                        continue
+                    chemical = cells[name_col].get_text().strip() if name_col is not None and name_col < len(cells) else None
+                    conc_raw = cells[conc_col].get_text() if conc_col is not None and conc_col < len(cells) else ""
+                    concentration = self._extract_concentration_from_text(conc_raw) or (conc_raw.strip() or None)
+                    ctx = " | ".join(c.get_text().strip() for c in cells)[:280]
+                    results.append(
+                        CASExtraction(
+                            cas=cas,
+                            chemical_name=chemical or None,
+                            concentration=concentration,
+                            section=3,
+                            method="html_table_parsing",
+                            confidence=0.98,
+                            context=ctx,
+                            validated=True,
+                        )
+                    )
+        except Exception:
+            return results
+        return results
+
+    def _iter_pipe_table_blocks(self, text: str) -> list[list[str]]:
+        lines = text.replace("\r", "\n").split("\n")
+        blocks: list[list[str]] = []
+        current: list[str] = []
+        for line in lines:
+            if "|" in line:
+                current.append(line)
+            elif current:
+                blocks.append(current)
+                current = []
+        if current:
+            blocks.append(current)
+        return blocks
+
+    def _process_pipe_table_lines(self, table_lines: list[str]) -> list[CASExtraction]:
+        results: list[CASExtraction] = []
+        if len(table_lines) < 2:
+            return results
+        header_line = table_lines[0]
+        header_cells = [c.strip() for c in header_line.split("|")]
+        while header_cells and header_cells[0] == "":
+            header_cells.pop(0)
+        while header_cells and header_cells[-1] == "":
+            header_cells.pop()
+        headers = [h.lower() for h in header_cells]
+        cas_col = name_col = conc_col = None
+        for i, header in enumerate(headers):
+            if any(t in header for t in ("cas", "cas-no", "cas number", "registry")):
+                cas_col = i
+            elif any(t in header for t in ("chemical", "component", "ingredient", "substance", "name")):
+                name_col = i
+            elif any(t in header for t in ("wt", "weight", "concentration", "%", "percent")):
+                conc_col = i
+        if cas_col is None:
+            return results
+        for line in table_lines[1:]:
+            if re.match(r"^[\s|\-_:]+$", line):
                 continue
-            seen.add(cas)
+            raw_cells = [c.strip() for c in line.split("|")]
+            while raw_cells and raw_cells[0] == "":
+                raw_cells.pop(0)
+            while raw_cells and raw_cells[-1] == "":
+                raw_cells.pop()
+            cells = raw_cells
+            if len(cells) <= cas_col:
+                continue
+            cas = self._clean_cas(cells[cas_col])
+            if not cas or not self._validate_cas_checksum(cas):
+                continue
+            chemical = cells[name_col] if name_col is not None and name_col < len(cells) else None
+            conc_cell = cells[conc_col] if conc_col is not None and conc_col < len(cells) else ""
+            concentration = self._extract_concentration_from_text(conc_cell) or (conc_cell.strip() or None)
+            results.append(
+                CASExtraction(
+                    cas=cas,
+                    chemical_name=(chemical.strip() if chemical else None) or None,
+                    concentration=concentration,
+                    section=3,
+                    method="pipe_table_parsing",
+                    confidence=0.95,
+                    context=" | ".join(cells)[:280],
+                    validated=True,
+                )
+            )
+        return results
+
+    def _table_rows_to_cas_extractions(self, table: list[list[str]], section: int) -> list[CASExtraction]:
+        """Use first row as header when it looks like a composition header."""
+        if not table or len(table) < 2:
+            return []
+        header_row = [str(x).lower() for x in table[0]]
+        joined = " ".join(header_row)
+        if "cas" not in joined:
+            return []
+        cas_col = name_col = conc_col = None
+        for i, h in enumerate(header_row):
+            h = h.strip()
+            if any(t in h for t in ("cas", "cas-no", "registry")):
+                cas_col = i
+            elif any(t in h for t in ("chemical", "component", "ingredient", "substance", "name")):
+                name_col = i
+            elif any(t in h for t in ("wt", "weight", "concentration", "%", "percent")):
+                conc_col = i
+        if cas_col is None:
+            return []
+        out: list[CASExtraction] = []
+        _cols = [cas_col]
+        if name_col is not None:
+            _cols.append(name_col)
+        if conc_col is not None:
+            _cols.append(conc_col)
+        max_idx = max(_cols)
+        for row in table[1:]:
+            if len(row) <= max_idx:
+                continue
+            cas = self._clean_cas(str(row[cas_col]))
+            if not cas or not self._validate_cas_checksum(cas):
+                continue
+            chem = str(row[name_col]).strip() if name_col is not None and name_col < len(row) else ""
+            conc_raw = str(row[conc_col]) if conc_col is not None and conc_col < len(row) else ""
+            concentration = self._extract_concentration_from_text(conc_raw) or (conc_raw.strip() or None)
             out.append(
                 CASExtraction(
                     cas=cas,
-                    section=3 if 3 in sections else None,
-                    method="focused_regex",
-                    confidence=0.95,
-                    validated=cas_validator.is_valid_cas_format(cas),
+                    chemical_name=chem or None,
+                    concentration=concentration,
+                    section=section,
+                    method="delimiter_table_parsing",
+                    confidence=0.93 if section == 3 else 0.85,
+                    context=" | ".join(str(x) for x in row)[:280],
+                    validated=True,
                 )
             )
+        return out
+
+    def _parse_whitespace_composition_lines(self, section_text: str) -> list[CASExtraction]:
+        """
+        Space/tab-aligned composition rows and CAS-only continuation lines (PDF reflow).
+        """
+        results: list[CASExtraction] = []
+        lines = section_text.replace("\r", "\n").split("\n")
+        pending_name: Optional[str] = None
+        only_cas_line = re.compile(r"^\s*(\d{1,7}-\d{2}-\d)\s*$")
+
+        for raw in lines:
+            line = raw.strip()
+            if not line:
+                continue
+            # Header / label lines — keep pending name unless it's a new subsection
+            low = line.lower()
+            if "chemical name" in low and "cas" in low:
+                pending_name = None
+                continue
+            if only_cas_line.match(line):
+                m = only_cas_line.match(line)
+                if m and pending_name:
+                    cas = self._clean_cas(m.group(1))
+                    if cas and self._validate_cas_checksum(cas):
+                        results.append(
+                            CASExtraction(
+                                cas=cas,
+                                chemical_name=pending_name.strip() or None,
+                                concentration=None,
+                                section=3,
+                                method="orphan_cas_line",
+                                confidence=0.88,
+                                context=line,
+                                validated=True,
+                            )
+                        )
+                continue
+
+            m = self.patterns["cas"].search(line)
+            if not m:
+                # Possible name-only line before CAS on next line
+                if len(line) > 2 and not re.match(r"^[\d\s.%<>,\-–]+$", line) and "section" not in low:
+                    pending_name = line
+                continue
+
+            cas = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+            norm = cas_validator.normalize_cas_input(cas) or cas
+            if not self._validate_cas_checksum(norm):
+                continue
+
+            before = line[: m.start()].strip()
+            name = before if len(before) > 2 else (pending_name.strip() if pending_name else None)
+            pending_name = None
+
+            rest = line[m.end() :].strip()
+            conc_part = re.split(r"\s{2,}H\d", rest, maxsplit=1)[0].strip()
+            if not conc_part:
+                conc_part = re.split(r"\s{2,}(?:H\d|P\d)", rest, maxsplit=1)[0].strip()
+            concentration = self._extract_concentration_from_text(conc_part) or (conc_part or None)
+            if concentration and len(concentration) > 80:
+                concentration = self._extract_concentration_from_text(concentration)
+
+            results.append(
+                CASExtraction(
+                    cas=norm,
+                    chemical_name=name,
+                    concentration=concentration,
+                    section=3,
+                    method="line_composition_parsing",
+                    confidence=0.9,
+                    context=line[:300],
+                    validated=True,
+                )
+            )
+        return results
+
+    def _extract_composition_from_section3(self, section_text: str) -> list[CASExtraction]:
+        if not (section_text or "").strip():
+            return []
+        acc: list[CASExtraction] = []
+        acc.extend(self._parse_html_tables_for_cas(section_text))
+        for block in self._iter_pipe_table_blocks(section_text):
+            acc.extend(self._process_pipe_table_lines(block))
+        for table in sds_pdf_utils.extract_tables_from_text(section_text):
+            acc.extend(self._table_rows_to_cas_extractions(table, section=3))
+        acc.extend(self._parse_whitespace_composition_lines(section_text))
+        if acc:
+            self.methods_used.append("composition_section3")
+        return acc
+
+    def _extract_cas_numbers(self, sections: dict[int, str], legacy: dict[str, Any]) -> list[CASExtraction]:
+        store: dict[str, CASExtraction] = {}
+        order: list[str] = []
+
+        # 1) Section 3 enhanced composition (names + concentrations + section id)
+        sec3 = sections.get(3, "") or ""
+        for item in self._extract_composition_from_section3(sec3):
+            self._put_cas(store, order, item)
+
+        # 2) Legacy regex CAS list (merge; fills CAS missed by table or vice versa)
+        legacy_cas = legacy.get("cas_numbers") or []
+        for cas in legacy_cas:
+            cas = str(cas).strip()
+            if not cas:
+                continue
+            norm = cas_validator.normalize_cas_input(cas) or cas
+            item = CASExtraction(
+                cas=norm,
+                section=3 if 3 in sections else None,
+                method="focused_regex",
+                confidence=0.95,
+                validated=cas_validator.is_valid_cas_format(norm),
+            )
+            self._put_cas(store, order, item)
         if legacy_cas:
             self.methods_used.append("focused_regex")
 
-        # Secondary: table-style extraction on key sections.
-        for sec in (3, 15, 1):
+        # 3) Delimiter tables in sections 15 and 1 (skip 3 — already covered above)
+        for sec in (15, 1):
             txt = sections.get(sec, "")
             if not txt:
                 continue
@@ -106,22 +445,26 @@ class SDSParserEngine:
                         if not m:
                             continue
                         cas = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-                        if cas in seen:
+                        norm = cas_validator.normalize_cas_input(cas) or cas
+                        if not self._validate_cas_checksum(norm):
                             continue
-                        seen.add(cas)
                         chem = row[0].strip() if row and idx != 0 else None
-                        out.append(
+                        self._put_cas(
+                            store,
+                            order,
                             CASExtraction(
-                                cas=cas,
-                                chemical_name=chem,
+                                cas=norm,
+                                chemical_name=chem or None,
                                 section=sec,
                                 method="table_parsing",
-                                confidence=0.9 if sec == 3 else 0.8,
+                                confidence=0.82 if sec == 15 else 0.78,
                                 context=" | ".join(str(x) for x in row)[:220],
-                                validated=self._validate_cas_checksum(cas),
-                            )
+                                validated=True,
+                            ),
                         )
             self.methods_used.append("table_parsing")
+
+        out = [store[k] for k in order]
 
         # Optional local AI enhancement via Ollama (cloud-safe auto-disable).
         if self.env.get("can_use_ai") and out:

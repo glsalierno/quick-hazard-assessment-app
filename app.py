@@ -197,7 +197,57 @@ with tab_sds:
                     "Choose one for **full database assessment**."
                 )
                 if staged_ci.extraction_rows:
-                    st.dataframe(pd.DataFrame(staged_ci.extraction_rows), use_container_width=True, hide_index=True)
+                    _df_sds = pd.DataFrame(staged_ci.extraction_rows)
+                    _show_cols = [
+                        c
+                        for c in (
+                            "cas",
+                            "chemical_name",
+                            "concentration",
+                            "section",
+                            "method",
+                            "confidence",
+                            "validated",
+                        )
+                        if c in _df_sds.columns
+                    ]
+                    _disp = _df_sds[_show_cols].copy()
+                    if "confidence" in _disp.columns:
+                        _disp["confidence"] = _disp["confidence"].apply(
+                            lambda x: f"{float(x):.0%}" if isinstance(x, (int, float)) else x
+                        )
+                    if "section" in _disp.columns:
+                        def _fmt_sec(v: object) -> str:
+                            if v is None or (isinstance(v, float) and pd.isna(v)):
+                                return "—"
+                            try:
+                                return str(int(v))
+                            except (TypeError, ValueError):
+                                return str(v)
+
+                        _disp["section"] = _disp["section"].apply(_fmt_sec)
+                    st.dataframe(
+                        _disp,
+                        use_container_width=True,
+                        hide_index=True,
+                        column_config={
+                            "cas": st.column_config.TextColumn("CAS", width="small"),
+                            "chemical_name": st.column_config.TextColumn("Chemical name", width="large"),
+                            "concentration": st.column_config.TextColumn("Concentration", width="medium"),
+                            "section": st.column_config.TextColumn("Section", width="small"),
+                            "method": st.column_config.TextColumn("Method", width="medium"),
+                            "confidence": st.column_config.TextColumn("Confidence", width="small"),
+                            "validated": st.column_config.CheckboxColumn("Valid CAS", disabled=True),
+                        },
+                    )
+                    if "context" in _df_sds.columns and _df_sds["context"].astype(str).str.strip().any():
+                        with st.expander("Row context (source text)", expanded=False):
+                            for _i, _row in _df_sds.iterrows():
+                                _ctx = str(_row.get("context") or "").strip()
+                                if not _ctx:
+                                    continue
+                                st.markdown(f"**{_row.get('cas', '')}**")
+                                st.code(_ctx[:1200], language="text")
                 pick = st.selectbox(
                     "CAS for database lookup",
                     options=staged_ci.cas_numbers,

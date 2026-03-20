@@ -98,6 +98,8 @@ class UnifiedInputHandler:
                     "method": ext.method,
                     "confidence": ext.confidence,
                     "validated": ext.validated,
+                    "context": ext.context or "",
+                    "warnings": ", ".join(ext.warnings) if ext.warnings else "",
                 }
             )
 
