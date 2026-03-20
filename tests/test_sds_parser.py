@@ -80,6 +80,12 @@ Ethane, pentafluoro-
         rows = eng._extract_composition_from_section3(sample)
         assert any(r.cas == "354-33-6" and r.chemical_name and "pentafluoro" in r.chemical_name.lower() for r in rows)
 
+    def test_docling_module_reports_status_without_crash(self) -> None:
+        from utils import docling_sds_parser
+
+        msg = docling_sds_parser.docling_status_message()
+        assert isinstance(msg, str) and len(msg) > 0
+
     def test_html_composition_table_optional(self) -> None:
         eng = SDSParserEngine()
         html = """
