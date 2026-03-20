@@ -209,15 +209,27 @@ with tab_sds:
                     apply_assessment_query(pick, show_banner=True, banner_note=note)
                     st.rerun()
 
-# Example buttons (outside form — use session state to set query and rerun)
-st.markdown("**Examples:**")
-example_cols = st.columns(4)
-for i, (example_cas, label) in enumerate(config.EXAMPLE_CHEMICALS):
-    if example_cols[i].button(label, key=f"ex_{i}"):
-        st.session_state["query"] = example_cas
-        st.session_state["cas_query_input"] = example_cas
-        st.session_state["result_for"] = None  # force re-fetch
-        st.rerun()
+# Example shortcuts: hide once user has SDS, typed input, or an active assessment query
+_typed = (st.session_state.get("cas_query_input") or "").strip()
+_hide_examples = (
+    uf_shared is not None
+    or st.session_state.get("sds_staged_chemical_input") is not None
+    or bool(_typed)
+    or bool(st.session_state.get("query"))
+)
+if not _hide_examples:
+    st.markdown("**Examples:**")
+    example_cols = st.columns(4)
+    for i, (example_cas, label) in enumerate(config.EXAMPLE_CHEMICALS):
+        if example_cols[i].button(label, key=f"ex_{i}"):
+            st.session_state["query"] = example_cas
+            st.session_state["cas_query_input"] = example_cas
+            st.session_state["result_for"] = None  # force re-fetch
+            st.rerun()
+    st.caption(
+        "**Assessment scope:** one compound per run — each full lookup runs **PubChem + DSSTox + ToxValDB** (and related panels) for **a single CAS** at a time. "
+        "Multi-ingredient SDS: extract CAS list, choose one, assess, then switch CAS and run again."
+    )
 
 # When form is submitted, set query to what the user typed
 if submitted and cas:
