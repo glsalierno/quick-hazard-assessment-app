@@ -107,12 +107,29 @@ st.info(
     "further down — that flow also **reads and extracts information** from the Safety Data Sheet (GHS, CAS, quantitative values)."
 )
 
+# Banner when CAS was chosen from Unified SDS parser (results render below this message)
+if st.session_state.pop("show_assessment_from_unified", False):
+    q = st.session_state.get("query") or ""
+    st.success(
+        f"**Database assessment started for:** `{q}`. "
+        "Scroll down (or stay on this page) to view **Hazard assessment** and **P2OASys scoring** tabs below."
+    )
+    extra = st.session_state.pop("unified_assess_note", None)
+    if extra:
+        st.info(extra)
+
 # Input form: CAS or name → database lookup and prediction
 with st.form("cas_input"):
     cas_label = "Enter CAS number or chemical name (for database lookup and predictions):"
     # Prefill from session state if we have a previous query
     default = st.session_state.get("query") or ""
-    cas = st.text_input(cas_label, value=default, placeholder="e.g., 67-64-1 or acetone")
+    if "cas_query_input" not in st.session_state:
+        st.session_state["cas_query_input"] = default
+    cas = st.text_input(
+        cas_label,
+        key="cas_query_input",
+        placeholder="e.g., 67-64-1 or acetone",
+    )
     col1, col2 = st.columns([1, 5])
     with col1:
         submitted = st.form_submit_button("Assess")
@@ -123,6 +140,7 @@ example_cols = st.columns(4)
 for i, (example_cas, label) in enumerate(config.EXAMPLE_CHEMICALS):
     if example_cols[i].button(label, key=f"ex_{i}"):
         st.session_state["query"] = example_cas
+        st.session_state["cas_query_input"] = example_cas
         st.session_state["result_for"] = None  # force re-fetch
         st.rerun()
 
@@ -131,6 +149,7 @@ if submitted and cas:
     clean_cas = cas_validator.normalize_cas_input(cas)
     if clean_cas:
         st.session_state["query"] = clean_cas
+        st.session_state["cas_query_input"] = clean_cas
         st.session_state["result_for"] = None
     st.rerun()
 
@@ -1079,12 +1098,23 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
                             key="sds_unified_cas_select",
                         )
                         if selected and st.button("Assess selected CAS", key="sds_unified_assess_btn"):
-                            if len(selected) == 1:
-                                st.session_state["query"] = selected[0]
+                            # Same pipeline as top-of-page Assess: PubChem + DSSTox + ToxValDB + full hazard UI.
+                            primary = None
+                            for s in selected:
+                                n = cas_validator.normalize_cas_input(s) or (s or "").strip()
+                                if n:
+                                    primary = n
+                                    break
+                            if primary:
+                                st.session_state["query"] = primary
+                                st.session_state["cas_query_input"] = primary
                                 st.session_state["result_for"] = None
-                            else:
-                                st.session_state["selected_cas_list"] = selected
-                                st.session_state["assessment_mode"] = "batch"
+                                st.session_state["show_assessment_from_unified"] = True
+                                if len(selected) > 1:
+                                    st.session_state["unified_assess_note"] = (
+                                        f"Multiple CAS selected — running full database assessment for **{primary}** first. "
+                                        "Select another CAS and click again for the next compound."
+                                    )
                             st.rerun()
                 else:
                     st.info("No CAS numbers extracted.")
