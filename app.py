@@ -18,6 +18,8 @@ import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
 from utils import atmo_gwp, hazard_for_p2oasys, hazard_report_utils, iarc_lookup, lookup_tables, p2oasys_aggregate, p2oasys_scorer
 from utils import summary_utils, toxvaldb_client
+from utils.input_handler import get_input_handler
+from utils.sds_integration import apply_assessment_query
 
 try:
     from utils import sds_compare, sds_pdf_utils, sds_regex_extractor
@@ -61,6 +63,15 @@ if "show_signal_word" not in st.session_state:
     st.session_state["show_signal_word"] = True
 if "ghs_layout" not in st.session_state:
     st.session_state["ghs_layout"] = "two_columns"
+if "sds_staged_chemical_input" not in st.session_state:
+    st.session_state["sds_staged_chemical_input"] = None
+if "_last_sds_upload_name" not in st.session_state:
+    st.session_state["_last_sds_upload_name"] = None
+# Single shared SDS PDF for CAS extraction + SDS Intelligence (one upload widget)
+if "shared_sds_pdf_bytes" not in st.session_state:
+    st.session_state["shared_sds_pdf_bytes"] = None
+if "shared_sds_pdf_name" not in st.session_state:
+    st.session_state["shared_sds_pdf_name"] = None
 
 # Prefer SQLite chemical DB when present (fast); else fall back to CSV-based DSSTox
 db_stats = chemical_db.get_db_stats()
@@ -102,12 +113,12 @@ with st.sidebar:
         st.caption(f"{carcinogenic_potency_client.DISPLAY_NAME} not loaded.")
 
 st.info(
-    "**Get started:** Either **enter a CAS number** (or chemical name) below for **database lookup and predictions** "
-    "(PubChem, ToxValDB, CPDB, IARC, QSAR Toolbox/VEGA, etc.), or **upload an SDS PDF** in the **SDS PDF comparison** section "
-    "further down — that flow also **reads and extracts information** from the Safety Data Sheet (GHS, CAS, quantitative values)."
+    "**Chemical input (unified):** **one PDF upload** (below) feeds both **CAS → database lookup** and the **SDS Intelligence** section. "
+    "Use the tabs to **type a CAS or name** or to **extract CAS from that PDF**. "
+    "Assessment uses the same **PubChem + DSSTox + ToxValDB** pipeline as v1.3."
 )
 
-# Banner when CAS was chosen from Unified SDS parser (results render below this message)
+# Banner when CAS was chosen from SDS upload or unified parser (results render below this message)
 if st.session_state.pop("show_assessment_from_unified", False):
     q = st.session_state.get("query") or ""
     st.success(
@@ -118,21 +129,85 @@ if st.session_state.pop("show_assessment_from_unified", False):
     if extra:
         st.info(extra)
 
-# Input form: CAS or name → database lookup and prediction
-with st.form("cas_input"):
-    cas_label = "Enter CAS number or chemical name (for database lookup and predictions):"
-    # Prefill from session state if we have a previous query
-    default = st.session_state.get("query") or ""
-    if "cas_query_input" not in st.session_state:
-        st.session_state["cas_query_input"] = default
-    cas = st.text_input(
-        cas_label,
-        key="cas_query_input",
-        placeholder="e.g., 67-64-1 or acetone",
+# --- Unified chemical input: typed text OR SDS PDF → same assessment pipeline ---
+st.markdown("### 🔍 Chemical input")
+# One file uploader for the whole page (CAS path + SDS Intelligence share these bytes)
+uf_shared = None
+if sds_pdf_utils and sds_regex_extractor:
+    uf_shared = st.file_uploader(
+        "Safety Data Sheet (PDF) — single upload for CAS extraction and SDS Intelligence below",
+        type=["pdf"],
+        key="shared_sds_pdf_upload",
+        help="Upload once here. Use **Type CAS or name** tab for text, or **From SDS** tab to pick CAS for assessment; scroll down for structured tables / comparison.",
     )
-    col1, col2 = st.columns([1, 5])
-    with col1:
-        submitted = st.form_submit_button("Assess")
+    if uf_shared is not None:
+        st.session_state["shared_sds_pdf_bytes"] = uf_shared.getvalue()
+        st.session_state["shared_sds_pdf_name"] = uf_shared.name
+    else:
+        st.session_state["shared_sds_pdf_bytes"] = None
+        st.session_state["shared_sds_pdf_name"] = None
+
+tab_typed, tab_sds = st.tabs(["Type CAS or name", "From SDS (PDF)"])
+
+with tab_typed:
+    with st.form("cas_input"):
+        cas_label = "Enter CAS number or chemical name (for database lookup and predictions):"
+        default = st.session_state.get("query") or ""
+        if "cas_query_input" not in st.session_state:
+            st.session_state["cas_query_input"] = default
+        cas = st.text_input(
+            cas_label,
+            key="cas_query_input",
+            placeholder="e.g., 67-64-1 or acetone",
+        )
+        col1, col2 = st.columns([1, 5])
+        with col1:
+            submitted = st.form_submit_button("Assess")
+
+with tab_sds:
+    if not (sds_pdf_utils and sds_regex_extractor):
+        st.warning("SDS PDF modules are not available in this deployment. Use **Type CAS or name** or install SDS dependencies.")
+    else:
+        uf = uf_shared
+        if uf is None:
+            st.caption("Upload a PDF in the field **above** (same file is used for SDS Intelligence further down).")
+        if uf is not None and st.session_state.get("_last_sds_upload_name") != uf.name:
+            st.session_state["_last_sds_upload_name"] = uf.name
+            st.session_state["sds_staged_chemical_input"] = None
+        ex1, ex2 = st.columns(2)
+        with ex1:
+            extract_pdf = st.button("Extract CAS from SDS", type="secondary", disabled=uf is None, key="top_sds_extract_btn")
+        if extract_pdf and uf:
+            with st.spinner("Extracting text and CAS from PDF…"):
+                staged = get_input_handler().process_sds_pdf(uf)
+            st.session_state["sds_staged_chemical_input"] = staged
+            st.rerun()
+
+        staged_ci = st.session_state.get("sds_staged_chemical_input")
+        if staged_ci is not None:
+            if not staged_ci.cas_numbers:
+                st.error("No CAS numbers could be extracted. Try a text-based PDF, OCR setup, or type a CAS/name in the other tab.")
+            else:
+                st.success(
+                    f"Found **{len(staged_ci.cas_numbers)}** CAS candidate(s) in `{staged_ci.source_label or 'SDS'}`. "
+                    "Choose one for **full database assessment**."
+                )
+                if staged_ci.extraction_rows:
+                    st.dataframe(pd.DataFrame(staged_ci.extraction_rows), use_container_width=True, hide_index=True)
+                pick = st.selectbox(
+                    "CAS for database lookup",
+                    options=staged_ci.cas_numbers,
+                    key="top_sds_cas_pick",
+                )
+                if st.button("Run full database assessment", type="primary", key="top_sds_run_assess_btn"):
+                    note = None
+                    if staged_ci.has_multiple_cas():
+                        note = (
+                            f"Multiple CAS in SDS; assessing **{pick}**. "
+                            "Select another CAS above and click again to switch compounds."
+                        )
+                    apply_assessment_query(pick, show_banner=True, banner_note=note)
+                    st.rerun()
 
 # Example buttons (outside form — use session state to set query and rerun)
 st.markdown("**Examples:**")
@@ -878,18 +953,20 @@ if current_query:
 # --- SDS Intelligence Platform (Prompts 1–6: structured extraction, tabbed display, comparison) ---
 st.markdown("---")
 st.markdown("## Safety Data Sheet (SDS) Intelligence Platform")
-st.caption("**Extract, validate, and compare chemical hazard data.** Upload an SDS PDF to extract GHS classifications, physical properties, and toxicological data. Results are presented in structured tables for comparison with regulatory databases.")
+st.caption(
+    "**Extract, validate, and compare chemical hazard data.** Uses the **same PDF** you uploaded under **Chemical input** (one upload for the whole app)."
+)
 if sds_compare and sds_pdf_utils and sds_regex_extractor:
-    with st.expander("## Document upload", expanded=True):
+    with st.expander("## Structured extraction", expanded=True):
         st.markdown("**Supported format:** PDF (SDS compliant with ANSI Z400.1/Z129.1 or REACH Annex II)")
         st.markdown("The parser identifies all 16 SDS sections and extracts: GHS hazard classifications (H/P codes, pictograms), physical and chemical properties, toxicological and ecotoxicological data.")
-        uploaded = st.file_uploader("Drag and drop or click to upload", type=["pdf"], key="sds_upload")
-
-        if uploaded is not None:
-            if st.button("Extract from SDS", key="sds_extract_compare_btn"):
+        pdf_bytes_intel = st.session_state.get("shared_sds_pdf_bytes")
+        pdf_name_intel = st.session_state.get("shared_sds_pdf_name") or "SDS.pdf"
+        if pdf_bytes_intel:
+            st.success(f"Using uploaded file: **{pdf_name_intel}** — change or clear it in **Chemical input** above.")
+            if st.button("Extract from SDS (structured tables)", key="sds_extract_compare_btn"):
                 with st.spinner("Extracting text from PDF…"):
-                    pdf_bytes = uploaded.getvalue()
-                    raw_text = sds_pdf_utils.extract_text_from_pdf_bytes(pdf_bytes)
+                    raw_text = sds_pdf_utils.extract_text_from_pdf_bytes(pdf_bytes_intel)
                     raw_text = sds_pdf_utils.normalize_whitespace(raw_text)
 
                 if not raw_text.strip():
@@ -906,6 +983,8 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
                     st.session_state["sds_result"] = sds_result
                     st.session_state["sds_compare_cas"] = None
                     st.session_state["sds_comparison"] = None
+        else:
+            st.info("Upload a PDF in **Chemical input** at the top of the page, then return here and click **Extract from SDS (structured tables)**.")
 
         sds_result = st.session_state.get("sds_result")
         if sds_result and isinstance(sds_result, dict):
@@ -1034,107 +1113,22 @@ if sds_compare and sds_pdf_utils and sds_regex_extractor:
                     else:
                         st.info("Select a CAS and run comparison to see SDS vs database.")
         else:
-            st.caption("Upload a PDF to extract GHS H/P codes, physical properties, and ecotoxicity in structured tables.")
+            st.caption("Upload a PDF under **Chemical input** at the top, then extract here for GHS, physical properties, and ecotoxicity tables.")
 
-    # Unified SDS parser (adaptive: cloud-safe rule-based, optional local AI enhancement)
+    # SDS parser environment note (detailed extract/compare stays in SDS Intelligence above)
     st.markdown("---")
-    st.markdown("## 🔬 Unified SDS Parser (Adaptive)")
-    st.caption("CAS-first parsing with automatic environment adaptation. On cloud it uses robust rule-based extraction; locally it can add optional AI enhancement.")
+    st.markdown("### SDS parser (environment)")
+    st.caption(
+        "**CAS → database lookup** uses the **single PDF upload** under **Chemical input** at the top. "
+        "This section only summarizes parser capabilities; use **SDS Intelligence Platform** for structured tables and SDS vs PubChem comparison."
+    )
     try:
         from utils.sds_parser import get_sds_parser
 
-        if "sds_unified_parser" not in st.session_state:
-            st.session_state["sds_unified_parser"] = get_sds_parser()
-        parser = st.session_state["sds_unified_parser"]
-
         with st.expander("Current parsing capabilities", expanded=False):
-            st.markdown(parser.get_capability_message())
-
-        uploaded_unified = st.file_uploader(
-            "Upload Safety Data Sheet (PDF)",
-            type=["pdf"],
-            key="sds_unified_upload",
-            help="The parser automatically selects the best available methods for this runtime.",
-        )
-        if uploaded_unified is not None:
-            if st.button("Extract data from SDS (Unified)", key="sds_unified_extract_btn"):
-                with st.spinner("Processing PDF and extracting data..."):
-                    unified_result = parser.parse_pdf(uploaded_unified.getvalue())
-                if unified_result is None:
-                    st.error("Could not parse PDF. Please verify the file is readable.")
-                    st.session_state["sds_unified_result"] = None
-                else:
-                    st.session_state["sds_unified_result"] = unified_result
-                    st.success(f"Extraction complete: found {len(unified_result.cas_numbers)} CAS number(s).")
-
-        unified_result = st.session_state.get("sds_unified_result")
-        if unified_result is not None:
-            c1, c2, c3, c4 = st.columns(4)
-            with c1:
-                st.metric("CAS numbers", len(unified_result.cas_numbers))
-            with c2:
-                st.metric("GHS codes", len(unified_result.ghs.h_codes) + len(unified_result.ghs.p_codes))
-            with c3:
-                st.metric("Properties", len(unified_result.physical_properties))
-            with c4:
-                st.metric("Ecotox values", len(unified_result.ecotoxicity))
-            st.caption(
-                f"Methods used: {', '.join(unified_result.methods_used) if unified_result.methods_used else 'n/a'} "
-                f"| Parse time: {unified_result.parse_time_ms} ms"
-            )
-
-            dfs = unified_result.to_dataframes()
-            t1, t2, t3, t4 = st.tabs(["CAS numbers", "GHS", "Properties", "Ecotoxicity"])
-            with t1:
-                if "cas_numbers" in dfs and not dfs["cas_numbers"].empty:
-                    st.dataframe(dfs["cas_numbers"], use_container_width=True, hide_index=True)
-                    cas_list = [c.cas for c in unified_result.cas_numbers if c and c.cas]
-                    if cas_list:
-                        cas_opts = [f"{x}" for x in cas_list]
-                        selected = st.multiselect(
-                            "Select CAS numbers to assess",
-                            options=cas_opts,
-                            default=cas_opts[:1],
-                            key="sds_unified_cas_select",
-                        )
-                        if selected and st.button("Assess selected CAS", key="sds_unified_assess_btn"):
-                            # Same pipeline as top-of-page Assess: PubChem + DSSTox + ToxValDB + full hazard UI.
-                            primary = None
-                            for s in selected:
-                                n = cas_validator.normalize_cas_input(s) or (s or "").strip()
-                                if n:
-                                    primary = n
-                                    break
-                            if primary:
-                                st.session_state["query"] = primary
-                                st.session_state["cas_query_input"] = primary
-                                st.session_state["result_for"] = None
-                                st.session_state["show_assessment_from_unified"] = True
-                                if len(selected) > 1:
-                                    st.session_state["unified_assess_note"] = (
-                                        f"Multiple CAS selected — running full database assessment for **{primary}** first. "
-                                        "Select another CAS and click again for the next compound."
-                                    )
-                            st.rerun()
-                else:
-                    st.info("No CAS numbers extracted.")
-            with t2:
-                if "ghs" in dfs and not dfs["ghs"].empty:
-                    st.dataframe(dfs["ghs"], use_container_width=True, hide_index=True)
-                else:
-                    st.info("No GHS data extracted.")
-            with t3:
-                if "physical_properties" in dfs and not dfs["physical_properties"].empty:
-                    st.dataframe(dfs["physical_properties"], use_container_width=True, hide_index=True)
-                else:
-                    st.info("No physical properties extracted.")
-            with t4:
-                if "ecotoxicity" in dfs and not dfs["ecotoxicity"].empty:
-                    st.dataframe(dfs["ecotoxicity"], use_container_width=True, hide_index=True)
-                else:
-                    st.info("No ecotoxicity data extracted.")
+            st.markdown(get_sds_parser().get_capability_message())
     except Exception as e:
-        st.info(f"Unified parser unavailable: {e}")
+        st.caption(f"Parser info unavailable: {e}")
 else:
     st.caption("SDS PDF extraction and comparison are available when the SDS modules (sds_pdf_utils, sds_regex_extractor, sds_compare) are installed (v1.4).")
 
