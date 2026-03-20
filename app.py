@@ -17,7 +17,7 @@ import streamlit as st
 import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
 from utils import atmo_gwp, hazard_for_p2oasys, hazard_report_utils, iarc_lookup, lookup_tables, p2oasys_aggregate, p2oasys_scorer
-from utils import summary_utils, toxvaldb_client
+from utils import summary_utils
 from utils.input_handler import get_input_handler
 from utils.sds_integration import apply_assessment_query
 
@@ -111,11 +111,17 @@ with st.sidebar:
         st.success(f"✅ {carcinogenic_potency_client.DISPLAY_NAME} (SQLite)")
     elif carcinogenic_potency_client:
         st.caption(f"{carcinogenic_potency_client.DISPLAY_NAME} not loaded.")
+    with st.expander("Assessment service (runtime)", expanded=False):
+        try:
+            from services.config import ServiceConfig
+
+            st.markdown(ServiceConfig.get_capability_message())
+        except Exception as e:
+            st.caption(str(e))
 
 st.info(
-    "**Chemical input (unified):** **one PDF upload** (below) feeds both **CAS → database lookup** and the **SDS Intelligence** section. "
-    "Use the tabs to **type a CAS or name** or to **extract CAS from that PDF**. "
-    "Assessment uses the same **PubChem + DSSTox + ToxValDB** pipeline as v1.3."
+    "**Unified assessment:** type a **CAS or name**, pick a CAS from an **SDS**, or use **examples** — all use the same "
+    "**`ChemicalAssessmentService`** (PubChem + DSSTox + ToxValDB + CPDB). **One PDF upload** (below) also feeds **SDS Intelligence**."
 )
 
 # Banner when CAS was chosen from SDS upload or unified parser (results render below this message)
@@ -301,58 +307,18 @@ if current_query:
     need_fetch = st.session_state.get("result_for") != clean_cas
     if need_fetch:
         with st.spinner("Fetching data and generating structure..."):
-            # DSSTox: SQLite (fast) or CSV
-            if use_sqlite_dsstox:
-                dsstox_info = chemical_db.get_dsstox_by_cas(clean_cas)
-            else:
-                dsstox_info = dsstox_local.get_dsstox_info(clean_cas, dsstox_data) if dsstox_data else None
-            dtxsid = (dsstox_info or {}).get("dtxsid")
-            preferred_name = (dsstox_info or {}).get("preferred_name")
+            from services.chemical_assessment import AssessmentResult, get_assessment_service
 
-            # PubChem
-            if cas_validator.is_valid_cas_format(clean_cas):
-                input_type = "cas"
-            else:
-                input_type = "name"
-            pubchem_data = pubchem_client.get_compound_data(clean_cas, input_type=input_type)
-
-            # ToxValDB: SQLite (local) or API
-            toxval_data = None
-            if dtxsid and use_sqlite_toxval:
-                recs = chemical_db.get_toxicity_by_dtxsid(dtxsid, numeric_only=False)
-                toxval_data = {}
-                for rec in recs:
-                    cat = (rec.get("study_type") or "other").strip() or "other"
-                    toxval_data.setdefault(cat, []).append({
-                        "value": rec.get("toxval_numeric"),
-                        "units": rec.get("toxval_units", ""),
-                        "species": rec.get("species", ""),
-                        "route": rec.get("exposure_route", ""),
-                        "study_type": rec.get("study_type", ""),
-                    })
-            elif dtxsid:
-                try:
-                    api_key = st.secrets.get("COMPTOX_API_KEY") if hasattr(st, "secrets") else None
-                    if not api_key:
-                        import os
-                        api_key = os.environ.get("COMPTOX_API_KEY")
-                    if api_key:
-                        toxval_data = toxvaldb_client.fetch_toxval_data(dtxsid, api_key)
-                except Exception:
-                    toxval_data = None
-
-            carc_potency_data = carcinogenic_potency_client.get_data_by_cas(clean_cas) if (carcinogenic_potency_client and carcinogenic_potency_client.is_available()) else None
-
+            _svc = get_assessment_service()
+            _ar = _svc.assess(current_query)
+            if isinstance(_ar, list):
+                _ar = _ar[0]
+            if isinstance(_ar, AssessmentResult) and _ar.has_multiple_components and _ar.all_components:
+                _ar = _ar.all_components[0]
+            if not isinstance(_ar, AssessmentResult):
+                raise TypeError("Unexpected assessment return type")
             st.session_state["result_for"] = clean_cas
-            st.session_state["result_data"] = {
-                "pubchem": pubchem_data,
-                "dsstox_info": dsstox_info,
-                "dtxsid": dtxsid,
-                "preferred_name": preferred_name,
-                "clean_cas": clean_cas,
-                "toxval_data": toxval_data,
-                "carc_potency_data": carc_potency_data,
-            }
+            st.session_state["result_data"] = _svc.to_result_data(_ar)
 
     result = st.session_state.get("result_data")
     tab_haz, tab_p2o = st.tabs(["Hazard assessment", "P2OASys scoring"])
