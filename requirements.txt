@@ -9,6 +9,8 @@ rdkit>=2023.9.6
 Pillow>=10.0.0
 openai>=1.0.0
 pypdf>=4.0.0
+# pdfplumber for robust CAS extraction (tables + text)
+pdfplumber>=0.10.0
 # OCR for scanned SDS PDFs (optional: install Tesseract and Poppler on system)
 pdf2image>=1.17.0
 pytesseract>=0.3.10

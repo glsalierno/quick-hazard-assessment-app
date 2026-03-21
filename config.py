@@ -52,6 +52,14 @@ USE_LLM_CAS_EXTRACTION = os.environ.get("USE_LLM_CAS_EXTRACTION", "").strip().lo
     "1", "true", "yes", "on",
 )
 
+# Robust multi-stage CAS extractor (pdfplumber + optional Docling/OCR).
+# Handles adversarial formatting: spaces around hyphens, Unicode dashes, split digits.
+USE_ROBUST_CAS_EXTRACTOR = os.environ.get("USE_ROBUST_CAS_EXTRACTOR", "1").strip().lower() in (
+    "1", "true", "yes", "on",
+)
+USE_DOCLING = os.environ.get("USE_DOCLING", "").strip().lower() in ("1", "true", "yes", "on")
+USE_OCR = os.environ.get("USE_OCR", "").strip().lower() in ("1", "true", "yes", "on")
+
 # QSAR Toolbox (OECD + VEGA/OPERA) — local WebSuite must be running. Windows only.
 # Set port (e.g. 51946) or leave None to disable. See https://github.com/glsalierno/PyQSARToolbox
 QSAR_TOOLBOX_PORT = os.environ.get("QSAR_TOOLBOX_PORT", None)

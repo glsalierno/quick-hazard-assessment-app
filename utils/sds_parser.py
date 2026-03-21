@@ -61,6 +61,42 @@ def _merge_docling_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> 
     )
 
 
+@st.cache_resource
+def _get_cached_robust_extractor(_use_docling: bool, _use_ocr: bool):  # -> RobustCASExtractor
+    """Cached RobustCASExtractor (Streamlit resource cache)."""
+    from utils.robust_cas_extractor import RobustCASExtractor
+    return RobustCASExtractor(use_docling=_use_docling, use_ocr=_use_ocr)
+
+
+def _merge_robust_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> None:
+    """Fallback: RobustCASExtractor when regex/Docling find no CAS (adversarial formatting)."""
+    try:
+        from config import USE_ROBUST_CAS_EXTRACTOR, USE_DOCLING, USE_OCR
+        if not USE_ROBUST_CAS_EXTRACTOR:
+            return
+    except ImportError:
+        return
+    try:
+        from utils.sds_debug import cas_rows_brief, sds_debug_log
+    except ImportError:
+        return
+    try:
+        extractor = _get_cached_robust_extractor(USE_DOCLING, USE_OCR)
+        extra = extractor.extract(pdf_bytes)
+        if not extra:
+            sds_debug_log("merge.robust", {"n_robust": 0, "skipped": True})
+            return
+        result.cas_numbers = extra
+        result.methods_used = sorted(set([*result.methods_used, "robust_cas"]))
+        sds_debug_log(
+            "merge.robust",
+            {"n_robust": len(extra), "sample": cas_rows_brief(extra)},
+        )
+    except Exception as e:
+        from utils.sds_debug import sds_debug_log
+        sds_debug_log("merge.robust.error", {"error": str(e)})
+
+
 class SDSParser:
     def __init__(self) -> None:
         self.engine = SDSParserEngine()
@@ -83,6 +119,9 @@ class SDSParser:
             result = self.engine.parse(text)
             if pdf_bytes:
                 _merge_docling_cas_extractions(result, pdf_bytes)
+            # Robust extractor fallback when no CAS found (adversarial PDF formatting).
+            if not result.cas_numbers and pdf_bytes:
+                _merge_robust_cas_extractions(result, pdf_bytes)
             return result
         except Exception as e:
             sds_debug_log(
