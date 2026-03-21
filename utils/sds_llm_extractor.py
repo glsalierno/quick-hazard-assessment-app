@@ -202,3 +202,130 @@ def is_ollama_available(host: str = "http://localhost:11434", timeout: int = 2) 
         return r.status_code == 200
     except Exception:
         return False
+
+
+# --- CAS / composition extraction (Section 3) ---
+
+_CAS_EXTRACT_PROMPT = """You are a chemical safety expert. Extract all CAS numbers, chemical names, and concentrations from this Safety Data Sheet section. Return ONLY a JSON object with keys "cas_numbers", "chemical_names", "concentrations". Each list must have the same length; use empty string for missing values. Concentrations may include ranges like ">=30 - <60%".
+
+Example:
+{"cas_numbers": ["75-45-6", "420-46-2"], "chemical_names": ["Methane, chlorodifluoro-", "Ethane, 1,1,1-trifluoro-"], "concentrations": [">=30 - <60%", ">=30 - <60%"]}
+
+Section text:
+"""
+
+
+def extract_cas_with_llm(
+    section_text: str,
+    host: str | None = None,
+    model: str | None = None,
+    timeout: int = 45,
+) -> dict[str, Any]:
+    """
+    Use local LLM (Ollama) to extract CAS numbers, chemical names, and concentrations
+    from SDS Section 3 (composition/ingredients) text.
+
+    Returns dict with keys: cas_numbers, chemical_names, concentrations (lists of same length).
+    Returns empty dict on failure (Ollama down, parse error, etc.).
+    """
+    if not section_text or not str(section_text).strip():
+        return {}
+    if not requests:
+        return {}
+
+    # Use config defaults when not provided
+    if host is None or model is None:
+        try:
+            from config import OLLAMA_HOST, OLLAMA_MODEL
+            host = host or OLLAMA_HOST
+            model = model or OLLAMA_MODEL
+        except ImportError:
+            host = host or "http://localhost:11434"
+            model = model or "qwen2:0.5b"
+
+    url = host.rstrip("/") + "/api/generate"
+    prompt = _CAS_EXTRACT_PROMPT + (section_text[:8000] if len(section_text) > 8000 else section_text)
+    payload = {"model": model, "prompt": prompt, "stream": False, "temperature": 0.1}
+
+    try:
+        r = requests.post(url, json=payload, timeout=timeout)
+        if r.status_code != 200:
+            return {}
+        data = r.json()
+        response_text = (data.get("response") or "").strip()
+    except Exception:
+        return {}
+
+    # Parse JSON from response (may be wrapped in markdown code block)
+    m = re.search(r"\{[\s\S]*\}", response_text)
+    if not m:
+        return {}
+    try:
+        parsed = json.loads(m.group(0))
+    except json.JSONDecodeError:
+        return {}
+
+    cas_list = parsed.get("cas_numbers")
+    names_list = parsed.get("chemical_names") or []
+    conc_list = parsed.get("concentrations") or []
+    if not isinstance(cas_list, list) or not cas_list:
+        return {}
+
+    # Validate and normalize CAS; align lengths
+    from utils import cas_validator
+
+    out_cas: list[str] = []
+    out_names: list[str] = []
+    out_conc: list[str] = []
+    for i, raw_cas in enumerate(cas_list):
+        cas_str = str(raw_cas).strip()
+        if not cas_str:
+            continue
+        norm = cas_validator.normalize_cas_input(cas_str) or cas_str
+        if not cas_validator.is_valid_cas_format(norm):
+            continue
+        try:
+            validated, _ = cas_validator.validate_cas_relaxed(norm)
+        except Exception:
+            validated = norm
+        if not validated:
+            continue
+        out_cas.append(validated)
+        out_names.append(str(names_list[i]).strip() if i < len(names_list) else "")
+        out_conc.append(str(conc_list[i]).strip() if i < len(conc_list) else "")
+
+    return {"cas_numbers": out_cas, "chemical_names": out_names, "concentrations": out_conc}
+
+
+# Alias per spec: extract_with_llm(section_text) -> dict
+extract_with_llm = extract_cas_with_llm
+
+
+def llm_cas_result_to_casextractions(result: dict[str, Any]) -> list[Any]:
+    """
+    Convert extract_cas_with_llm output to list of CASExtraction for merging into
+    sds_parser_engine. Uses TYPE_CHECKING import to avoid circular dependency.
+    """
+    if not result or not result.get("cas_numbers"):
+        return []
+    from utils.sds_models import CASExtraction
+
+    cas_list = result["cas_numbers"]
+    names = result.get("chemical_names") or []
+    concs = result.get("concentrations") or []
+    out: list[CASExtraction] = []
+    for i, cas in enumerate(cas_list):
+        name = names[i].strip() if i < len(names) and names[i] else ""
+        conc = concs[i].strip() if i < len(concs) and concs[i] else ""
+        out.append(
+            CASExtraction(
+                cas=cas,
+                chemical_name=name or None,
+                concentration=conc or None,
+                section=3,
+                method="llm_ollama",
+                confidence=0.9,
+                validated=True,
+            )
+        )
+    return out

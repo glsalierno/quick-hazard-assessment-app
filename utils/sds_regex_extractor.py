@@ -676,12 +676,60 @@ def extract_sds_fields_from_text(text: str) -> ParsedSDSResult:
     if quantitative:
         cleaned["quantitative"] = quantitative
 
+    # Optional: LLM fallback when regex finds no CAS (e.g. complex tables).
+    if not cas_numbers:
+        llm_cas = _try_llm_cas_fallback(text)
+        if llm_cas:
+            cas_numbers = llm_cas.get("cas_numbers") or []
+            cleaned["cas_numbers"] = cas_numbers
+            cleaned["llm_composition"] = llm_cas.get("llm_composition") or []
+
     cleaned["meta"] = {
-        "extraction_method": "regex_only_phase1",
+        "extraction_method": "regex_plus_llm_fallback" if cleaned.get("llm_composition") else "regex_only_phase1",
         "note": "Fields omitted when not found; caller can still ignore empty mandatory fields.",
         "cas_from_focused_extraction": cas_from_focused,
+        "cas_from_llm": bool(cleaned.get("llm_composition")),
     }
     return cleaned  # type: ignore[return-value]
+
+
+def _try_llm_cas_fallback(text: str) -> dict[str, Any] | None:
+    """
+    When regex finds no CAS, try local LLM (Ollama) on Section 3.
+    Returns None if disabled, Ollama unavailable, or extraction fails.
+    """
+    try:
+        from config import USE_LLM_CAS_EXTRACTION
+    except ImportError:
+        return None
+    if not USE_LLM_CAS_EXTRACTION:
+        return None
+    try:
+        from utils.sds_llm_extractor import extract_cas_with_llm, is_ollama_available
+    except ImportError:
+        return None
+    if not is_ollama_available():
+        return None
+    parser = SDSParser()
+    section_3 = parser.extract_section_content(text or "", 3)
+    if not section_3 or len(section_3) < 50:
+        section_3 = parser.extract_section_content(text or "", 2) or ""
+    if not section_3 or len(section_3) < 50:
+        return None
+    result = extract_cas_with_llm(section_3)
+    if not result or not result.get("cas_numbers"):
+        return None
+    cas_list = result["cas_numbers"]
+    names = result.get("chemical_names") or []
+    concs = result.get("concentrations") or []
+    llm_composition = []
+    for i, cas in enumerate(cas_list):
+        llm_composition.append({
+            "cas": cas,
+            "chemical_name": (names[i].strip() or None) if i < len(names) else None,
+            "concentration": (concs[i].strip() or None) if i < len(concs) else None,
+        })
+    return {"cas_numbers": cas_list, "llm_composition": llm_composition}
 
 
 # --- Structured tables (Prompt 1: database-style DataFrames) ---

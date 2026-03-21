@@ -86,8 +86,20 @@ class EnvironmentDetector:
                 "- ✅ Optional Ollama AI enhancement (`phi3:mini`)\n"
                 "- ✅ Highest accuracy parsing path"
             )
+        llm_wanted = False
+        try:
+            from config import USE_LLM_CAS_EXTRACTION
+            llm_wanted = USE_LLM_CAS_EXTRACTION
+        except ImportError:
+            pass
+        if llm_wanted and not env.get("has_ollama"):
+            return (
+                "💻 **Running locally (rule-based mode)**\n"
+                "- ✅ Rule-based extraction enabled\n"
+                "- ⚠️ `USE_LLM_CAS_EXTRACTION` is on, but Ollama is not running. Start Ollama and pull `qwen2:0.5b` for LLM CAS fallback."
+            )
         return (
             "💻 **Running locally (rule-based mode)**\n"
             "- ✅ Rule-based extraction enabled\n"
-            "- ℹ️ For AI enhancement install/start Ollama and pull `phi3:mini`"
+            "- ℹ️ For AI enhancement install/start Ollama and pull `qwen2:0.5b` or `phi3:mini`. Set `USE_LLM_CAS_EXTRACTION=1` to enable."
         )

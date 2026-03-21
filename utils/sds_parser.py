@@ -4,6 +4,7 @@ Unified SDS Parser public interface.
 
 from __future__ import annotations
 
+import traceback
 from typing import Optional
 
 import streamlit as st
@@ -17,9 +18,12 @@ from utils.sds_parser_engine import SDSParserEngine
 def _merge_docling_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> None:
     """Prepend / enrich composition rows from Docling table export when available."""
     from utils import docling_sds_parser
+    from utils.sds_debug import cas_rows_brief, sds_debug_log
 
+    n_before = len(result.cas_numbers)
     extra = docling_sds_parser.extract_composition_from_pdf(pdf_bytes)
     if not extra:
+        sds_debug_log("merge.docling", {"n_docling": 0, "n_before": n_before, "skipped": True})
         return
 
     def _key(c: str) -> str:
@@ -46,6 +50,15 @@ def _merge_docling_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> 
             seen.add(k)
     result.cas_numbers = merged
     result.methods_used = sorted(set([*result.methods_used, "docling"]))
+    sds_debug_log(
+        "merge.docling",
+        {
+            "n_docling_rows": len(extra),
+            "n_before": n_before,
+            "n_after": len(merged),
+            "docling_sample": cas_rows_brief(extra),
+        },
+    )
 
 
 class SDSParser:
@@ -54,16 +67,28 @@ class SDSParser:
         self.env = EnvironmentDetector.detect()
 
     def parse_pdf(self, pdf_bytes: bytes) -> Optional[SDSParseResult]:
+        from utils.sds_debug import sds_debug_log
+
         try:
+            sds_debug_log("parse_pdf.start", {"pdf_bytes": len(pdf_bytes or b"")})
             text = sds_pdf_utils.extract_text_from_pdf_bytes(pdf_bytes)
             text = sds_pdf_utils.normalize_whitespace(text)
+            sds_debug_log(
+                "parse_pdf.text_extracted",
+                {"text_len": len(text or ""), "head": (text or "")[:800]},
+            )
             if not (text or "").strip():
+                sds_debug_log("parse_pdf.abort", {"reason": "no_text"})
                 return None
             result = self.engine.parse(text)
             if pdf_bytes:
                 _merge_docling_cas_extractions(result, pdf_bytes)
             return result
         except Exception as e:
+            sds_debug_log(
+                "parse_pdf.exception",
+                {"error": str(e), "traceback": traceback.format_exc()},
+            )
             st.error(f"Parsing error: {e}")
             return None
 
