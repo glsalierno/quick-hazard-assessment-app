@@ -14,9 +14,15 @@ pdf2image>=1.17.0
 pytesseract>=0.3.10
 easyocr>=1.7.0
 psutil>=5.9.0
+# OpenCV headless for Streamlit Cloud (avoids cv2 LOADER_DIR crash from opencv-python).
+# Must be before docling/easyocr so pip prefers it over GUI opencv.
+opencv-python-headless>=4.8.0
 # Optional but recommended locally: IBM Docling for PDF table / composition extraction (torch + models on first use).
 # On Streamlit Cloud set HAZQUERY_DISABLE_DOCLING=1 if build memory/time is an issue.
 docling>=2.0.0
+# DistilBERT CAS path (utils/cas_extractor.py) — also pulled in by Docling on many installs
+torch>=2.0.0
+transformers>=4.35.0
 # Optional: add text layer to PDFs (pip install ocrmypdf; needs Tesseract)
 # ocrmypdf>=16.0.0
 # Optional: OECD QSAR Toolbox + VEGA (Windows only; start WebSuite, set QSAR_TOOLBOX_PORT)
