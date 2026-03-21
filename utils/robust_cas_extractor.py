@@ -21,9 +21,13 @@ from io import BytesIO
 from typing import Any, Optional
 
 from utils import cas_validator
+from utils.cas_reconstructor import CASReconstructor
 from utils.sds_models import CASExtraction
 
 logger = logging.getLogger(__name__)
+
+# Reconstructor runs first on raw text to fix digit loss from PDF extraction
+_cas_reconstructor = CASReconstructor(max_gap=25, try_ocr_corrections=False)
 
 
 def _is_cas_debug() -> bool:
@@ -475,9 +479,25 @@ class RobustCASExtractor:
                     )
                     store[item.cas] = merged
 
-        # Stage 1: pdfplumber
+        # Stage 0 + 1: pdfplumber extraction, then CAS Reconstructor (before regex/table)
         try:
             full_text, tables = _pdfplumber_extract(pdf_bytes)
+            # Reconstructor fixes digit loss (split lines, Unicode dashes, spaces)
+            if full_text:
+                recon_cas = _cas_reconstructor.reconstruct_from_text(full_text)
+                if _is_cas_debug():
+                    dbg = _cas_reconstructor.reconstruct_with_debug(full_text)
+                    _cas_debug_log("reconstructor", cas=",".join(recon_cas), context=str(dbg)[:400])
+                for cas in recon_cas:
+                    _put(
+                        CASExtraction(
+                            cas=cas,
+                            section=3,
+                            method="reconstructor",
+                            confidence=0.95,
+                            validated=True,
+                        )
+                    )
             for item in _tables_to_cas_extractions(tables):
                 _put(item)
             for item in _extract_cas_from_text(full_text):
