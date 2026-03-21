@@ -29,6 +29,18 @@ def is_sds_debug_enabled() -> bool:
         return False
 
 
+def is_cas_debug_enabled() -> bool:
+    """True if CAS extraction should log pattern matches and validation (Streamlit session or env)."""
+    if os.getenv("CAS_DEBUG", "").strip().lower() in ("1", "true", "yes", "on"):
+        return True
+    try:
+        import streamlit as st
+
+        return bool(st.session_state.get("cas_debug_enabled", False))
+    except Exception:
+        return False
+
+
 def make_json_safe(obj: Any, max_depth: int = 8, _depth: int = 0) -> Any:
     """Convert objects to structures safe for ``st.json``."""
     if _depth > max_depth:
@@ -211,10 +223,12 @@ class SDSDebugger:
         except Exception:
             return
 
-        if not st.session_state.get("sds_debug_enabled", False) and not os.getenv("SDS_DEBUG"):
+        debug_on = st.session_state.get("sds_debug_enabled", False) or os.getenv("SDS_DEBUG")
+        cas_debug_on = st.session_state.get("cas_debug_enabled", False) or os.getenv("CAS_DEBUG", "").strip().lower() in ("1", "true", "yes", "on")
+        if not debug_on and not cas_debug_on:
             return
 
-        with st.expander("🔍 SDS parser debug console", expanded=False):
+        with st.expander("🔍 SDS parser debug console", expanded=cas_debug_on):
             logs = self.get_logs()
             c1, c2, c3 = st.columns(3)
             with c1:
@@ -260,6 +274,31 @@ class SDSDebugger:
 
             st.caption(f"Showing {len(filtered)} / {len(logs)} entries")
 
+            # Raw extractor diagnostic (when SDS uploaded)
+            pdf_bytes = st.session_state.get("shared_sds_pdf_bytes")
+            if pdf_bytes and isinstance(pdf_bytes, bytes):
+                with st.expander("🔬 Raw extractor diagnostic", expanded=False):
+                    try:
+                        from utils.robust_cas_extractor import get_robust_extractor
+
+                        extractor = get_robust_extractor(use_docling=False, use_ocr=False)
+                        results = extractor.extract(pdf_bytes)
+                        st.write(f"**Robust extractor found {len(results)} CAS** (no merging)")
+                        for r in results:
+                            st.write(f"- {r.cas} (conf: {r.confidence:.2f}, method: {r.method})")
+                        try:
+                            import io
+                            import pdfplumber
+
+                            with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+                                for i, page in enumerate(pdf.pages[:4]):  # first 4 pages
+                                    txt = page.extract_text() or "(no text)"
+                                    st.text_area(f"Page {i + 1} raw text (pdfplumber)", txt[:3000], height=120)
+                        except Exception as e:
+                            st.caption(f"pdfplumber preview: {e}")
+                    except Exception as e:
+                        st.caption(f"Diagnostic error: {e}")
+
             for i, log in enumerate(reversed(filtered[-50:])):  # newest first, cap UI
                 title = f"`{log['stage']}` · {log.get('timestamp', '')}"
                 with st.expander(title, expanded=(i == 0)):
@@ -282,6 +321,11 @@ def render_sds_debug_sidebar_controls() -> None:
         "SDS parser debug logging",
         key="sds_debug_enabled",
         help="Log parsing stages to the debug console below. Or set env SDS_DEBUG=1.",
+    )
+    st.checkbox(
+        "🔍 CAS debug mode",
+        key="cas_debug_enabled",
+        help="Log pattern matches, reconstructed CAS, and validation in robust extractor. Or set env CAS_DEBUG=1.",
     )
     if env_on:
         st.caption("Env **SDS_DEBUG** is on — logging active.")

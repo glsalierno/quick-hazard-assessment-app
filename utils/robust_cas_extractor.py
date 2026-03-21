@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import logging
 import re
+import unicodedata
 from io import BytesIO
 from typing import Any, Optional
 
@@ -23,6 +24,42 @@ from utils import cas_validator
 from utils.sds_models import CASExtraction
 
 logger = logging.getLogger(__name__)
+
+
+def _is_cas_debug() -> bool:
+    """Lazy check for CAS debug mode (avoids importing Streamlit when not needed)."""
+    try:
+        from utils.sds_debug import is_cas_debug_enabled
+
+        return is_cas_debug_enabled()
+    except Exception:
+        return False
+
+
+def _cas_debug_log(stage: str, match: str = "", cas: str = "", validated: Optional[str] = None, context: str = "") -> None:
+    """Log CAS extraction detail to Streamlit debug console when cas_debug is on."""
+    if not _is_cas_debug():
+        return
+    logger.info("CAS debug [%s]: match=%r cas=%r validated=%s", stage, match, cas, validated)
+    try:
+        from datetime import datetime
+
+        import streamlit as st
+
+        from utils.sds_debug import make_json_safe
+
+        entry = {
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "stage": f"cas_extractor.{stage}",
+            "data": make_json_safe({"match": match, "cas": cas, "validated": validated, "context": (context[:200] if context else "")}),
+            "metadata": {},
+        }
+        logs = st.session_state.setdefault("sds_debug_logs", [])
+        logs.append(entry)
+        if len(logs) > 80:
+            del logs[: len(logs) - 80]
+    except Exception:
+        pass
 
 # --- Adversarial CAS patterns ---
 # Spaces around hyphens, Unicode dash variants (en-dash U+2013, em-dash U+2014, minus U+2212, full-width U+FF0D)
@@ -49,18 +86,35 @@ _CONC_RANGE_RE = re.compile(
 _CONC_SIMPLE_RE = re.compile(r"(\d+(?:\.\d+)?)\s*[%％]", re.IGNORECASE)
 
 
-def _normalize_cas_text(text: str) -> str:
-    """Replace Unicode dashes with hyphen for consistent matching."""
+def _clean_text_for_cas(text: str) -> str:
+    """
+    Aggressive Unicode cleaning for adversarial PDFs.
+    - NFKC normalization (compatibility chars)
+    - Remove zero-width spaces (U+200B, U+200C, U+200D, U+FEFF)
+    - Normalize all dash variants to ASCII hyphen
+    """
     if not text:
         return ""
-    return (
-        text.replace("\u2013", "-")
-        .replace("\u2014", "-")
-        .replace("\u2010", "-")
+    t = unicodedata.normalize("NFKC", text)
+    t = re.sub(r"[\u200B-\u200D\uFEFF]", "", t)  # zero-width spaces
+    t = (
+        t.replace("\u2010", "-")
         .replace("\u2011", "-")
-        .replace("\u2212", "-")
-        .replace("\uFF0D", "-")
+        .replace("\u2012", "-")
+        .replace("\u2013", "-")  # en-dash
+        .replace("\u2014", "-")  # em-dash
+        .replace("\u2015", "-")
+        .replace("\u2212", "-")  # minus sign
+        .replace("\uFF0D", "-")  # full-width hyphen
     )
+    # Collapse spaces between digits: "7 5 - 4 5 - 6" -> "75-45-6"
+    t = re.sub(r"(\d)\s+(\d)", r"\1\2", t)
+    return t
+
+
+def _normalize_cas_text(text: str) -> str:
+    """Alias for backward compat; delegates to _clean_text_for_cas."""
+    return _clean_text_for_cas(text)
 
 
 def _extract_concentration(text: str) -> Optional[str]:
@@ -105,15 +159,51 @@ def _extract_context(text: str, pos: int, window: int = 120) -> tuple[str, Optio
 
 
 def _validate_and_normalize_cas(first: str, second: str, check: str) -> Optional[str]:
-    """Validate CAS and return normalized string or None."""
+    """
+    Validate CAS and return normalized string or None.
+    Prefers format-valid CAS; validate_cas_relaxed may alter check digit.
+    """
     norm = cas_validator.normalize_to_cas_format(first.strip(), second.strip(), check.strip())
     if not norm:
         return None
     try:
-        result, _ = cas_validator.validate_cas_relaxed(norm)
+        result, check_ok = cas_validator.validate_cas_relaxed(norm)
+        # If checksum validation altered the CAS, prefer original if format is valid
+        if result and result != norm and not check_ok:
+            if cas_validator.is_valid_cas_format(norm):
+                return norm
         return result or norm
     except Exception:
         return norm if cas_validator.is_valid_cas_format(norm) else None
+
+
+def _reconstruct_from_digit_sequences(text: str) -> list[tuple[str, int]]:
+    """
+    Fragment reconstruction: find three digit sequences that could form a CAS.
+    Scans whole text for \\b(\\d{1,7})\\b; when three consecutive matches have
+    lengths (1-7, 2, 1), try to form CAS. Returns list of (cas, start_pos).
+    """
+    text_clean = _clean_text_for_cas(text)
+    matches = list(re.finditer(r"\b(\d{1,7})\b", text_clean))
+    results: list[tuple[str, int]] = []
+    seen: set[str] = set()
+
+    for i in range(len(matches) - 2):
+        a, b, c = matches[i].group(1), matches[i + 1].group(1), matches[i + 2].group(1)
+        if len(b) != 2 or len(c) != 1 or not (1 <= len(a) <= 7):
+            continue
+        # Require close proximity: gap between first and third match < 25 chars
+        gap = matches[i + 2].start() - matches[i].end()
+        if gap > 25:
+            continue
+        candidate = f"{a}-{b}-{c}"
+        if candidate in seen:
+            continue
+        norm = _validate_and_normalize_cas(a, b, c)
+        if norm:
+            seen.add(norm)
+            results.append((norm, matches[i].start()))
+    return results
 
 
 def _extract_cas_from_text(text: str, source_page: Optional[int] = None) -> list[CASExtraction]:
@@ -123,14 +213,17 @@ def _extract_cas_from_text(text: str, source_page: Optional[int] = None) -> list
     """
     if not text:
         return []
-    text_norm = _normalize_cas_text(text)
+    _cas_debug_log("input_text", context=text[:2000] if text else "")
+    text_norm = _clean_text_for_cas(text)
     results: list[CASExtraction] = []
     seen: set[str] = set()
 
     # Flexible pattern (spaces, Unicode dashes)
     for m in _CAS_FLEXIBLE_RE.finditer(text_norm):
         first, second, check = m.groups()
+        raw_match = m.group(0)
         cas = _validate_and_normalize_cas(first, second, check)
+        _cas_debug_log("flexible", match=raw_match, cas=f"{first}-{second}-{check}", validated=cas)
         if cas and cas not in seen:
             seen.add(cas)
             raw_ctx, name, conc = _extract_context(text, m.start())
@@ -151,6 +244,7 @@ def _extract_cas_from_text(text: str, source_page: Optional[int] = None) -> list
     for m in _CAS_FRAGMENT_RE.finditer(text_norm):
         first, second, check = m.groups()
         cas = _validate_and_normalize_cas(first, second, check)
+        _cas_debug_log("fragment", match=m.group(0), cas=f"{first}-{second}-{check}", validated=cas)
         if cas and cas not in seen:
             seen.add(cas)
             raw_ctx, name, conc = _extract_context(text, m.start())
@@ -162,6 +256,25 @@ def _extract_cas_from_text(text: str, source_page: Optional[int] = None) -> list
                     section=3,
                     method="robust_fragment",
                     confidence=0.88,
+                    context=raw_ctx[:300] if raw_ctx else None,
+                    validated=True,
+                )
+            )
+
+    # Digit-sequence reconstruction (e.g. "75" "45" "6" split across lines)
+    for cas, pos in _reconstruct_from_digit_sequences(text):
+        _cas_debug_log("digit_seq", match="", cas=cas, validated=cas)
+        if cas not in seen:
+            seen.add(cas)
+            raw_ctx, name, conc = _extract_context(text, pos)
+            results.append(
+                CASExtraction(
+                    cas=cas,
+                    chemical_name=name,
+                    concentration=conc,
+                    section=3,
+                    method="robust_digit_seq",
+                    confidence=0.85,
                     context=raw_ctx[:300] if raw_ctx else None,
                     validated=True,
                 )
@@ -209,8 +322,6 @@ def _tables_to_cas_extractions(tables: list[list[list[str]]]) -> list[CASExtract
             continue
         header_row = [str(c).lower() for c in table[0]]
         joined = " ".join(header_row)
-        if "cas" not in joined:
-            continue
         cas_col = name_col = conc_col = None
         for i, h in enumerate(header_row):
             if any(x in h for x in ("cas", "cas-no", "registry")):
@@ -220,6 +331,15 @@ def _tables_to_cas_extractions(tables: list[list[list[str]]]) -> list[CASExtract
             elif any(x in h for x in ("wt", "weight", "concentration", "%", "percent")):
                 conc_col = i
 
+        # Fallback: if no CAS header, find column with digits + hyphen pattern
+        if cas_col is None and len(table) > 1:
+            max_cols = max(len(row) for row in table if row)
+            for col_idx in range(max_cols):
+                cells = [str(row[col_idx] or "") for row in table[1:7] if col_idx < len(row)]
+                sample = " ".join(cells)
+                if re.search(r"\d{1,7}[\-\u2010-\u2015]\d{2}[\-\u2010-\u2015]\d", sample):
+                    cas_col = col_idx
+                    break
         if cas_col is None:
             continue
 
@@ -232,6 +352,7 @@ def _tables_to_cas_extractions(tables: list[list[list[str]]]) -> list[CASExtract
                 continue
             first, second, check = m.groups()
             cas = _validate_and_normalize_cas(first, second, check)
+            _cas_debug_log("table", match=cell, cas=f"{first}-{second}-{check}", validated=cas)
             if not cas or cas in seen:
                 continue
             seen.add(cas)
@@ -403,3 +524,7 @@ class RobustCASExtractor:
 def get_robust_extractor(use_docling: bool = False, use_ocr: bool = False) -> RobustCASExtractor:
     """Factory for RobustCASExtractor. Cache with @st.cache_resource in callers if needed."""
     return RobustCASExtractor(use_docling=use_docling, use_ocr=use_ocr)
+
+
+# Alias for diagnostic code: get_cas_extractor -> get_robust_extractor
+get_cas_extractor = get_robust_extractor
