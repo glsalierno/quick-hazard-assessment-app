@@ -115,9 +115,12 @@ with st.sidebar:
             st.markdown(ServiceConfig.get_capability_message())
         except Exception as e:
             st.caption(str(e))
-    from utils.sds_debug import render_sds_debug_sidebar_controls
+    try:
+        from utils.sds_debug import render_sds_debug_sidebar_controls
 
-    render_sds_debug_sidebar_controls()
+        render_sds_debug_sidebar_controls()
+    except ImportError:
+        pass
     try:
         from utils.cas_extractor import is_pure_cas_bert_available
 

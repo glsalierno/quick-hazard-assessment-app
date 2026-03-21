@@ -12,7 +12,7 @@ from __future__ import annotations
 import logging
 import os
 from io import BytesIO
-from typing import Optional
+from typing import Any, Optional
 
 from pypdf import PdfReader
 
@@ -24,7 +24,6 @@ MIN_TEXT_LENGTH_FOR_OCR = 250
 # Optional OCR stack (Tesseract + pdf2image, then EasyOCR fallback)
 _HAS_PDF2IMAGE = False
 _HAS_PYTESSERACT = False
-_HAS_EASYOCR = False
 _HAS_OCRMYPDF = False
 
 try:
@@ -39,13 +38,10 @@ try:
 except ImportError:
     pytesseract = None  # type: ignore[misc, assignment]
 
-try:
-    import easyocr
-    import numpy as np
-    _HAS_EASYOCR = True
-except ImportError:
-    easyocr = None  # type: ignore[misc, assignment]
-    np = None  # type: ignore[misc, assignment]
+# EasyOCR imports cv2 (opencv) which can fail with LOADER_DIR on Streamlit Cloud.
+# Lazy-import only when OCR is actually run to avoid startup crash.
+easyocr = None  # type: ignore[misc, assignment]
+np = None  # type: ignore[misc, assignment]
 
 try:
     import ocrmypdf
@@ -59,9 +55,20 @@ def ocr_available() -> bool:
     return bool(_HAS_PDF2IMAGE and _HAS_PYTESSERACT)
 
 
+def _try_import_easyocr() -> tuple[bool, Any, Any]:
+    """Lazy import easyocr and numpy. Returns (ok, easyocr_module, np_module)."""
+    try:
+        import easyocr
+        import numpy as np_mod
+        return True, easyocr, np_mod
+    except Exception:
+        return False, None, None
+
+
 def easyocr_available() -> bool:
     """True if EasyOCR is available for fallback OCR."""
-    return bool(_HAS_EASYOCR)
+    ok, _, _ = _try_import_easyocr()
+    return ok
 
 
 def extract_text_from_pdf_bytes(
@@ -137,13 +144,15 @@ def extract_text_via_ocr(
     if not images:
         return ""
 
-    reader_easy: Optional["easyocr.Reader"] = None
-    if use_easyocr_fallback and _HAS_EASYOCR and np is not None:
-        try:
-            reader_easy = easyocr.Reader(["en"], gpu=False, verbose=False)
-        except Exception as e:
-            logger.info("EasyOCR init skipped: %s", e)
-            reader_easy = None
+    reader_easy: Any = None
+    if use_easyocr_fallback:
+        ok, easyocr_mod, _ = _try_import_easyocr()
+        if ok and easyocr_mod:
+            try:
+                reader_easy = easyocr_mod.Reader(["en"], gpu=False, verbose=False)
+            except Exception as e:
+                logger.info("EasyOCR init skipped: %s", e)
+                reader_easy = None
 
     page_texts: list[str] = []
     for i, img in enumerate(images):
@@ -168,12 +177,13 @@ def _ocr_page_tesseract(img) -> str:
         return ""
 
 
-def _ocr_page_easyocr(img, reader: "easyocr.Reader") -> str:
+def _ocr_page_easyocr(img: Any, reader: Any) -> str:
     """Run EasyOCR on a PIL Image. img is PIL Image; reader is easyocr.Reader."""
-    if not _HAS_EASYOCR or np is None:
+    ok, _, np_mod = _try_import_easyocr()
+    if not ok or np_mod is None:
         return ""
     try:
-        arr = np.array(img)
+        arr = np_mod.array(img)
         results = reader.readtext(arr, paragraph=True)
         return " ".join([item[1] for item in results if len(item) > 1])
     except Exception as e:
