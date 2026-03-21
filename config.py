@@ -59,12 +59,15 @@ USE_ROBUST_CAS_EXTRACTOR = os.environ.get("USE_ROBUST_CAS_EXTRACTOR", "1").strip
 )
 USE_DOCLING = os.environ.get("USE_DOCLING", "").strip().lower() in ("1", "true", "yes", "on")
 
-# PubChem cross-reference: used for confidence scoring (not as a rejection gate).
-# When enabled, PubChem lookup boosts confidence when found; no penalty when not found.
+# PubChem cross-reference: validate CAS against PubChem. Only verified CAS shown when gate is on.
 USE_PUBCHEM_CAS_VALIDATION = os.environ.get("USE_PUBCHEM_CAS_VALIDATION", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
-# Minimum confidence (0–1) to show in SDS UI. Set to 0 to show all; 0.2 hides very low-confidence.
+# Only show CAS found in PubChem; invalid/unverified CAS hidden.
+SHOW_ONLY_PUBCHEM_VERIFIED = os.environ.get("SHOW_ONLY_PUBCHEM_VERIFIED", "1").strip().lower() in (
+    "1", "true", "yes", "on",
+)
+# Minimum confidence (0–1) to show in SDS UI. Set to 0 to show all verified; 0.2 hides very low-confidence.
 MIN_CAS_CONFIDENCE = float(os.environ.get("MIN_CAS_CONFIDENCE", "0.0"))
 
 # Reconstructor: run only when table/regex find zero CAS. Off by default to preserve extraction (set =1 to reduce false positives).
