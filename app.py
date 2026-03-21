@@ -204,7 +204,6 @@ if sds_pdf_utils and sds_regex_extractor:
             st.session_state["sds_staged_chemical_input"] = staged
             st.session_state["_last_sds_upload_name"] = uf_shared.name
             if staged and staged.cas_numbers and len(staged.cas_numbers) == 1:
-                st.session_state["cas_query_input"] = staged.cas_numbers[0]
                 st.session_state["_pending_cas_query_input"] = staged.cas_numbers[0]
                 st.rerun()
     else:
