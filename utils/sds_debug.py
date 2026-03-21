@@ -286,6 +286,22 @@ class SDSDebugger:
                         st.write(f"**Robust extractor found {len(results)} CAS** (no merging)")
                         for r in results:
                             st.write(f"- {r.cas} (conf: {r.confidence:.2f}, method: {r.method})")
+                        if st.session_state.get("cas_debug_enabled") or os.getenv("CAS_DEBUG", "").strip().lower() in ("1", "true", "yes", "on"):
+                            try:
+                                import io as _io
+
+                                import pdfplumber as _pdfplumber
+
+                                from utils.cas_reconstructor import CASReconstructor
+
+                                with _pdfplumber.open(_io.BytesIO(pdf_bytes)) as _pdf:
+                                    _full = "\n".join(p.extract_text() or "" for p in _pdf.pages)
+                                _recon = CASReconstructor(max_gap=25)
+                                _dbg = _recon.reconstruct_with_debug(_full)
+                                with st.expander("🔧 Reconstructor debug", expanded=True):
+                                    st.json(_dbg)
+                            except Exception as _e:
+                                st.caption(f"Reconstructor debug: {_e}")
                         try:
                             import io
                             import pdfplumber
