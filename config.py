@@ -59,9 +59,9 @@ USE_ROBUST_CAS_EXTRACTOR = os.environ.get("USE_ROBUST_CAS_EXTRACTOR", "1").strip
 )
 USE_DOCLING = os.environ.get("USE_DOCLING", "").strip().lower() in ("1", "true", "yes", "on")
 
-# PubChem cross-reference: filter out CAS not in PubChem. Off by default (set USE_PUBCHEM_CAS_VALIDATION=1 to enable).
-# When on, invalid CAS are hidden; when off, all extracted CAS are shown.
-USE_PUBCHEM_CAS_VALIDATION = os.environ.get("USE_PUBCHEM_CAS_VALIDATION", "0").strip().lower() in (
+# PubChem cross-reference: filter out CAS not in PubChem before showing in UI.
+# Invalid CAS are hidden; set USE_PUBCHEM_CAS_VALIDATION=0 to show all extracted CAS (debug).
+USE_PUBCHEM_CAS_VALIDATION = os.environ.get("USE_PUBCHEM_CAS_VALIDATION", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
 
