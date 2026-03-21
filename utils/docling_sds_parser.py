@@ -17,31 +17,58 @@ from utils.sds_models import CASExtraction
 
 logger = logging.getLogger(__name__)
 
-# --- Optional Docling (heavy deps: torch, models on first run) ---
+# --- Optional Docling (lazy import to avoid cv2/opencv at startup on Streamlit Cloud) ---
 _DOCLING_IMPORT_ERROR: Optional[str] = None
-try:
-    from docling.datamodel.base_models import DocumentStream, InputFormat
-    from docling.document_converter import DocumentConverter, PdfFormatOption
-    from docling.datamodel.pipeline_options import PdfPipelineOptions
+_DOCLING_CACHE: Optional[dict[str, Any]] = None
 
+
+def _try_import_docling() -> dict[str, Any]:
+    """Lazy import docling. Returns dict with keys or None values. Only called when needed."""
+    global _DOCLING_CACHE, _DOCLING_IMPORT_ERROR
+    if _DOCLING_CACHE is not None:
+        return _DOCLING_CACHE
     try:
-        from docling.datamodel.pipeline_options import TableFormerMode
+        from docling.datamodel.base_models import DocumentStream, InputFormat
+        from docling.document_converter import DocumentConverter, PdfFormatOption
+        from docling.datamodel.pipeline_options import PdfPipelineOptions
 
-        _HAS_TABLE_FORMER_MODE = True
-    except ImportError:
-        TableFormerMode = None  # type: ignore[misc, assignment]
-        _HAS_TABLE_FORMER_MODE = False
-except ImportError as e:
-    DocumentConverter = None  # type: ignore[misc, assignment]
-    DocumentStream = None  # type: ignore[misc, assignment]
-    InputFormat = None  # type: ignore[misc, assignment]
-    PdfFormatOption = None  # type: ignore[misc, assignment]
-    PdfPipelineOptions = None  # type: ignore[misc, assignment]
-    _DOCLING_IMPORT_ERROR = str(e)
+        try:
+            from docling.datamodel.pipeline_options import TableFormerMode
+            _HAS_TABLE_FORMER_MODE = True
+        except ImportError:
+            TableFormerMode = None  # type: ignore[misc, assignment]
+            _HAS_TABLE_FORMER_MODE = False
+
+        _DOCLING_IMPORT_ERROR = None
+        _DOCLING_CACHE = {
+            "DocumentConverter": DocumentConverter,
+            "DocumentStream": DocumentStream,
+            "InputFormat": InputFormat,
+            "PdfFormatOption": PdfFormatOption,
+            "PdfPipelineOptions": PdfPipelineOptions,
+            "TableFormerMode": TableFormerMode,
+            "_HAS_TABLE_FORMER_MODE": _HAS_TABLE_FORMER_MODE,
+        }
+        return _DOCLING_CACHE
+    except ImportError as e:
+        _DOCLING_IMPORT_ERROR = str(e)
+        _DOCLING_CACHE = {
+            "DocumentConverter": None,
+            "DocumentStream": None,
+            "InputFormat": None,
+            "PdfFormatOption": None,
+            "PdfPipelineOptions": None,
+            "TableFormerMode": None,
+            "_HAS_TABLE_FORMER_MODE": False,
+        }
+        return _DOCLING_CACHE
 
 
 def is_docling_available() -> bool:
-    return DocumentConverter is not None and not is_docling_disabled()
+    if is_docling_disabled():
+        return False
+    d = _try_import_docling()
+    return d["DocumentConverter"] is not None
 
 
 def is_docling_disabled() -> bool:
@@ -51,8 +78,11 @@ def is_docling_disabled() -> bool:
 def docling_status_message() -> str:
     if is_docling_disabled():
         return "Docling disabled via HAZQUERY_DISABLE_DOCLING."
+    d = _try_import_docling()
     if _DOCLING_IMPORT_ERROR:
         return f"Docling not installed ({_DOCLING_IMPORT_ERROR[:120]}…)."
+    if d["DocumentConverter"] is None:
+        return "Docling not installed."
     return "Docling available for PDF table extraction."
 
 
@@ -176,23 +206,51 @@ def _dataframe_to_cas_extractions(df: Any, table_index: int) -> list[CASExtracti
     return out
 
 
-def build_docling_converter() -> Optional[Any]:
-    """Create a DocumentConverter configured for SDS-style tables (no Streamlit)."""
-    if not is_docling_available():
+def build_docling_converter(*, low_memory: bool = False) -> Optional[Any]:
+    """
+    Create a DocumentConverter configured for SDS-style tables (no Streamlit).
+
+    ``low_memory=True`` (or env ``HAZQUERY_DOCLING_LOW_MEMORY=1``) disables OCR and uses
+    faster table structure to reduce RAM / avoid ``std::bad_alloc`` on large pages.
+    """
+    d = _try_import_docling()
+    DocumentConverter = d["DocumentConverter"]
+    PdfPipelineOptions = d["PdfPipelineOptions"]
+    PdfFormatOption = d["PdfFormatOption"]
+    InputFormat = d["InputFormat"]
+    TableFormerMode = d["TableFormerMode"]
+    _HAS_TABLE_FORMER_MODE = d["_HAS_TABLE_FORMER_MODE"]
+    if not DocumentConverter or not PdfPipelineOptions or not PdfFormatOption or not InputFormat:
         return None
-    assert PdfPipelineOptions is not None and PdfFormatOption is not None and InputFormat is not None
+
+    lm = low_memory or os.getenv("HAZQUERY_DOCLING_LOW_MEMORY", "").strip().lower() in (
+        "1",
+        "true",
+        "yes",
+        "on",
+    )
 
     try:
         pipeline_options = PdfPipelineOptions()
-        pipeline_options.do_ocr = True
+        pipeline_options.do_ocr = not lm
         pipeline_options.do_table_structure = True
         try:
             pipeline_options.table_structure_options.do_cell_matching = True
         except Exception:
             pass
+        for attr in ("generate_page_images", "generate_picture_images"):
+            if hasattr(pipeline_options, attr):
+                try:
+                    setattr(pipeline_options, attr, False)
+                except Exception:
+                    pass
         if _HAS_TABLE_FORMER_MODE and TableFormerMode is not None:
             try:
-                pipeline_options.table_structure_options.mode = TableFormerMode.ACCURATE
+                fast_mode = getattr(TableFormerMode, "FAST", None)
+                if lm and fast_mode is not None:
+                    pipeline_options.table_structure_options.mode = fast_mode
+                else:
+                    pipeline_options.table_structure_options.mode = TableFormerMode.ACCURATE
             except Exception:
                 pass
 
@@ -204,6 +262,23 @@ def build_docling_converter() -> Optional[Any]:
     except Exception as e:
         logger.warning("Docling DocumentConverter init failed: %s", e)
         return None
+
+
+_batch_low_memory_converter: Optional[Any] = None
+
+
+def get_batch_low_memory_converter() -> Optional[Any]:
+    """Singleton converter for batch/CLI (OCR off, FAST tables) — lower peak RAM."""
+    global _batch_low_memory_converter
+    if _batch_low_memory_converter is None:
+        _batch_low_memory_converter = build_docling_converter(low_memory=True)
+    return _batch_low_memory_converter
+
+
+def reset_batch_low_memory_converter() -> None:
+    """Release singleton (e.g. after long batch) to free native heap."""
+    global _batch_low_memory_converter
+    _batch_low_memory_converter = None
 
 
 def get_cached_docling_converter() -> Optional[Any]:
@@ -220,15 +295,39 @@ def get_cached_docling_converter() -> Optional[Any]:
         return build_docling_converter()
 
 
-def extract_composition_from_pdf(pdf_bytes: bytes, *, use_cache: bool = True) -> list[CASExtraction]:
+def extract_composition_from_pdf(
+    pdf_bytes: bytes,
+    *,
+    use_cache: bool = True,
+    low_memory: bool = False,
+    converter: Optional[Any] = None,
+) -> list[CASExtraction]:
     """
     Run Docling on PDF bytes and return composition rows (CAS + name + concentration when present).
     """
-    if not pdf_bytes or is_docling_disabled() or not is_docling_available():
+    from utils.sds_debug import cas_rows_brief, sds_debug_log
+
+    if not pdf_bytes:
+        sds_debug_log("docling.skip", {"reason": "empty_bytes"})
+        return []
+    if is_docling_disabled():
+        sds_debug_log("docling.skip", {"reason": "HAZQUERY_DISABLE_DOCLING"})
+        return []
+    if not is_docling_available():
+        sds_debug_log("docling.skip", {"reason": "not_installed", "detail": _DOCLING_IMPORT_ERROR})
         return []
 
-    converter = get_cached_docling_converter() if use_cache else build_docling_converter()
+    if converter is not None:
+        pass
+    elif low_memory:
+        converter = get_batch_low_memory_converter()
+    elif use_cache:
+        converter = get_cached_docling_converter()
+    else:
+        converter = build_docling_converter()
+    DocumentStream = _try_import_docling().get("DocumentStream")
     if converter is None or DocumentStream is None:
+        sds_debug_log("docling.skip", {"reason": "converter_init_failed"})
         return []
 
     buf = BytesIO(pdf_bytes)
@@ -237,10 +336,12 @@ def extract_composition_from_pdf(pdf_bytes: bytes, *, use_cache: bool = True) ->
         conv_res = converter.convert(source)
     except Exception as e:
         logger.warning("Docling convert failed: %s", e)
+        sds_debug_log("docling.error", {"error": str(e)})
         return []
 
     doc = conv_res.document
     if not getattr(doc, "tables", None):
+        sds_debug_log("docling.no_tables", {"message": "document.tables empty or missing"})
         return []
 
     scored: list[tuple[int, int, Any]] = []
@@ -290,4 +391,31 @@ def extract_composition_from_pdf(pdf_bytes: bytes, *, use_cache: bool = True) ->
                 seen.add(k)
                 components.append(ext)
 
+    table_summaries = []
+    for table_ix, table in enumerate(doc.tables):
+        try:
+            try:
+                table_df = table.export_to_dataframe(doc=doc)
+            except TypeError:
+                table_df = table.export_to_dataframe()
+            table_summaries.append(
+                {
+                    "ix": table_ix,
+                    "shape": [int(table_df.shape[0]), int(table_df.shape[1])],
+                    "columns": [str(c) for c in table_df.columns][:20],
+                    "score": _table_composition_score([str(c).strip().lower() for c in table_df.columns]),
+                }
+            )
+        except Exception as ex:
+            table_summaries.append({"ix": table_ix, "error": str(ex)})
+
+    sds_debug_log(
+        "docling.result",
+        {
+            "n_tables": len(doc.tables),
+            "n_components": len(components),
+            "table_summaries": table_summaries[:25],
+            "rows": cas_rows_brief(components),
+        },
+    )
     return components
