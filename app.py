@@ -125,7 +125,7 @@ with st.sidebar:
                     st.metric("CAS checked", pubchem_stats["total_checked"])
                     st.metric("Found in PubChem", pubchem_stats["found_in_pubchem"])
                     st.metric("Not found", pubchem_stats["not_found"])
-                    st.caption("PubChem used for confidence scoring; all CAS shown, sorted by confidence.")
+                    st.caption("Only PubChem-verified CAS shown; invalid CAS hidden.")
         except Exception:
             pass
     try:
@@ -231,7 +231,7 @@ if staged_ci is not None and staged_ci.cas_numbers:
         st.caption(f"**{len(staged_ci.cas_numbers)} CAS** from SDS. Choose one and assess:")
         if staged_ci.extraction_rows:
             _df_sds = pd.DataFrame(staged_ci.extraction_rows)
-            _show_cols = [c for c in ("cas", "chemical_name", "concentration", "confidence", "pubchem_verified", "dsstox_found", "recognized", "name_validated", "method", "source") if c in _df_sds.columns]
+            _show_cols = [c for c in ("cas", "chemical_name", "concentration", "confidence", "pubchem_verified", "name_validated", "method", "source") if c in _df_sds.columns]
             _disp = _df_sds[_show_cols].copy() if _show_cols else _df_sds
             if "confidence" in _disp.columns:
                 _disp["confidence"] = _disp["confidence"].apply(lambda x: f"{float(x):.0%}" if x is not None else "—")
@@ -245,16 +245,12 @@ if staged_ci is not None and staged_ci.cas_numbers:
             }
             if "pubchem_verified" in _disp.columns:
                 _col_config["pubchem_verified"] = st.column_config.CheckboxColumn("In PubChem", disabled=True, help="CAS verified in PubChem")
-            if "dsstox_found" in _disp.columns:
-                _col_config["dsstox_found"] = st.column_config.CheckboxColumn("In DSSTox", disabled=True)
-            if "recognized" in _disp.columns:
-                _col_config["recognized"] = st.column_config.CheckboxColumn("In DSSTox", disabled=True)
             if "name_validated" in _disp.columns:
                 _col_config["name_validated"] = st.column_config.CheckboxColumn("Name match", disabled=True)
             st.dataframe(_disp, use_container_width=True, hide_index=True, column_config={k: v for k, v in _col_config.items() if k in _disp.columns})
             st.caption(
-                "**Confidence:** High (80–100%) = multiple validations; Medium (50–80%) = some checks; Low (<50%) = verify manually. "
-                "All CAS shown; sorted by confidence. Use manual correction below to override."
+                "**Only PubChem-verified CAS shown.** Confidence: High (80–100%) = multiple signals; Medium (50–80%) = some checks. "
+                "Use manual correction below to override or add CAS."
             )
         pick = st.selectbox("CAS for assessment", options=staged_ci.cas_numbers, key="top_sds_cas_pick")
         if st.button("Assess selected CAS", type="primary", key="top_sds_run_assess_btn"):

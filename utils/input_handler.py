@@ -21,17 +21,6 @@ def _validate_checksum(cas: str) -> bool:
     return check_ok
 
 
-def _dsstox_exists(cas: str) -> bool:
-    """Check if CAS exists in DSSTox. Returns False if DB unavailable or not found (never raises)."""
-    if not cas or not str(cas).strip():
-        return False
-    try:
-        from utils import chemical_db
-        return chemical_db.get_dsstox_by_cas(cas) is not None
-    except Exception:
-        return False
-
-
 _METHOD_WEIGHTS: dict[str, float] = {
     "docling_table": 0.2,
     "pipe_table_parsing": 0.15,
@@ -45,8 +34,8 @@ _METHOD_WEIGHTS: dict[str, float] = {
 
 def _calculate_confidence(row: dict[str, Any], pubchem_result: dict[str, Any]) -> float:
     """
-    Compute confidence score (0–1) from checksum, PubChem, DSSTox, method, and context.
-    Never returns 0 unless candidate is empty; failures are penalties, not rejections.
+    Compute confidence score (0–1) from checksum, PubChem, method, and context.
+    DSSTox cross-check disabled; validation relies on PubChem only.
     """
     cas = (row.get("cas") or "").strip()
     if not cas:
@@ -62,10 +51,6 @@ def _calculate_confidence(row: dict[str, Any], pubchem_result: dict[str, Any]) -
 
     # PubChem: use boost from validator (0.2 if found, 0.0 if not, 0.0 if unknown)
     confidence += pubchem_result.get("confidence_boost", 0.0)
-
-    # DSSTox: +0.1 if found
-    if _dsstox_exists(cas):
-        confidence += 0.1
 
     # Method quality
     method = row.get("method") or ""
@@ -86,10 +71,10 @@ def _score_cas_confidence(
     cas_list: List[str], rows: List[dict[str, Any]]
 ) -> Tuple[List[str], List[dict[str, Any]]]:
     """
-    Score all CAS with graduated confidence. Keep ALL candidates; never reject based on validation.
-    Sort by confidence (high first). Optionally filter very low-confidence per config.
+    Score CAS with PubChem-only validation. Invalid CAS (not found in PubChem) are hidden.
+    Sort by confidence (high first). DSSTox cross-check disabled.
     """
-    from config import MIN_CAS_CONFIDENCE, USE_PUBCHEM_CAS_VALIDATION
+    from config import MIN_CAS_CONFIDENCE, SHOW_ONLY_PUBCHEM_VERIFIED, USE_PUBCHEM_CAS_VALIDATION
     from utils.pubchem_validator import get_pubchem_validator
 
     validator = get_pubchem_validator()
@@ -112,10 +97,12 @@ def _score_cas_confidence(
             r["pubchem_status"] = "skipped"
             r["_pubchem_result"] = {"confidence_boost": 0.0}
 
-        r["dsstox_found"] = _dsstox_exists(cas)
         r["confidence"] = _calculate_confidence(r, r.get("_pubchem_result", {}))
         r.pop("_pubchem_result", None)
 
+        # Filter invalid: only show PubChem-verified CAS when gate is on
+        if SHOW_ONLY_PUBCHEM_VERIFIED and USE_PUBCHEM_CAS_VALIDATION and r["pubchem_verified"] is not True:
+            continue
         enriched.append(r)
 
     enriched.sort(key=lambda x: float(x.get("confidence", 0)), reverse=True)
