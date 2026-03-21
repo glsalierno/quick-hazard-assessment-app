@@ -68,7 +68,8 @@ if "shared_sds_pdf_name" not in st.session_state:
 if "use_pure_cas_bert" not in st.session_state:
     st.session_state["use_pure_cas_bert"] = False
 if "use_dual_parser_crossref" not in st.session_state:
-    st.session_state["use_dual_parser_crossref"] = True
+    # Default False: single parser (SDSParser + robust) is more reliable; dual needs extract_sds_for_llm
+    st.session_state["use_dual_parser_crossref"] = bool(os.environ.get("HAZQUERY_DUAL_PARSER", "").strip().lower() in ("1", "true", "yes", "on"))
 
 # Prefer SQLite chemical DB when present (fast); else fall back to CSV-based DSSTox
 db_stats = chemical_db.get_db_stats()
@@ -125,7 +126,10 @@ with st.sidebar:
                     st.metric("CAS checked", pubchem_stats["total_checked"])
                     st.metric("Found in PubChem", pubchem_stats["found_in_pubchem"])
                     st.metric("Not found", pubchem_stats["not_found"])
-                    st.caption("Only PubChem-verified CAS shown; invalid CAS hidden.")
+                    st.caption(
+                        "PubChem-verified CAS marked. "
+                        + ("Only verified shown." if config.SHOW_ONLY_PUBCHEM_VERIFIED else "All extracted CAS shown; set SHOW_ONLY_PUBCHEM_VERIFIED=1 to hide unverified.")
+                    )
         except Exception:
             pass
     try:
@@ -249,7 +253,7 @@ if staged_ci is not None and staged_ci.cas_numbers:
                 _col_config["name_validated"] = st.column_config.CheckboxColumn("Name match", disabled=True)
             st.dataframe(_disp, use_container_width=True, hide_index=True, column_config={k: v for k, v in _col_config.items() if k in _disp.columns})
             st.caption(
-                "**Only PubChem-verified CAS shown.** Confidence: High (80–100%) = multiple signals; Medium (50–80%) = some checks. "
+                "**Confidence:** High (80–100%) = multiple validations; Medium (50–80%) = some checks. "
                 "Use manual correction below to override or add CAS."
             )
         pick = st.selectbox("CAS for assessment", options=staged_ci.cas_numbers, key="top_sds_cas_pick")

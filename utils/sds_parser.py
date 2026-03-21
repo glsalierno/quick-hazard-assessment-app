@@ -69,7 +69,7 @@ def _get_cached_robust_extractor(_use_docling: bool, _use_ocr: bool):  # -> Robu
 
 
 def _merge_robust_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> None:
-    """Fallback: RobustCASExtractor when regex/Docling find no CAS (adversarial formatting)."""
+    """Always run RobustCASExtractor (pdfplumber tables) and merge with regex/Docling results."""
     try:
         from config import USE_ROBUST_CAS_EXTRACTOR, USE_DOCLING, USE_OCR
         if not USE_ROBUST_CAS_EXTRACTOR:
@@ -86,11 +86,37 @@ def _merge_robust_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> N
         if not extra:
             sds_debug_log("merge.robust", {"n_robust": 0, "skipped": True})
             return
-        result.cas_numbers = extra
+        # Merge robust (pdfplumber) with existing (pypdf+regex); prefer richer data per CAS
+        def _key(c: str) -> str:
+            return cas_validator.normalize_cas_input(c) or c
+        robust_by: dict[str, CASExtraction] = {_key(x.cas): x for x in extra}
+        seen = set(robust_by.keys())
+        for old in result.cas_numbers:
+            k = _key(old.cas)
+            if k not in seen:
+                robust_by[k] = old
+                seen.add(k)
+            elif old.chemical_name or old.concentration:
+                # Enrich robust row with regex metadata
+                r = robust_by[k]
+                if not r.chemical_name and old.chemical_name:
+                    r = CASExtraction(
+                        cas=r.cas,
+                        chemical_name=old.chemical_name,
+                        concentration=r.concentration or old.concentration,
+                        section=r.section or old.section,
+                        method=r.method,
+                        confidence=max(float(r.confidence or 0), float(old.confidence or 0)),
+                        context=r.context or old.context,
+                        validated=r.validated or old.validated,
+                        warnings=list(set((r.warnings or []) + (old.warnings or []))),
+                    )
+                    robust_by[k] = r
+        result.cas_numbers = list(robust_by.values())
         result.methods_used = sorted(set([*result.methods_used, "robust_cas"]))
         sds_debug_log(
             "merge.robust",
-            {"n_robust": len(extra), "sample": cas_rows_brief(extra)},
+            {"n_robust": len(extra), "n_merged": len(result.cas_numbers), "sample": cas_rows_brief(extra)},
         )
     except Exception as e:
         from utils.sds_debug import sds_debug_log
@@ -119,8 +145,8 @@ class SDSParser:
             result = self.engine.parse(text)
             if pdf_bytes:
                 _merge_docling_cas_extractions(result, pdf_bytes)
-            # Robust extractor fallback when no CAS found (adversarial PDF formatting).
-            if not result.cas_numbers and pdf_bytes:
+            # Robust extractor (pdfplumber tables) - always run and merge for reliable CAS extraction.
+            if pdf_bytes:
                 _merge_robust_cas_extractions(result, pdf_bytes)
             return result
         except Exception as e:

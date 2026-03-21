@@ -57,14 +57,16 @@ USE_LLM_CAS_EXTRACTION = os.environ.get("USE_LLM_CAS_EXTRACTION", "").strip().lo
 USE_ROBUST_CAS_EXTRACTOR = os.environ.get("USE_ROBUST_CAS_EXTRACTOR", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
-USE_DOCLING = os.environ.get("USE_DOCLING", "").strip().lower() in ("1", "true", "yes", "on")
+# Docling improves table extraction from complex SDS PDFs. Default on for reliable CAS extraction.
+USE_DOCLING = os.environ.get("USE_DOCLING", "1").strip().lower() in ("1", "true", "yes", "on")
 
-# PubChem cross-reference: validate CAS against PubChem. Only verified CAS shown when gate is on.
+# PubChem cross-reference: validate CAS against PubChem.
 USE_PUBCHEM_CAS_VALIDATION = os.environ.get("USE_PUBCHEM_CAS_VALIDATION", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
-# Only show CAS found in PubChem; invalid/unverified CAS hidden.
-SHOW_ONLY_PUBCHEM_VERIFIED = os.environ.get("SHOW_ONLY_PUBCHEM_VERIFIED", "1").strip().lower() in (
+# Only show CAS found in PubChem when gate is on. Default 0 = show all extracted (reliable extraction);
+# set to 1 to hide unverified (may yield 0 CAS if PubChem times out or rate limits).
+SHOW_ONLY_PUBCHEM_VERIFIED = os.environ.get("SHOW_ONLY_PUBCHEM_VERIFIED", "0").strip().lower() in (
     "1", "true", "yes", "on",
 )
 # Minimum confidence (0–1) to show in SDS UI. Set to 0 to show all verified; 0.2 hides very low-confidence.
