@@ -13,39 +13,117 @@ import streamlit as st
 from utils import cas_validator
 
 
-def _filter_cas_by_pubchem(
+def _validate_checksum(cas: str) -> bool:
+    """Return True if CAS passes checksum validation."""
+    if not cas or not str(cas).strip():
+        return False
+    _, check_ok = cas_validator.validate_cas_relaxed(str(cas).strip())
+    return check_ok
+
+
+def _dsstox_exists(cas: str) -> bool:
+    """Check if CAS exists in DSSTox. Returns False if DB unavailable or not found (never raises)."""
+    if not cas or not str(cas).strip():
+        return False
+    try:
+        from utils import chemical_db
+        return chemical_db.get_dsstox_by_cas(cas) is not None
+    except Exception:
+        return False
+
+
+_METHOD_WEIGHTS: dict[str, float] = {
+    "docling_table": 0.2,
+    "pipe_table_parsing": 0.15,
+    "fragment_reconstruction": 0.1,
+    "regex_pattern": 0.05,
+    "docling_distilbert": 0.15,
+    "table": 0.15,
+    "ocr_fallback": -0.1,
+}
+
+
+def _calculate_confidence(row: dict[str, Any], pubchem_result: dict[str, Any]) -> float:
+    """
+    Compute confidence score (0–1) from checksum, PubChem, DSSTox, method, and context.
+    Never returns 0 unless candidate is empty; failures are penalties, not rejections.
+    """
+    cas = (row.get("cas") or "").strip()
+    if not cas:
+        return 0.0
+
+    confidence = 0.5  # Neutral baseline
+
+    # Checksum: +0.3 if pass, -0.2 if fail
+    if _validate_checksum(cas):
+        confidence += 0.3
+    else:
+        confidence -= 0.2
+
+    # PubChem: use boost from validator (0.2 if found, 0.0 if not, 0.0 if unknown)
+    confidence += pubchem_result.get("confidence_boost", 0.0)
+
+    # DSSTox: +0.1 if found
+    if _dsstox_exists(cas):
+        confidence += 0.1
+
+    # Method quality
+    method = row.get("method") or ""
+    confidence += _METHOD_WEIGHTS.get(method, 0.0)
+
+    # Has chemical name (+0.1)
+    if (row.get("chemical_name") or "").strip():
+        confidence += 0.1
+
+    # Has concentration (+0.05)
+    if (row.get("concentration") or "").strip():
+        confidence += 0.05
+
+    return max(0.1, min(1.0, confidence))
+
+
+def _score_cas_confidence(
     cas_list: List[str], rows: List[dict[str, Any]]
 ) -> Tuple[List[str], List[dict[str, Any]]]:
     """
-    Filter out CAS not found in PubChem. Only include exists=True or exists=None.
-    Add pubchem_verified to each row for UI display.
+    Score all CAS with graduated confidence. Keep ALL candidates; never reject based on validation.
+    Sort by confidence (high first). Optionally filter very low-confidence per config.
     """
-    from config import USE_PUBCHEM_CAS_VALIDATION
-
-    if not USE_PUBCHEM_CAS_VALIDATION:
-        return cas_list, rows
-
+    from config import MIN_CAS_CONFIDENCE, USE_PUBCHEM_CAS_VALIDATION
     from utils.pubchem_validator import get_pubchem_validator
 
     validator = get_pubchem_validator()
-    filtered_cas: List[str] = []
-    filtered_rows: List[dict[str, Any]] = []
     row_by_cas = {r.get("cas", ""): r for r in rows}
 
+    enriched: List[dict[str, Any]] = []
     for cas in cas_list:
-        check = validator.validate(cas)
-        if check["exists"] is False:
-            continue
-        filtered_cas.append(cas)
-        r = row_by_cas.get(cas, {})
-        r = dict(r)
-        r["pubchem_verified"] = check["exists"] is True
-        r["pubchem_status"] = "verified" if check["exists"] is True else "unknown"
-        if check.get("name") and not r.get("chemical_name"):
-            r["chemical_name"] = check["name"]
-        filtered_rows.append(r)
+        r = dict(row_by_cas.get(cas, {}))
+        r["cas"] = cas
 
-    return filtered_cas, filtered_rows
+        if USE_PUBCHEM_CAS_VALIDATION:
+            check = validator.validate(cas)
+            r["pubchem_verified"] = check["exists"] is True
+            r["pubchem_status"] = "verified" if check["exists"] is True else ("unknown" if check["exists"] is None else "not_found")
+            if check.get("name") and not r.get("chemical_name"):
+                r["chemical_name"] = check["name"]
+            r["_pubchem_result"] = check
+        else:
+            r["pubchem_verified"] = None
+            r["pubchem_status"] = "skipped"
+            r["_pubchem_result"] = {"confidence_boost": 0.0}
+
+        r["dsstox_found"] = _dsstox_exists(cas)
+        r["confidence"] = _calculate_confidence(r, r.get("_pubchem_result", {}))
+        r.pop("_pubchem_result", None)
+
+        enriched.append(r)
+
+    enriched.sort(key=lambda x: float(x.get("confidence", 0)), reverse=True)
+    min_conf = float(MIN_CAS_CONFIDENCE) if isinstance(MIN_CAS_CONFIDENCE, (int, float)) else 0.0
+    filtered = [r for r in enriched if float(r.get("confidence", 0)) >= min_conf]
+
+    out_cas = [r["cas"] for r in filtered]
+    return out_cas, filtered
 
 
 @dataclass
@@ -174,7 +252,7 @@ class UnifiedInputHandler:
                 }
             )
 
-        cas_list, rows = _filter_cas_by_pubchem(cas_list, rows)
+        cas_list, rows = _score_cas_confidence(cas_list, rows)
         primary = best[1] if best[1] and best[1] in cas_list else (cas_list[0] if cas_list else "")
         in_type = "sds_multi" if len(cas_list) > 1 else "sds_single"
         return ChemicalInput(
@@ -226,7 +304,7 @@ class UnifiedInputHandler:
                     "warnings": "",
                 }
             )
-        cas_list, rows = _filter_cas_by_pubchem(cas_list, rows)
+        cas_list, rows = _score_cas_confidence(cas_list, rows)
         label = getattr(uploaded_file, "name", None) or "SDS.pdf"
         primary = best[1] if best[1] and best[1] in cas_list else (cas_list[0] if cas_list else "")
         in_type = "sds_multi" if len(cas_list) > 1 else "sds_single"
@@ -261,7 +339,7 @@ class UnifiedInputHandler:
             {"n_cas": len(cas_list), "recognized": sum(1 for r in rows if r.get("recognized"))},
         )
 
-        cas_list, rows = _filter_cas_by_pubchem(cas_list, rows)
+        cas_list, rows = _score_cas_confidence(cas_list, rows)
 
         if not cas_list:
             return ChemicalInput(
