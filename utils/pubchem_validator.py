@@ -37,7 +37,7 @@ class PubChemValidator:
             }
         """
         if not cas or not str(cas).strip():
-            return {"exists": False, "cid": None, "name": None, "confidence_boost": -0.3}
+            return {"exists": False, "cid": None, "name": None, "confidence_boost": 0.0}
 
         cas = str(cas).strip()
 
@@ -56,7 +56,7 @@ class PubChemValidator:
                 "exists": exists,
                 "cid": data.get("cid") if exists else None,
                 "name": (data.get("iupac_name") or data.get("formula")) if exists else None,
-                "confidence_boost": 0.2 if exists else -0.3,
+                "confidence_boost": 0.2 if exists else 0.0,
             }
 
             if exists:

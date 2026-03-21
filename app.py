@@ -124,8 +124,8 @@ with st.sidebar:
                 with st.expander("🔍 PubChem CAS validation", expanded=False):
                     st.metric("CAS checked", pubchem_stats["total_checked"])
                     st.metric("Found in PubChem", pubchem_stats["found_in_pubchem"])
-                    st.metric("Not found (filtered out)", pubchem_stats["not_found"])
-                    st.caption("Invalid CAS are excluded from SDS options.")
+                    st.metric("Not found", pubchem_stats["not_found"])
+                    st.caption("PubChem used for confidence scoring; all CAS shown, sorted by confidence.")
         except Exception:
             pass
     try:
@@ -231,27 +231,64 @@ if staged_ci is not None and staged_ci.cas_numbers:
         st.caption(f"**{len(staged_ci.cas_numbers)} CAS** from SDS. Choose one and assess:")
         if staged_ci.extraction_rows:
             _df_sds = pd.DataFrame(staged_ci.extraction_rows)
-            _show_cols = [c for c in ("cas", "chemical_name", "concentration", "pubchem_verified", "recognized", "name_validated", "source") if c in _df_sds.columns]
+            _show_cols = [c for c in ("cas", "chemical_name", "concentration", "confidence", "pubchem_verified", "dsstox_found", "recognized", "name_validated", "method", "source") if c in _df_sds.columns]
             _disp = _df_sds[_show_cols].copy() if _show_cols else _df_sds
+            if "confidence" in _disp.columns:
+                _disp["confidence"] = _disp["confidence"].apply(lambda x: f"{float(x):.0%}" if x is not None else "—")
             _col_config = {
                 "cas": st.column_config.TextColumn("CAS", width="small"),
                 "chemical_name": st.column_config.TextColumn("Chemical name", width="large"),
                 "concentration": st.column_config.TextColumn("Concentration", width="medium"),
+                "confidence": st.column_config.TextColumn("Confidence", width="small", help="Graduated score; high = validated"),
+                "method": st.column_config.TextColumn("Method", width="small"),
                 "source": st.column_config.TextColumn("Source", width="small"),
             }
             if "pubchem_verified" in _disp.columns:
                 _col_config["pubchem_verified"] = st.column_config.CheckboxColumn("In PubChem", disabled=True, help="CAS verified in PubChem")
+            if "dsstox_found" in _disp.columns:
+                _col_config["dsstox_found"] = st.column_config.CheckboxColumn("In DSSTox", disabled=True)
             if "recognized" in _disp.columns:
                 _col_config["recognized"] = st.column_config.CheckboxColumn("In DSSTox", disabled=True)
             if "name_validated" in _disp.columns:
                 _col_config["name_validated"] = st.column_config.CheckboxColumn("Name match", disabled=True)
             st.dataframe(_disp, use_container_width=True, hide_index=True, column_config={k: v for k, v in _col_config.items() if k in _disp.columns})
+            st.caption(
+                "**Confidence:** High (80–100%) = multiple validations; Medium (50–80%) = some checks; Low (<50%) = verify manually. "
+                "All CAS shown; sorted by confidence. Use manual correction below to override."
+            )
         pick = st.selectbox("CAS for assessment", options=staged_ci.cas_numbers, key="top_sds_cas_pick")
         if st.button("Assess selected CAS", type="primary", key="top_sds_run_assess_btn"):
             apply_assessment_query(pick, show_banner=True, banner_note=f"Assessing **{pick}** from SDS.")
             st.rerun()
+
+        with st.expander("✏️ Manual correction"):
+            st.markdown("If the extracted CAS is incorrect, you can:")
+            col1, col2 = st.columns(2)
+            with col1:
+                correct_cas = st.text_input("Correct CAS number:", key="manual_cas_override", placeholder="e.g., 67-64-1")
+                if st.button("Use this CAS", key="manual_cas_use_btn"):
+                    if correct_cas and cas_validator.is_valid_cas_format(str(correct_cas).strip()):
+                        st.session_state["query"] = cas_validator.normalize_cas_input(correct_cas) or correct_cas.strip()
+                        st.session_state["result_for"] = None
+                        st.session_state["_pending_cas_query_input"] = correct_cas.strip()
+                        st.rerun()
+                    elif correct_cas:
+                        st.warning("Enter a valid CAS format (e.g., 67-64-1).")
+            with col2:
+                if st.button("Report issue", key="manual_cas_report_btn"):
+                    st.info("Thank you! This helps improve the extractor.")
     elif len(staged_ci.cas_numbers) == 1 and not cas:
         st.caption("CAS extracted — click **Assess** above.")
+        with st.expander("✏️ Manual correction"):
+            correct_cas = st.text_input("Correct CAS if wrong:", key="manual_cas_single", placeholder="e.g., 67-64-1")
+            if st.button("Use this CAS", key="manual_cas_single_btn"):
+                if correct_cas and cas_validator.is_valid_cas_format(str(correct_cas).strip()):
+                    st.session_state["query"] = cas_validator.normalize_cas_input(correct_cas) or correct_cas.strip()
+                    st.session_state["result_for"] = None
+                    st.session_state["_pending_cas_query_input"] = correct_cas.strip()
+                    st.rerun()
+                elif correct_cas:
+                    st.warning("Enter a valid CAS format (e.g., 67-64-1).")
 elif staged_ci is not None and not staged_ci.cas_numbers:
     st.warning("No CAS extracted from SDS. Type a CAS or name above.")
 
