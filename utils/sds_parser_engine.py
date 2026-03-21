@@ -35,16 +35,46 @@ class SDSParserEngine:
         }
 
     def parse(self, pdf_text: str) -> SDSParseResult:
+        from utils.sds_debug import cas_rows_brief, sds_debug_log
+
         start = time.time()
+        sds_debug_log(
+            "parse.input",
+            {
+                "text_length": len(pdf_text or ""),
+                "text_head": (pdf_text or "")[:1200],
+                "text_tail": (pdf_text or "")[-900:] if len(pdf_text or "") > 2200 else "",
+            },
+        )
         result = SDSParseResult(environment=self.env["capability"])
         sections = self._extract_sections(pdf_text)
         result.raw_sections = sections
+        sec3 = sections.get(3) or ""
+        sds_debug_log(
+            "parse.sections",
+            {
+                "section_numbers": sorted(sections.keys()),
+                "section_3_chars": len(sec3),
+                "section_3_snippet": sec3[:2800],
+                "section_1_chars": len(sections.get(1) or ""),
+                "section_15_chars": len(sections.get(15) or ""),
+            },
+        )
 
         # Leverage existing robust extractor for backward compatibility.
         structured = sds_regex_extractor.extract_sds_structured(pdf_text)
         result.tables = structured.get("tables") or {}
         result.legacy = structured.get("legacy") or {}
         self.methods_used.append("regex_structured")
+        leg = result.legacy or {}
+        sds_debug_log(
+            "parse.legacy_extractor",
+            {
+                "cas_numbers": (leg.get("cas_numbers") or [])[:40],
+                "n_cas_legacy": len(leg.get("cas_numbers") or []),
+                "has_ghs": bool((leg.get("ghs") or {}).get("h_codes")),
+            },
+        )
 
         result.cas_numbers = self._extract_cas_numbers(sections, result.legacy)
         if 2 in sections:
@@ -58,6 +88,15 @@ class SDSParserEngine:
 
         result.parse_time_ms = int((time.time() - start) * 1000)
         result.methods_used = sorted(set(self.methods_used))
+        sds_debug_log(
+            "parse.cas_final",
+            {
+                "parse_time_ms": result.parse_time_ms,
+                "methods_used": result.methods_used,
+                "n_cas": len(result.cas_numbers),
+                "rows": cas_rows_brief(result.cas_numbers),
+            },
+        )
         return result
 
     def _extract_sections(self, text: str) -> dict[int, str]:
@@ -393,15 +432,40 @@ class SDSParserEngine:
         return results
 
     def _extract_composition_from_section3(self, section_text: str) -> list[CASExtraction]:
+        from utils.sds_debug import cas_rows_brief, sds_debug_log
+
         if not (section_text or "").strip():
+            sds_debug_log("composition.section3", {"empty": True})
             return []
-        acc: list[CASExtraction] = []
-        acc.extend(self._parse_html_tables_for_cas(section_text))
-        for block in self._iter_pipe_table_blocks(section_text):
-            acc.extend(self._process_pipe_table_lines(block))
-        for table in sds_pdf_utils.extract_tables_from_text(section_text):
-            acc.extend(self._table_rows_to_cas_extractions(table, section=3))
-        acc.extend(self._parse_whitespace_composition_lines(section_text))
+        html_rows = self._parse_html_tables_for_cas(section_text)
+        pipe_block_list = list(self._iter_pipe_table_blocks(section_text))
+        pipe_rows: list[CASExtraction] = []
+        for block in pipe_block_list:
+            pipe_rows.extend(self._process_pipe_table_lines(block))
+        delim_tables = sds_pdf_utils.extract_tables_from_text(section_text)
+        delim_rows: list[CASExtraction] = []
+        for table in delim_tables:
+            delim_rows.extend(self._table_rows_to_cas_extractions(table, section=3))
+        line_rows = self._parse_whitespace_composition_lines(section_text)
+        acc = html_rows + pipe_rows + delim_rows + line_rows
+        preview_lines = (section_text or "").replace("\r", "\n").split("\n")[:40]
+        sds_debug_log(
+            "composition.section3_paths",
+            {
+                "section_chars": len(section_text),
+                "counts": {
+                    "html_table": len(html_rows),
+                    "pipe_table": len(pipe_rows),
+                    "delimiter_table": len(delim_rows),
+                    "line_whitespace": len(line_rows),
+                    "total": len(acc),
+                },
+                "n_pipe_blocks": len(pipe_block_list),
+                "n_delimiter_tables": len(delim_tables),
+                "preview_lines": preview_lines,
+                "merged_sample": cas_rows_brief(acc),
+            },
+        )
         if acc:
             self.methods_used.append("composition_section3")
         return acc
@@ -415,7 +479,39 @@ class SDSParserEngine:
         for item in self._extract_composition_from_section3(sec3):
             self._put_cas(store, order, item)
 
-        # 2) Legacy regex CAS list (merge; fills CAS missed by table or vice versa)
+        # 2) LLM composition (from regex+LLM fallback when regex found no CAS)
+        llm_comp = legacy.get("llm_composition") or []
+        for row in llm_comp:
+            if isinstance(row, dict):
+                cas = (row.get("cas") or "").strip()
+                if not cas:
+                    continue
+                norm = cas_validator.normalize_cas_input(cas) or cas
+                if not self._validate_cas_checksum(norm):
+                    continue
+                name = row.get("chemical_name") or None
+                conc = row.get("concentration") or None
+                if isinstance(name, str):
+                    name = name.strip() or None
+                if isinstance(conc, str):
+                    conc = conc.strip() or None
+                self._put_cas(
+                    store,
+                    order,
+                    CASExtraction(
+                        cas=norm,
+                        chemical_name=name,
+                        concentration=conc,
+                        section=3,
+                        method="llm_ollama",
+                        confidence=0.9,
+                        validated=True,
+                    ),
+                )
+        if llm_comp:
+            self.methods_used.append("llm_ollama")
+
+        # 3) Legacy regex CAS list (merge; fills CAS missed by table or vice versa)
         legacy_cas = legacy.get("cas_numbers") or []
         for cas in legacy_cas:
             cas = str(cas).strip()
@@ -433,7 +529,7 @@ class SDSParserEngine:
         if legacy_cas:
             self.methods_used.append("focused_regex")
 
-        # 3) Delimiter tables in sections 15 and 1 (skip 3 — already covered above)
+        # 4) Delimiter tables in sections 15 and 1 (skip 3 — already covered above)
         for sec in (15, 1):
             txt = sections.get(sec, "")
             if not txt:
@@ -466,9 +562,19 @@ class SDSParserEngine:
 
         out = [store[k] for k in order]
 
-        # Optional local AI enhancement via Ollama (cloud-safe auto-disable).
-        if self.env.get("can_use_ai") and out:
-            out = self._enhance_with_ollama(out, sections)
+        # Optional local LLM enhancement via Ollama when names/concentrations are missing.
+        try:
+            from config import USE_LLM_CAS_EXTRACTION
+        except ImportError:
+            USE_LLM_CAS_EXTRACTION = False
+        use_llm = (self.env.get("can_use_ai") or USE_LLM_CAS_EXTRACTION) and out
+        if use_llm:
+            try:
+                from utils.sds_llm_extractor import is_ollama_available
+                if is_ollama_available():
+                    out = self._enhance_with_ollama(out, sections)
+            except ImportError:
+                pass
 
         # Final confidence penalty for failed checks.
         for item in out:
@@ -478,45 +584,30 @@ class SDSParserEngine:
         return out
 
     def _enhance_with_ollama(self, current: list[CASExtraction], sections: dict[int, str]) -> list[CASExtraction]:
+        """Fill missing chemical_name/concentration using local LLM (Ollama)."""
         context = sections.get(3) or sections.get(1) or ""
-        if not context:
+        if not context or len(context) < 50:
             return current
         try:
-            import requests
+            from utils.sds_llm_extractor import extract_cas_with_llm
 
-            prompt = (
-                "Verify CAS numbers from SDS context. Return JSON array only: "
-                '[{"cas":"64-17-5","confidence":0.95,"chemical":"Ethanol","concentration":"95%"}]\n'
-                f'Current: {[x.cas for x in current]}\nContext:\n{context[:900]}'
-            )
-            r = requests.post(
-                "http://localhost:11434/api/generate",
-                json={"model": "phi3:mini", "prompt": prompt, "stream": False, "temperature": 0.1},
-                timeout=8,
-            )
-            if r.status_code != 200:
+            result = extract_cas_with_llm(context, timeout=30)
+            if not result or not result.get("cas_numbers"):
                 return current
-            data = r.json()
-            raw = data.get("response") or ""
-            m = re.search(r"\[.*\]", raw, re.DOTALL)
-            if not m:
-                return current
-            parsed = json.loads(m.group(0))
+            cas_list = result["cas_numbers"]
+            names = result.get("chemical_names") or []
+            concs = result.get("concentrations") or []
             by_cas = {x.cas: x for x in current}
-            for item in parsed:
-                cas = str(item.get("cas") or "").strip()
+            for i, cas in enumerate(cas_list):
                 if cas not in by_cas:
                     continue
                 existing = by_cas[cas]
-                conf = item.get("confidence")
-                if isinstance(conf, (int, float)):
-                    existing.confidence = max(existing.confidence, float(conf))
-                chem = item.get("chemical")
-                if chem and not existing.chemical_name:
-                    existing.chemical_name = str(chem)
-                conc = item.get("concentration")
+                name = (names[i].strip() or None) if i < len(names) else None
+                conc = (concs[i].strip() or None) if i < len(concs) else None
+                if name and not existing.chemical_name:
+                    existing.chemical_name = name
                 if conc and not existing.concentration:
-                    existing.concentration = str(conc)
+                    existing.concentration = conc
             self.methods_used.append("ollama_ai")
         except Exception:
             # Enhancement only; never fail parsing.

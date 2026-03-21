@@ -44,7 +44,13 @@ SDS_EXAMPLES_DIR = os.environ.get("SDS_EXAMPLES_DIR", os.path.join(REPO_ROOT, ".
 # Local LLM (Ollama) — for SDS extraction/summarization when running locally (no API key).
 # Not used on Streamlit Cloud. See docs/OLLAMA_SETUP.md.
 OLLAMA_HOST = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
-OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2:0.5b")  # alternative: gemma2:2b
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "qwen2:0.5b")  # alternative: phi3:mini, gemma2:2b
+
+# Use local LLM (Ollama) as fallback when regex fails to find CAS, names, or concentrations.
+# Set USE_LLM_CAS_EXTRACTION=1 to enable. Requires Ollama running with a small model (e.g. qwen2:0.5b).
+USE_LLM_CAS_EXTRACTION = os.environ.get("USE_LLM_CAS_EXTRACTION", "").strip().lower() in (
+    "1", "true", "yes", "on",
+)
 
 # QSAR Toolbox (OECD + VEGA/OPERA) — local WebSuite must be running. Windows only.
 # Set port (e.g. 51946) or leave None to disable. See https://github.com/glsalierno/PyQSARToolbox

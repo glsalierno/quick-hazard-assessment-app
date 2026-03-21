@@ -70,6 +70,17 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
    - Install **Tesseract** and **Poppler** on your system, then `pip install pdf2image pytesseract easyocr`. See [docs/OCR_SETUP.md](docs/OCR_SETUP.md).
    - Optional: **ocrmypdf** to produce searchable PDFs: `pip install ocrmypdf`, then `python scripts/make_searchable_pdf.py input.pdf [output.pdf]`.
 
+8. **Windows terminal PATH & pip script warnings**
+   - If pip warns that scripts are installed outside `PATH`, open the integrated terminal **from this workspace** so `.vscode/settings.json` applies: it appends common **user** Python `Scripts` folders and sets `HF_HUB_DISABLE_SYMLINKS_WARNING=1` and `TF_ENABLE_ONEDNN_OPTS=0` to reduce Hugging Face / oneDNN noise.
+   - For **system-wide** fixes, add to your user `PATH`: `%APPDATA%\Python\Python313\Scripts` (adjust version) or use a venv and `pip` only from that environment.
+
+9. **SDS parsing agreement / accuracy report (batch)**
+   - Compares **pure Docling + DistilBERT CAS** and **Docling-only composition** against the **unified SDS parser** (reference proxy, not human labels):
+     ```bash
+     python scripts/sds_parsing_accuracy_report.py --folder "../sds examples" --out-dir artifacts
+     ```
+   - Optional: `--limit N` for a subset. Outputs `artifacts/sds_parsing_accuracy_report.md`, `.csv`, and `sds_parsing_accuracy_summary.json` (micro/macro F1, pooled TP/FP/FN).
+
 ---
 
 ## Deploy on Streamlit Community Cloud

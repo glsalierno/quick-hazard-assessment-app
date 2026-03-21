@@ -55,6 +55,7 @@ The app can use environment variables so you don’t hardcode values:
 |----------|---------|---------|
 | `OLLAMA_HOST` | `http://localhost:11434` | Where Ollama is running |
 | `OLLAMA_MODEL` | `qwen2:0.5b` (or see `config.py`) | Which model to use for SDS/summarization |
+| `USE_LLM_CAS_EXTRACTION` | (off) | Set to `1` to enable local LLM fallback when regex fails to find CAS, names, or concentrations in complex SDS tables |
 
 **Windows (PowerShell, current session):**
 ```powershell
