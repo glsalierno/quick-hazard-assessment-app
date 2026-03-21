@@ -115,6 +115,19 @@ with st.sidebar:
             st.markdown(ServiceConfig.get_capability_message())
         except Exception as e:
             st.caption(str(e))
+    if config.USE_PUBCHEM_CAS_VALIDATION:
+        try:
+            from utils.pubchem_validator import get_pubchem_validator
+
+            pubchem_stats = get_pubchem_validator().get_stats()
+            if pubchem_stats.get("total_checked", 0) > 0:
+                with st.expander("🔍 PubChem CAS validation", expanded=False):
+                    st.metric("CAS checked", pubchem_stats["total_checked"])
+                    st.metric("Found in PubChem", pubchem_stats["found_in_pubchem"])
+                    st.metric("Not found (filtered out)", pubchem_stats["not_found"])
+                    st.caption("Invalid CAS are excluded from SDS options.")
+        except Exception:
+            pass
     try:
         from utils.sds_debug import render_sds_debug_sidebar_controls
 
@@ -218,7 +231,7 @@ if staged_ci is not None and staged_ci.cas_numbers:
         st.caption(f"**{len(staged_ci.cas_numbers)} CAS** from SDS. Choose one and assess:")
         if staged_ci.extraction_rows:
             _df_sds = pd.DataFrame(staged_ci.extraction_rows)
-            _show_cols = [c for c in ("cas", "chemical_name", "concentration", "recognized", "name_validated", "source") if c in _df_sds.columns]
+            _show_cols = [c for c in ("cas", "chemical_name", "concentration", "pubchem_verified", "recognized", "name_validated", "source") if c in _df_sds.columns]
             _disp = _df_sds[_show_cols].copy() if _show_cols else _df_sds
             _col_config = {
                 "cas": st.column_config.TextColumn("CAS", width="small"),
@@ -226,6 +239,8 @@ if staged_ci is not None and staged_ci.cas_numbers:
                 "concentration": st.column_config.TextColumn("Concentration", width="medium"),
                 "source": st.column_config.TextColumn("Source", width="small"),
             }
+            if "pubchem_verified" in _disp.columns:
+                _col_config["pubchem_verified"] = st.column_config.CheckboxColumn("In PubChem", disabled=True, help="CAS verified in PubChem")
             if "recognized" in _disp.columns:
                 _col_config["recognized"] = st.column_config.CheckboxColumn("In DSSTox", disabled=True)
             if "name_validated" in _disp.columns:

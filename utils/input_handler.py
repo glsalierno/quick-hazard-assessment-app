@@ -6,11 +6,46 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, List, Optional, Tuple
 
 import streamlit as st
 
 from utils import cas_validator
+
+
+def _filter_cas_by_pubchem(
+    cas_list: List[str], rows: List[dict[str, Any]]
+) -> Tuple[List[str], List[dict[str, Any]]]:
+    """
+    Filter out CAS not found in PubChem. Only include exists=True or exists=None.
+    Add pubchem_verified to each row for UI display.
+    """
+    from config import USE_PUBCHEM_CAS_VALIDATION
+
+    if not USE_PUBCHEM_CAS_VALIDATION:
+        return cas_list, rows
+
+    from utils.pubchem_validator import get_pubchem_validator
+
+    validator = get_pubchem_validator()
+    filtered_cas: List[str] = []
+    filtered_rows: List[dict[str, Any]] = []
+    row_by_cas = {r.get("cas", ""): r for r in rows}
+
+    for cas in cas_list:
+        check = validator.validate(cas)
+        if check["exists"] is False:
+            continue
+        filtered_cas.append(cas)
+        r = row_by_cas.get(cas, {})
+        r = dict(r)
+        r["pubchem_verified"] = check["exists"] is True
+        r["pubchem_status"] = "verified" if check["exists"] is True else "unknown"
+        if check.get("name") and not r.get("chemical_name"):
+            r["chemical_name"] = check["name"]
+        filtered_rows.append(r)
+
+    return filtered_cas, filtered_rows
 
 
 @dataclass
@@ -139,7 +174,8 @@ class UnifiedInputHandler:
                 }
             )
 
-        primary = best[1] if best[1] else cas_list[0]
+        cas_list, rows = _filter_cas_by_pubchem(cas_list, rows)
+        primary = best[1] if best[1] and best[1] in cas_list else (cas_list[0] if cas_list else "")
         in_type = "sds_multi" if len(cas_list) > 1 else "sds_single"
         return ChemicalInput(
             input_type=in_type,
@@ -190,8 +226,9 @@ class UnifiedInputHandler:
                     "warnings": "",
                 }
             )
+        cas_list, rows = _filter_cas_by_pubchem(cas_list, rows)
         label = getattr(uploaded_file, "name", None) or "SDS.pdf"
-        primary = best[1] if best[1] else (cas_list[0] if cas_list else "")
+        primary = best[1] if best[1] and best[1] in cas_list else (cas_list[0] if cas_list else "")
         in_type = "sds_multi" if len(cas_list) > 1 else "sds_single"
         return ChemicalInput(
             input_type=in_type if cas_list else "sds_single",
@@ -223,6 +260,8 @@ class UnifiedInputHandler:
             "input_handler.dual_parser_result",
             {"n_cas": len(cas_list), "recognized": sum(1 for r in rows if r.get("recognized"))},
         )
+
+        cas_list, rows = _filter_cas_by_pubchem(cas_list, rows)
 
         if not cas_list:
             return ChemicalInput(

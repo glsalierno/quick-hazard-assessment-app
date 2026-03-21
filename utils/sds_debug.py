@@ -296,7 +296,11 @@ class SDSDebugger:
 
                                 with _pdfplumber.open(_io.BytesIO(pdf_bytes)) as _pdf:
                                     _full = "\n".join(p.extract_text() or "" for p in _pdf.pages)
-                                _recon = CASReconstructor(max_gap=25)
+                                try:
+                                    from config import RECONSTRUCTOR_MAX_GAP
+                                except Exception:
+                                    RECONSTRUCTOR_MAX_GAP = 15
+                                _recon = CASReconstructor(max_gap=RECONSTRUCTOR_MAX_GAP)
                                 _dbg = _recon.reconstruct_with_debug(_full)
                                 with st.expander("🔧 Reconstructor debug", expanded=True):
                                     st.json(_dbg)

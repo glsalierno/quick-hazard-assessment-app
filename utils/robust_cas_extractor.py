@@ -26,8 +26,19 @@ from utils.sds_models import CASExtraction
 
 logger = logging.getLogger(__name__)
 
-# Reconstructor runs first on raw text to fix digit loss from PDF extraction
-_cas_reconstructor = CASReconstructor(max_gap=25, try_ocr_corrections=False)
+
+def _get_reconstructor() -> CASReconstructor:
+    """Build reconstructor from config."""
+    try:
+        from config import RECONSTRUCTOR_MAX_GAP, RECONSTRUCTOR_USE_CONTEXT_FILTER
+    except Exception:
+        RECONSTRUCTOR_MAX_GAP = 15
+        RECONSTRUCTOR_USE_CONTEXT_FILTER = False
+    return CASReconstructor(
+        max_gap=RECONSTRUCTOR_MAX_GAP,
+        try_ocr_corrections=False,
+        use_context_filter=RECONSTRUCTOR_USE_CONTEXT_FILTER,
+    )
 
 
 def _is_cas_debug() -> bool:
@@ -479,29 +490,59 @@ class RobustCASExtractor:
                     )
                     store[item.cas] = merged
 
-        # Stage 0 + 1: pdfplumber extraction, then CAS Reconstructor (before regex/table)
+        # Stage 0 + 1: pdfplumber extraction, tables + text first (or reconstructor if fallback-only)
         try:
             full_text, tables = _pdfplumber_extract(pdf_bytes)
-            # Reconstructor fixes digit loss (split lines, Unicode dashes, spaces)
-            if full_text:
-                recon_cas = _cas_reconstructor.reconstruct_from_text(full_text)
-                if _is_cas_debug():
-                    dbg = _cas_reconstructor.reconstruct_with_debug(full_text)
-                    _cas_debug_log("reconstructor", cas=",".join(recon_cas), context=str(dbg)[:400])
-                for cas in recon_cas:
-                    _put(
-                        CASExtraction(
-                            cas=cas,
-                            section=3,
-                            method="reconstructor",
-                            confidence=0.95,
-                            validated=True,
+            use_fallback_only = False
+            try:
+                from config import USE_RECONSTRUCTOR_AS_FALLBACK_ONLY
+
+                use_fallback_only = USE_RECONSTRUCTOR_AS_FALLBACK_ONLY
+            except Exception:
+                pass
+
+            _recon = _get_reconstructor()
+
+            if use_fallback_only:
+                for item in _tables_to_cas_extractions(tables):
+                    _put(item)
+                for item in _extract_cas_from_text(full_text):
+                    _put(item)
+                if not store and full_text:
+                    recon_cas = _recon.reconstruct_from_text(full_text)
+                    if _is_cas_debug():
+                        dbg = _recon.reconstruct_with_debug(full_text)
+                        _cas_debug_log("reconstructor", cas=",".join(recon_cas), context=str(dbg)[:400])
+                    for cas in recon_cas:
+                        _put(
+                            CASExtraction(
+                                cas=cas,
+                                section=3,
+                                method="reconstructor",
+                                confidence=0.95,
+                                validated=True,
+                            )
                         )
-                    )
-            for item in _tables_to_cas_extractions(tables):
-                _put(item)
-            for item in _extract_cas_from_text(full_text):
-                _put(item)
+            else:
+                if full_text:
+                    recon_cas = _recon.reconstruct_from_text(full_text)
+                    if _is_cas_debug():
+                        dbg = _recon.reconstruct_with_debug(full_text)
+                        _cas_debug_log("reconstructor", cas=",".join(recon_cas), context=str(dbg)[:400])
+                    for cas in recon_cas:
+                        _put(
+                            CASExtraction(
+                                cas=cas,
+                                section=3,
+                                method="reconstructor",
+                                confidence=0.95,
+                                validated=True,
+                            )
+                        )
+                for item in _tables_to_cas_extractions(tables):
+                    _put(item)
+                for item in _extract_cas_from_text(full_text):
+                    _put(item)
         except Exception as e:
             logger.warning("pdfplumber stage failed: %s", e)
 

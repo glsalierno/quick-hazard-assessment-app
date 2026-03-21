@@ -58,6 +58,20 @@ USE_ROBUST_CAS_EXTRACTOR = os.environ.get("USE_ROBUST_CAS_EXTRACTOR", "1").strip
     "1", "true", "yes", "on",
 )
 USE_DOCLING = os.environ.get("USE_DOCLING", "").strip().lower() in ("1", "true", "yes", "on")
+
+# PubChem cross-reference validation: filter out CAS not found in PubChem before showing as options.
+USE_PUBCHEM_CAS_VALIDATION = os.environ.get("USE_PUBCHEM_CAS_VALIDATION", "1").strip().lower() in (
+    "1", "true", "yes", "on",
+)
+
+# Reconstructor: run only when table/regex find zero CAS (reduces false positives).
+USE_RECONSTRUCTOR_AS_FALLBACK_ONLY = os.environ.get("USE_RECONSTRUCTOR_AS_FALLBACK_ONLY", "1").strip().lower() in (
+    "1", "true", "yes", "on",
+)
+RECONSTRUCTOR_MAX_GAP = int(os.environ.get("RECONSTRUCTOR_MAX_GAP", "15"))
+RECONSTRUCTOR_USE_CONTEXT_FILTER = os.environ.get("RECONSTRUCTOR_USE_CONTEXT_FILTER", "").strip().lower() in (
+    "1", "true", "yes", "on",
+)
 USE_OCR = os.environ.get("USE_OCR", "").strip().lower() in ("1", "true", "yes", "on")
 
 # QSAR Toolbox (OECD + VEGA/OPERA) — local WebSuite must be running. Windows only.
