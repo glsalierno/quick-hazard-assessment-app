@@ -42,6 +42,35 @@ def _normalize_text(text: str) -> str:
     return text
 
 
+def _looks_like_date(cas: str) -> bool:
+    """
+    Reject CAS that look like dates (0-31-X month-day, 20-23-X year, etc.).
+    """
+    if not cas or "-" not in cas:
+        return False
+    parts = cas.split("-")
+    if len(parts) != 3:
+        return False
+    p1, p2, p3 = parts[0], parts[1], parts[2]
+    # Month-day: first part 0-12 or 1-31, second 1-31 or 1-12
+    if len(p1) <= 2 and len(p2) == 2 and len(p3) == 1:
+        try:
+            a, b = int(p1), int(p2)
+            if (0 <= a <= 31 and 1 <= b <= 31) or (1 <= a <= 12 and 1 <= b <= 12):
+                return True
+        except ValueError:
+            pass
+    # Year-like: 20xx-xx-x or 19xx-xx-x
+    if len(p1) == 4 and p1.startswith(("19", "20")):
+        try:
+            y = int(p1)
+            if 1900 <= y <= 2099:
+                return True
+        except ValueError:
+            pass
+    return False
+
+
 def _validate_cas_checksum(cas: str) -> bool:
     """Validate CAS check digit using cas_validator."""
     if not cas or "-" not in cas:
@@ -90,9 +119,15 @@ class CASReconstructor:
     Runs BEFORE regex extraction to fix digit loss.
     """
 
-    def __init__(self, max_gap: int = 25, try_ocr_corrections: bool = False):
+    def __init__(
+        self,
+        max_gap: int = 15,
+        try_ocr_corrections: bool = False,
+        use_context_filter: bool = False,
+    ):
         self.max_gap = max_gap
         self.try_ocr_corrections = try_ocr_corrections
+        self.use_context_filter = use_context_filter
 
     def _extract_all_digit_sequences(self, text: str) -> List[Dict[str, Any]]:
         """Extract every contiguous digit sequence with position context."""
@@ -107,12 +142,22 @@ class CASReconstructor:
             })
         return sequences
 
+    def _has_cas_context(self, text: str, start: int, end: int, window: int = 80) -> bool:
+        """True if text within ±window chars contains CAS-like keywords."""
+        if not text:
+            return False
+        lo = max(0, start - window)
+        hi = min(len(text), end + window)
+        snippet = text[lo:hi].lower()
+        return any(kw in snippet for kw in ("cas", "no.", "number", "registry", "composition", "ingredient"))
+
     def _assemble_cas_triples(
-        self, sequences: List[Dict[str, Any]]
+        self, sequences: List[Dict[str, Any]], text: str = ""
     ) -> List[str]:
         """
         Assemble three consecutive digit sequences into CAS candidates.
         CAS format: [1-7 digits]-[2 digits]-[1 digit]
+        Rejects date-like patterns. Prefers candidates with CAS-like context when text provided.
         """
         candidates: List[str] = []
         seen: set[str] = set()
@@ -133,6 +178,10 @@ class CASReconstructor:
             candidate = f"{p1}-{p2}-{p3}"
             if candidate in seen:
                 continue
+            if _looks_like_date(candidate):
+                continue
+            if self.use_context_filter and text and not self._has_cas_context(text, sequences[i]["start"], sequences[i + 2]["end"]):
+                continue
             seen.add(candidate)
             candidates.append(candidate)
         return candidates
@@ -147,7 +196,7 @@ class CASReconstructor:
 
         normalized = _normalize_text(raw_text)
         sequences = self._extract_all_digit_sequences(normalized)
-        candidates = self._assemble_cas_triples(sequences)
+        candidates = self._assemble_cas_triples(sequences, normalized)
 
         valid: List[str] = []
         seen: set[str] = set()
@@ -182,7 +231,7 @@ class CASReconstructor:
         """
         normalized = _normalize_text(raw_text)
         sequences = self._extract_all_digit_sequences(normalized)
-        candidates = self._assemble_cas_triples(sequences)
+        candidates = self._assemble_cas_triples(sequences, normalized)
 
         valid: List[str] = []
         for c in candidates:
