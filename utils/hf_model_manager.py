@@ -95,11 +95,17 @@ class HFModelManager:
             if quantization_config is not None:
                 kwargs["quantization_config"] = quantization_config
             else:
+                from utils.hf_transformers_compat import dtype_kw_for_from_pretrained
+
                 if torch is not None and torch.cuda.is_available():
                     kwargs["device_map"] = "auto"
-                    kwargs["torch_dtype"] = torch.float16
+                    kwargs.update(
+                        dtype_kw_for_from_pretrained(AutoModelForCausalLM, torch.float16)
+                    )
                 else:
-                    kwargs["torch_dtype"] = torch.float32
+                    kwargs.update(
+                        dtype_kw_for_from_pretrained(AutoModelForCausalLM, torch.float32)
+                    )
 
             self.model = AutoModelForCausalLM.from_pretrained(model_id, **kwargs)
 

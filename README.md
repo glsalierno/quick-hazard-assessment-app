@@ -19,7 +19,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 *Enhanced predictions with OPERA QSAR are available in the [command-line version](https://github.com/glsalierno/quick_hazard_assessment); OPERA is not included in this Streamlit deployment.*
 
-**v1.4:** SDS PDF upload, regex extraction, and optional **local LLM** (Ollama + Qwen or Gemma) for improved SDS parsing — see [Local LLM setup (Ollama)](docs/OLLAMA_SETUP.md).
+**v1.4 SDS upload:** **MarkItDown + regex** and **Hybrid** (MarkItDown → OCR if no CAS) only — see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md). Optional **local LLM** (Ollama) for other flows: [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
 
 ---
 
@@ -47,9 +47,11 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 4. **Run the app**
    ```bash
-   streamlit run app.py
+   python -m streamlit run app.py
    ```
    Open the URL shown in the terminal (usually http://localhost:8501).
+
+   **Tip:** Test the app locally before deploying to Streamlit Cloud. Each Cloud redeploy clones the repo and fetches Git LFS files, which consumes your LFS bandwidth quota. Running locally avoids LFS entirely.
 
 5. **Optional — Local LLM (Qwen / Gemma) for SDS extraction**
    - Install [Ollama](https://ollama.com) on your machine.
@@ -67,14 +69,21 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 7. **OCR for scanned SDS PDFs**
    - If embedded text is short (< 250 chars), the app runs **Tesseract** OCR automatically (via `pdf2image` + `pytesseract`). **EasyOCR** is used as a fallback for pages where Tesseract returns little text.
-   - Install **Tesseract** and **Poppler** on your system, then `pip install pdf2image pytesseract easyocr`. See [docs/OCR_SETUP.md](docs/OCR_SETUP.md).
+   - Install **Tesseract** and **Poppler** on your system and ensure both are on `PATH`, then `pip install pdf2image pytesseract easyocr`. See [docs/OCR_SETUP.md](docs/OCR_SETUP.md). Without Poppler, `pdf2image` cannot rasterize PDF pages (`Unable to get page count`).
    - Optional: **ocrmypdf** to produce searchable PDFs: `pip install ocrmypdf`, then `python scripts/make_searchable_pdf.py input.pdf [output.pdf]`.
 
-8. **Windows terminal PATH & pip script warnings**
+8. **SDS CAS extraction (two pipelines only)**
+   - Full rationale and list of **removed** parsers: **[docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md)**.
+   - Install: `pip install "markitdown[pdf]"` (see `requirements.txt`). **Default:** **Hybrid** (`hybrid_md_ocr`). Valid values: `hybrid_md_ocr` | `markitdown_fast`. Legacy env values (e.g. `default`, `ocr_tesseract`) are **remapped** to a supported pipeline.
+   - Sidebar: **“SDS CAS extraction (v1.4 — two pipelines only)”** — **Hybrid** or **MarkItDown + regex**.
+   - Caching: `cache/{sha256}/` (see `utils/cache_manager.py`). Env: `HAZQUERY_EXTRACTION_PIPELINE`, `HAZQUERY_DEFAULT_SDS_PIPELINE`, `HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`, `HAZQUERY_OCR_ENGINE`, `HAZQUERY_TESSERACT_PSM`.
+   - Benchmark: `python tests/test_extraction_pipelines.py --folder "../sds examples" --limit 20` → `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
+
+9. **Windows terminal PATH & pip script warnings**
    - If pip warns that scripts are installed outside `PATH`, open the integrated terminal **from this workspace** so `.vscode/settings.json` applies: it appends common **user** Python `Scripts` folders and sets `HF_HUB_DISABLE_SYMLINKS_WARNING=1` and `TF_ENABLE_ONEDNN_OPTS=0` to reduce Hugging Face / oneDNN noise.
    - For **system-wide** fixes, add to your user `PATH`: `%APPDATA%\Python\Python313\Scripts` (adjust version) or use a venv and `pip` only from that environment.
 
-9. **SDS parsing agreement / accuracy report (batch)**
+10. **SDS parsing agreement / accuracy report (batch)**
    - Compares **pure Docling + DistilBERT CAS** and **Docling-only composition** against the **unified SDS parser** (reference proxy, not human labels):
      ```bash
      python scripts/sds_parsing_accuracy_report.py --folder "../sds examples" --out-dir artifacts

@@ -19,6 +19,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any, Optional
 
+from utils.hf_transformers_compat import dtype_kw_for_from_pretrained
 from utils.docling_sds_parser import (
     DocumentStream,
     build_docling_converter,
@@ -242,17 +243,18 @@ class PureCASExtractor:
                 has_ckpt = any(self.model_dir.iterdir())
             except OSError:
                 has_ckpt = False
+        _dt = dtype_kw_for_from_pretrained(DistilBertForTokenClassification, torch.float32)
         if has_ckpt:
             self.tokenizer = DistilBertTokenizerFast.from_pretrained(str(self.model_dir))
             self.model = DistilBertForTokenClassification.from_pretrained(
-                str(self.model_dir), torch_dtype=torch.float32
+                str(self.model_dir), **_dt
             )
         else:
             self.tokenizer = DistilBertTokenizerFast.from_pretrained(base)
             self.model = DistilBertForTokenClassification.from_pretrained(
                 base,
                 num_labels=2,
-                torch_dtype=torch.float32,
+                **_dt,
             )
         self.model.to(self.device)
         self.model.eval()
@@ -330,6 +332,22 @@ class PureCASExtractor:
                 continue
 
         return self._deduplicate(results)
+
+    def classify_cell_text(self, cell_text: str) -> Optional[CASResult]:
+        """
+        Run DistilBERT token classification on a single text snippet (e.g. MarkItDown table cell).
+        """
+        if not cell_text or len(str(cell_text).strip()) < 3:
+            return None
+        if self.model is None or self.tokenizer is None:
+            return None
+        return self._classify_cell(
+            cell_text=str(cell_text).strip(),
+            cells=[str(cell_text).strip()],
+            cell_idx=0,
+            table_idx=-1,
+            page_no=None,
+        )
 
     def _classify_cell(
         self,

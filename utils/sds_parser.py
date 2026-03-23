@@ -40,6 +40,9 @@ def _merge_docling_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> 
                 d.concentration = old.concentration
             d.confidence = max(float(d.confidence or 0), float(old.confidence or 0))
             d.validated = bool(d.validated or old.validated)
+            # Preserve multi-section evidence (Phase 3)
+            old_secs = (old.sections or []) + ([old.section] if old.section is not None else [])
+            d.sections = sorted(set((d.sections or []) + old_secs))
 
     merged = list(doc_by.values())
     seen = set(doc_by.keys())
@@ -71,8 +74,11 @@ def _get_cached_robust_extractor(_use_docling: bool, _use_ocr: bool):  # -> Robu
 def _merge_robust_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> None:
     """Always run RobustCASExtractor (pdfplumber tables) and merge with regex/Docling results."""
     try:
-        from config import USE_ROBUST_CAS_EXTRACTOR, USE_DOCLING, USE_OCR
-        if not USE_ROBUST_CAS_EXTRACTOR:
+        from utils.sds_strategy import get as strategy_get
+        use_robust = strategy_get("USE_ROBUST_CAS_EXTRACTOR", True)
+        use_docling = strategy_get("USE_DOCLING", True)
+        use_ocr = strategy_get("USE_OCR", False)
+        if not use_robust:
             return
     except ImportError:
         return
@@ -81,7 +87,7 @@ def _merge_robust_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> N
     except ImportError:
         return
     try:
-        extractor = _get_cached_robust_extractor(USE_DOCLING, USE_OCR)
+        extractor = _get_cached_robust_extractor(use_docling, use_ocr)
         extra = extractor.extract(pdf_bytes)
         if not extra:
             sds_debug_log("merge.robust", {"n_robust": 0, "skipped": True})
@@ -100,11 +106,14 @@ def _merge_robust_cas_extractions(result: SDSParseResult, pdf_bytes: bytes) -> N
                 # Enrich robust row with regex metadata
                 r = robust_by[k]
                 if not r.chemical_name and old.chemical_name:
+                    old_secs = (old.sections or []) + ([old.section] if old.section is not None else [])
+                    merged_secs = sorted(set((r.sections or []) + old_secs))
                     r = CASExtraction(
                         cas=r.cas,
                         chemical_name=old.chemical_name,
                         concentration=r.concentration or old.concentration,
                         section=r.section or old.section,
+                        sections=merged_secs,
                         method=r.method,
                         confidence=max(float(r.confidence or 0), float(old.confidence or 0)),
                         context=r.context or old.context,
@@ -144,7 +153,12 @@ class SDSParser:
                 return None
             result = self.engine.parse(text)
             if pdf_bytes:
-                _merge_docling_cas_extractions(result, pdf_bytes)
+                try:
+                    from utils.sds_strategy import get as strategy_get
+                    if strategy_get("USE_DOCLING", True):
+                        _merge_docling_cas_extractions(result, pdf_bytes)
+                except Exception:
+                    _merge_docling_cas_extractions(result, pdf_bytes)
             # Robust extractor (pdfplumber tables) - always run and merge for reliable CAS extraction.
             if pdf_bytes:
                 _merge_robust_cas_extractions(result, pdf_bytes)

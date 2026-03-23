@@ -12,11 +12,48 @@ from __future__ import annotations
 import logging
 import os
 from io import BytesIO
+from pathlib import Path
 from typing import Any, Optional
 
 from pypdf import PdfReader
 
 logger = logging.getLogger(__name__)
+
+
+def poppler_kwargs_for_pdf2image() -> dict[str, Any]:
+    """
+    Extra kwargs for ``pdf2image.convert_from_bytes`` when Poppler is not on PATH.
+
+    On Windows, download Poppler from
+    https://github.com/oschwartz10612/poppler-windows/releases/ and set **either**:
+
+    - Add ``.../poppler-xx/Library/bin`` to system **PATH**, **or**
+    - Set env ``HAZQUERY_POPPLER_PATH`` or ``POPPLER_PATH`` to that **bin** folder
+      (the directory that contains ``pdfinfo.exe`` and ``pdftoppm.exe``).
+    """
+    for key in ("HAZQUERY_POPPLER_PATH", "POPPLER_PATH"):
+        raw = (os.environ.get(key) or "").strip().strip('"')
+        if not raw:
+            continue
+        p = Path(raw)
+        if p.is_dir():
+            return {"poppler_path": str(p)}
+        logger.warning("Poppler path from %s is not a directory: %s", key, raw)
+    return {}
+
+
+def ocr_raster_dpi() -> int:
+    """
+    Raster DPI for pdf2image OCR (lower = faster, less accurate).
+
+    Env ``HAZQUERY_OCR_DPI`` (default 200), clamped to 72–400.
+    """
+    try:
+        v = int((os.environ.get("HAZQUERY_OCR_DPI") or "200").strip())
+        return max(72, min(400, v))
+    except ValueError:
+        return 200
+
 
 # Minimum total extracted text length (chars) below which we run OCR.
 MIN_TEXT_LENGTH_FOR_OCR = 250
@@ -122,7 +159,7 @@ def _extract_embedded_text(pdf_bytes: bytes) -> str:
 def extract_text_via_ocr(
     pdf_bytes: bytes,
     use_easyocr_fallback: bool = True,
-    dpi: int = 200,
+    dpi: Optional[int] = None,
     lang: str = "eng",
 ) -> str:
     """
@@ -130,13 +167,19 @@ def extract_text_via_ocr(
 
     Requires: pdf2image (and system Poppler), pytesseract (and system Tesseract).
     Optional: EasyOCR for pages where Tesseract returns little text.
+
+    ``dpi`` defaults to :func:`ocr_raster_dpi` (env ``HAZQUERY_OCR_DPI``).
     """
     if not _HAS_PDF2IMAGE or not convert_from_bytes:
         logger.warning("pdf2image not available for OCR.")
         return ""
 
+    eff_dpi = dpi if dpi is not None else ocr_raster_dpi()
+
     try:
-        images = convert_from_bytes(pdf_bytes, dpi=dpi, fmt="jpeg")
+        images = convert_from_bytes(
+            pdf_bytes, dpi=eff_dpi, fmt="jpeg", **poppler_kwargs_for_pdf2image()
+        )
     except Exception as e:
         logger.warning("pdf2image failed: %s", e)
         return ""

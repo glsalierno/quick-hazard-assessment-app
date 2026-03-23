@@ -133,7 +133,10 @@ class HFCASExtractor:
             if quantization_config:
                 kwargs["quantization_config"] = quantization_config
             else:
-                kwargs["torch_dtype"] = torch.float16 if self.device == "cuda" else torch.float32
+                from utils.hf_transformers_compat import dtype_kw_for_from_pretrained
+
+                dt = torch.float16 if self.device == "cuda" else torch.float32
+                kwargs.update(dtype_kw_for_from_pretrained(AutoModelForCausalLM, dt))
                 if self.device == "cuda":
                     kwargs["device_map"] = "auto"
             self.model = AutoModelForCausalLM.from_pretrained(model_id, **kwargs)

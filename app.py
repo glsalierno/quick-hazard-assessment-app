@@ -65,11 +65,33 @@ if "shared_sds_pdf_bytes" not in st.session_state:
     st.session_state["shared_sds_pdf_bytes"] = None
 if "shared_sds_pdf_name" not in st.session_state:
     st.session_state["shared_sds_pdf_name"] = None
-if "use_pure_cas_bert" not in st.session_state:
-    st.session_state["use_pure_cas_bert"] = False
-if "use_dual_parser_crossref" not in st.session_state:
-    # Default False: single parser (SDSParser + robust) is more reliable; dual needs extract_sds_for_llm
-    st.session_state["use_dual_parser_crossref"] = bool(os.environ.get("HAZQUERY_DUAL_PARSER", "").strip().lower() in ("1", "true", "yes", "on"))
+if "sds_extraction_pipeline" not in st.session_state:
+    try:
+        from utils.alternative_extraction import normalize_sds_pipeline_mode
+
+        _raw = (
+            os.environ.get("HAZQUERY_EXTRACTION_PIPELINE", "").strip()
+            or os.environ.get("HAZQUERY_DEFAULT_SDS_PIPELINE", "").strip()
+            or getattr(config, "DEFAULT_SDS_EXTRACTION_PIPELINE", "hybrid_md_ocr")
+        )
+        st.session_state["sds_extraction_pipeline"] = normalize_sds_pipeline_mode(str(_raw))
+    except Exception:
+        st.session_state["sds_extraction_pipeline"] = "hybrid_md_ocr"
+else:
+    try:
+        from utils.alternative_extraction import SUPPORTED_SDS_PIPELINES, normalize_sds_pipeline_mode
+
+        _pip = st.session_state.get("sds_extraction_pipeline")
+        if _pip not in SUPPORTED_SDS_PIPELINES:
+            st.session_state["sds_extraction_pipeline"] = normalize_sds_pipeline_mode(str(_pip or ""))
+    except Exception:
+        pass
+if "pdf_cache_behavior" not in st.session_state:
+    st.session_state["pdf_cache_behavior"] = "use"
+if "sds_ocr_engine" not in st.session_state:
+    st.session_state["sds_ocr_engine"] = "tesseract"
+if "sds_tesseract_psm" not in st.session_state:
+    st.session_state["sds_tesseract_psm"] = 6
 
 # Prefer SQLite chemical DB when present (fast); else fall back to CSV-based DSSTox
 db_stats = chemical_db.get_db_stats()
@@ -127,8 +149,8 @@ with st.sidebar:
                     st.metric("Found in PubChem", pubchem_stats["found_in_pubchem"])
                     st.metric("Not found", pubchem_stats["not_found"])
                     st.caption(
-                        "PubChem-verified CAS marked. "
-                        + ("Only verified shown." if config.SHOW_ONLY_PUBCHEM_VERIFIED else "All extracted CAS shown; set SHOW_ONLY_PUBCHEM_VERIFIED=1 to hide unverified.")
+                        "Only checksum-valid CAS shown; no invalid or made-up CAS. "
+                        + ("PubChem-verified only. Set SHOW_ONLY_PUBCHEM_VERIFIED=0 to include unverified." if config.SHOW_ONLY_PUBCHEM_VERIFIED else "Unverified included.")
                     )
         except Exception:
             pass
@@ -139,31 +161,101 @@ with st.sidebar:
     except ImportError:
         pass
     try:
-        from utils.cas_extractor import is_pure_cas_bert_available
+        from utils.sds_strategy import PRESETS, get as strategy_get
 
-        _pure_cas_help = (
-            "Uses **only** Docling (layout/tables) + **DistilBERT** token labels for CAS spans — "
-            "not the legacy regex/merged SDS engine. Train a model with "
-            "`python scripts/train_cas_bert.py` into `models/cas_bert`, or set "
-            "`HAZQUERY_CAS_BERT_MODEL`. "
-            f"**Status:** {is_pure_cas_bert_available()}"
-        )
-    except Exception as _e:
-        _pure_cas_help = f"Pure CAS path unavailable: {_e}"
-    st.checkbox(
-        "CAS from SDS: Docling + DistilBERT only (no regex SDS engine)",
-        key="use_pure_cas_bert",
-        help=_pure_cas_help,
-    )
-    st.caption("Or set env `HAZQUERY_PURE_CAS_BERT=1` to force this pipeline.")
-    _dual_parser_disabled = st.session_state.get("use_pure_cas_bert", False)
-    st.checkbox(
-        "CAS from SDS: Dual parser (A+B) + DB cross-reference",
-        key="use_dual_parser_crossref",
-        disabled=_dual_parser_disabled,
-        help="Run both parsers (pypdf+regex and pdfplumber fallback), merge CAS, cross-reference with DSSTox and PubChem name validation. Recognized CAS sorted first.",
-    )
-    st.caption("Or set env `HAZQUERY_DUAL_PARSER=1`. Disabled when Pure BERT is on.")
+        with st.expander("🧪 SDS extraction strategy (test combos)", expanded=False):
+            st.caption("Override extraction settings. Re-upload SDS to test. Resets on page reload.")
+            preset = st.selectbox(
+                "Preset",
+                options=["(config default)", "docling_pubchem", *(k for k in PRESETS.keys() if k != "docling_pubchem")],
+                key="sds_strategy_preset",
+                format_func=lambda k: PRESETS.get(k, {}).get("label", k) if k != "(config default)" else k,
+            )
+            if preset != "(config default)":
+                st.session_state["sds_strategy_override"] = {k: v for k, v in PRESETS[preset].items() if k != "label"}
+            else:
+                st.session_state["sds_strategy_override"] = {}
+            if st.session_state.get("sds_strategy_override"):
+                st.json({k: v for k, v in st.session_state["sds_strategy_override"].items()})
+            with st.expander("📋 Strategy env overrides (legacy unified parser)", expanded=False):
+                st.markdown("""
+**SDS PDF CAS upload** uses **v1.4 only** (MarkItDown + regex or Hybrid). See
+[docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md).
+
+Presets below tweak **USE_DOCLING**, **USE_OCR**, etc. for any code paths that still
+read ``utils.sds_strategy`` (not the primary SDS upload extractor).
+
+| Option | Effect |
+|--------|--------|
+| USE_DOCLING | IBM Docling (where still used) |
+| USE_OCR | Tesseract (where still used) |
+| SHOW_ONLY_PUBCHEM_VERIFIED | Hide unverified CAS |
+""")
+    except ImportError:
+        pass
+    try:
+        from utils.alternative_extraction import PIPELINE_LABELS, PIPELINE_SIDEBAR_ORDER
+
+        _v14_expanded = bool(sds_pdf_utils and sds_regex_extractor)
+        with st.expander("📄 SDS CAS extraction (v1.4 — two pipelines only)", expanded=_v14_expanded):
+            st.markdown(
+                "Only **Hybrid** and **MarkItDown + regex** are supported. "
+                "See [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md) for why other parsers were removed.\n\n"
+                "**Hybrid:** MarkItDown first; **OCR** (under *Advanced OCR options*) runs only if no CAS is found. "
+                "Requires `pip install 'markitdown[pdf]'`; OCR fallback needs **Poppler** + **Tesseract** or **EasyOCR** on PATH "
+                "or `HAZQUERY_POPPLER_PATH`."
+            )
+            _md_ok = False
+            try:
+                import markitdown  # noqa: F401
+
+                _md_ok = True
+            except Exception:
+                pass
+            if not _md_ok:
+                st.warning(
+                    "MarkItDown not installed — v1.4 pipelines will fail until you run: "
+                    "`pip install 'markitdown[pdf]'`"
+                )
+            opts = [k for k in PIPELINE_SIDEBAR_ORDER if k in PIPELINE_LABELS]
+            st.selectbox(
+                "Extraction strategy",
+                options=opts,
+                key="sds_extraction_pipeline",
+                format_func=lambda k: PIPELINE_LABELS.get(k, k),
+            )
+            st.selectbox(
+                "Cache behavior",
+                options=["use", "force", "clear_once"],
+                key="pdf_cache_behavior",
+                format_func=lambda x: {
+                    "use": "Use cache if available",
+                    "force": "Force reprocess (ignore cache)",
+                    "clear_once": "Clear cache once, then use cache",
+                }.get(x, x),
+            )
+            with st.expander("Advanced OCR options", expanded=False):
+                st.caption("Used only when **Hybrid** runs OCR because MarkItDown found no CAS.")
+                st.selectbox(
+                    "OCR engine (hybrid fallback)",
+                    options=["tesseract", "easyocr", "llm_vision"],
+                    key="sds_ocr_engine",
+                    format_func=lambda x: {
+                        "tesseract": "Tesseract (default)",
+                        "easyocr": "EasyOCR (slower)",
+                        "llm_vision": "LLM vision (falls back to Tesseract)",
+                    }.get(x, x),
+                    disabled=False,
+                )
+                st.number_input(
+                    "Tesseract PSM (6=block, 11=sparse)", min_value=0, max_value=13, key="sds_tesseract_psm"
+                )
+            st.caption(
+                "Env: `HAZQUERY_EXTRACTION_PIPELINE`, `HAZQUERY_DEFAULT_SDS_PIPELINE`, "
+                "`HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`."
+            )
+    except ImportError:
+        pass
 
 st.info(
     "Enter a **CAS or name** above, or upload an **SDS PDF** below to auto-extract CAS. "
@@ -290,6 +382,9 @@ if staged_ci is not None and staged_ci.cas_numbers:
                 elif correct_cas:
                     st.warning("Enter a valid CAS format (e.g., 67-64-1).")
 elif staged_ci is not None and not staged_ci.cas_numbers:
+    _ex_err = getattr(staged_ci, "extraction_error", None)
+    if _ex_err:
+        st.error(f"**SDS extraction issue:** {_ex_err}")
     st.warning("No CAS extracted from SDS. Type a CAS or name above.")
 
 # Example shortcuts: hide once user has SDS, typed input, or an active assessment query
@@ -330,23 +425,41 @@ if current_query:
     need_fetch = st.session_state.get("result_for") != clean_cas
     if need_fetch:
         with st.spinner("Fetching data and generating structure..."):
-            from services.chemical_assessment import AssessmentResult, get_assessment_service
+            try:
+                from services.chemical_assessment import AssessmentResult, get_assessment_service
 
-            _svc = get_assessment_service()
-            _ar = _svc.assess(current_query)
-            if isinstance(_ar, list):
-                _ar = _ar[0]
-            if isinstance(_ar, AssessmentResult) and _ar.has_multiple_components and _ar.all_components:
-                _ar = _ar.all_components[0]
-            if not isinstance(_ar, AssessmentResult):
-                raise TypeError("Unexpected assessment return type")
-            st.session_state["result_for"] = clean_cas
-            st.session_state["result_data"] = _svc.to_result_data(_ar)
+                _svc = get_assessment_service()
+                _ar = _svc.assess(current_query)
+                if _ar is None:
+                    st.error(f"Assessment returned no result for **{current_query}**.")
+                    st.session_state["result_for"] = clean_cas
+                    st.session_state["result_data"] = None
+                else:
+                    if isinstance(_ar, list):
+                        _ar = _ar[0] if _ar else None
+                    if _ar and isinstance(_ar, AssessmentResult) and _ar.has_multiple_components and _ar.all_components:
+                        _ar = _ar.all_components[0]
+                    if not isinstance(_ar, AssessmentResult):
+                        st.error(f"Unexpected assessment result for **{current_query}** (type: {type(_ar).__name__}). Try a different CAS.")
+                        st.session_state["result_for"] = clean_cas
+                        st.session_state["result_data"] = None
+                    else:
+                        st.session_state["result_for"] = clean_cas
+                        st.session_state["result_data"] = _svc.to_result_data(_ar)
+            except (ValueError, TypeError) as e:
+                st.error(f"Could not assess **{current_query}**: {e}")
+                st.session_state["result_for"] = clean_cas
+                st.session_state["result_data"] = None
 
     result = st.session_state.get("result_data")
     tab_haz, tab_p2o = st.tabs(["Hazard assessment", "P2OASys scoring"])
     with tab_haz:
-        if result and result.get("pubchem"):
+        if not result or not result.get("pubchem"):
+            msg = "No hazard data yet. Enter a CAS or name above and click **Assess**, or upload an SDS and select a CAS."
+            if result and result.get("fetch_error"):
+                msg = f"**Could not fetch hazard data:** {result['fetch_error']}. Check network, PubChem connectivity, or try a different CAS."
+            st.info(msg)
+        elif result and result.get("pubchem"):
             pubchem_data = result["pubchem"]
             dsstox_info = result.get("dsstox_info")
             dtxsid = result.get("dtxsid")

@@ -55,6 +55,7 @@ class AssessmentResult:
     assessment_time: float = 0.0
     has_multiple_components: bool = False
     all_components: List["AssessmentResult"] = field(default_factory=list)
+    fetch_error: Optional[str] = None
 
 
 class ChemicalAssessmentService:
@@ -74,14 +75,16 @@ class ChemicalAssessmentService:
         ident = result.identity
         preferred = ident.chemical_name or (result.dsstox_info or {}).get("preferred_name")
         dtxsid = ident.dtxsid or (result.dsstox_info or {}).get("dtxsid")
+        pubchem = result.pubchem_data if result.pubchem_data and not result.fetch_error else None
         return {
-            "pubchem": result.pubchem_data,
+            "pubchem": pubchem,
             "dsstox_info": result.dsstox_info,
             "dtxsid": dtxsid,
             "preferred_name": preferred,
             "clean_cas": ident.cas,
             "toxval_data": result.toxval_data,
             "carc_potency_data": result.carc_potency_data,
+            "fetch_error": result.fetch_error,
         }
 
     def assess(
@@ -275,7 +278,14 @@ class ChemicalAssessmentService:
             input_type = "cas"
         else:
             input_type = "name"
-        pubchem_data = pubchem_client.get_compound_data(cas, input_type=input_type)
+        pubchem_data = None
+        fetch_error = None
+        try:
+            pubchem_data = pubchem_client.get_compound_data(cas, input_type=input_type)
+        except Exception as e:
+            fetch_error = f"PubChem fetch failed: {e}"
+        if not pubchem_data and not fetch_error:
+            fetch_error = "Compound not found in PubChem"
 
         toxval_data = None
         if dtxsid and self.use_sqlite_toxval:
@@ -306,10 +316,11 @@ class ChemicalAssessmentService:
 
         return AssessmentResult(
             identity=identity,
-            pubchem_data=pubchem_data,
+            pubchem_data=pubchem_data if pubchem_data is not None else {},
             dsstox_info=dsstox_info,
             toxval_data=toxval_data,
             carc_potency_data=carc,
+            fetch_error=fetch_error,
         )
 
 
