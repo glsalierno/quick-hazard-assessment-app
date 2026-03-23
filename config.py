@@ -64,9 +64,9 @@ USE_DOCLING = os.environ.get("USE_DOCLING", "1").strip().lower() in ("1", "true"
 USE_PUBCHEM_CAS_VALIDATION = os.environ.get("USE_PUBCHEM_CAS_VALIDATION", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
-# Only show CAS found in PubChem. Default 1 = strict: no invalid or unverified CAS shown.
-# Set to 0 to show all extracted (may include unverified when PubChem times out).
-SHOW_ONLY_PUBCHEM_VERIFIED = os.environ.get("SHOW_ONLY_PUBCHEM_VERIFIED", "1").strip().lower() in (
+# Only show CAS found in PubChem. Default 0 = show checksum-valid SDS extractions (MarkItDown/OCR)
+# even when PubChem has no hit; set to 1 to hide unverified CAS.
+SHOW_ONLY_PUBCHEM_VERIFIED = os.environ.get("SHOW_ONLY_PUBCHEM_VERIFIED", "0").strip().lower() in (
     "1", "true", "yes", "on",
 )
 # Minimum confidence (0–1) to show in SDS UI. Set to 0 to show all verified; 0.2 hides very low-confidence.

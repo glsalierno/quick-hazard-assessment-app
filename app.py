@@ -7,9 +7,10 @@ from __future__ import annotations
 
 import io
 import json
+import logging
 import os
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 import streamlit as st
@@ -19,6 +20,7 @@ from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_
 from utils import atmo_gwp, hazard_for_p2oasys, hazard_report_utils, iarc_lookup, lookup_tables, p2oasys_aggregate, p2oasys_scorer
 from utils import summary_utils
 from utils.input_handler import get_input_handler
+from utils.markitdown_check import is_markitdown_available
 from utils.sds_integration import apply_assessment_query
 
 try:
@@ -36,8 +38,20 @@ try:
 except ImportError:
     qsar_toolbox_client = None  # optional: OECD QSAR Toolbox + VEGA (Windows, PyQSARToolbox)
 
+
+def _is_assessment_result(obj: Any) -> bool:
+    """
+    Duck-type check — avoids Streamlit reload where ``isinstance(x, AssessmentResult)``
+    fails because the service was constructed with a different class object than
+    ``from services.chemical_assessment import AssessmentResult`` in this run.
+    """
+    return obj is not None and hasattr(obj, "identity") and hasattr(obj, "pubchem_data")
+
+
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
+
+MARKITDOWN_OK, _MARKITDOWN_ERR = is_markitdown_available()
 
 # Session state: persist query and result to avoid re-fetching on every rerun
 if "query" not in st.session_state:
@@ -93,20 +107,40 @@ if "sds_ocr_engine" not in st.session_state:
 if "sds_tesseract_psm" not in st.session_state:
     st.session_state["sds_tesseract_psm"] = 6
 
-# Prefer SQLite chemical DB when present (fast); else fall back to CSV-based DSSTox
+# Prefer SQLite chemical DB when present (fast). CSV DSSTox is loaded lazily (cached) in the
+# sidebar so the page title renders before a large mapping file is read (helps Streamlit Cloud).
 db_stats = chemical_db.get_db_stats()
 use_sqlite_dsstox = db_stats.get("dsstox", {}).get("exists", False)
 use_sqlite_toxval = db_stats.get("toxvaldb", {}).get("exists", False)
-dsstox_data = None if use_sqlite_dsstox else dsstox_local.load_dsstox_enhanced()
+
+_LOG = logging.getLogger(__name__)
+
+
+@st.cache_resource(show_spinner="Loading DSSTox (CSV)…")
+def _cached_dsstox_csv_data() -> Optional[dict[str, Any]]:
+    """Load DSS/ CSV mapping once per worker. Returns None on failure or empty."""
+    try:
+        return dsstox_local.load_dsstox_enhanced()
+    except Exception as e:
+        _LOG.warning("DSSTox CSV load failed: %s", e)
+        return None
+
+
+dsstox_data: Optional[dict[str, Any]] = None
 
 # Title and description
 st.title(f"🧪 {config.APP_TITLE}")
 st.markdown(
     "Chemical hazard assessment from **PubChem** + **DSSTox local** (no API key required)."
 )
+if not MARKITDOWN_OK:
+    st.error(_MARKITDOWN_ERR or "MarkItDown is required for SDS PDF parsing.")
+    st.caption("Typed CAS/name still works below. SDS upload is disabled until MarkItDown is installed.")
 
 # Sidebar: database stats (SQLite or CSV)
 with st.sidebar:
+    if not use_sqlite_dsstox:
+        dsstox_data = _cached_dsstox_csv_data()
     st.header("📊 Local database")
     if use_sqlite_dsstox:
         dsstox_records = int(db_stats.get("dsstox", {}).get("records") or 0)
@@ -205,17 +239,10 @@ read ``utils.sds_strategy`` (not the primary SDS upload extractor).
                 "Requires `pip install 'markitdown[pdf]'`; OCR fallback needs **Poppler** + **Tesseract** or **EasyOCR** on PATH "
                 "or `HAZQUERY_POPPLER_PATH`."
             )
-            _md_ok = False
-            try:
-                import markitdown  # noqa: F401
-
-                _md_ok = True
-            except Exception:
-                pass
-            if not _md_ok:
+            if not MARKITDOWN_OK:
                 st.warning(
-                    "MarkItDown not installed — v1.4 pipelines will fail until you run: "
-                    "`pip install 'markitdown[pdf]'`"
+                    "MarkItDown not installed — v1.4 SDS pipelines cannot run. "
+                    "Run: `pip install 'markitdown[pdf]'`"
                 )
             opts = [k for k in PIPELINE_SIDEBAR_ORDER if k in PIPELINE_LABELS]
             st.selectbox(
@@ -293,9 +320,10 @@ with st.form("cas_input", clear_on_submit=False):
     )
     submitted = st.form_submit_button("Assess")
 
-# SDS upload below CAS input
+# --- SDS PDF path (input_handler + alternative_extraction; does not run through assess() until user picks a CAS) ---
+# SDS upload below CAS input (requires MarkItDown for v1.4 extraction)
 uf_shared = None
-if sds_pdf_utils and sds_regex_extractor:
+if sds_pdf_utils and sds_regex_extractor and MARKITDOWN_OK:
     uf_shared = st.file_uploader(
         "Or upload SDS (PDF) to extract CAS",
         type=["pdf"],
@@ -418,6 +446,7 @@ if submitted and cas:
         st.session_state["result_for"] = None
     st.rerun()
 
+# --- Typed CAS / name assessment (ChemicalAssessmentService only; independent of SDS PDF pipeline) ---
 # Run assessment when we have a query and either no cached result or result is for a different query
 current_query = st.session_state.get("query")
 if current_query:
@@ -426,7 +455,7 @@ if current_query:
     if need_fetch:
         with st.spinner("Fetching data and generating structure..."):
             try:
-                from services.chemical_assessment import AssessmentResult, get_assessment_service
+                from services.chemical_assessment import get_assessment_service
 
                 _svc = get_assessment_service()
                 _ar = _svc.assess(current_query)
@@ -437,9 +466,15 @@ if current_query:
                 else:
                     if isinstance(_ar, list):
                         _ar = _ar[0] if _ar else None
-                    if _ar and isinstance(_ar, AssessmentResult) and _ar.has_multiple_components and _ar.all_components:
-                        _ar = _ar.all_components[0]
-                    if not isinstance(_ar, AssessmentResult):
+                    if (
+                        _ar
+                        and _is_assessment_result(_ar)
+                        and getattr(_ar, "has_multiple_components", False)
+                        and getattr(_ar, "all_components", None)
+                    ):
+                        _comps = _ar.all_components
+                        _ar = _comps[0] if _comps else _ar
+                    if not _is_assessment_result(_ar):
                         st.error(f"Unexpected assessment result for **{current_query}** (type: {type(_ar).__name__}). Try a different CAS.")
                         st.session_state["result_for"] = clean_cas
                         st.session_state["result_data"] = None

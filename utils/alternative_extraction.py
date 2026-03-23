@@ -173,6 +173,9 @@ def run_markitdown_pipeline(
     force_cache: bool,
 ) -> tuple[list[str], list[dict[str, Any]], str]:
     """Returns (cas_list, detail_rows, markdown_text)."""
+    from utils.markitdown_check import require_markitdown
+
+    require_markitdown()
     from parsers.markitdown_parser import MarkItDownParser
 
     fp = pdf_fingerprint(pdf_bytes)
