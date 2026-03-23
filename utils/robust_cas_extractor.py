@@ -28,16 +28,19 @@ logger = logging.getLogger(__name__)
 
 
 def _get_reconstructor() -> CASReconstructor:
-    """Build reconstructor from config."""
+    """Build reconstructor from config or strategy override."""
     try:
-        from config import RECONSTRUCTOR_MAX_GAP, RECONSTRUCTOR_USE_CONTEXT_FILTER
+        from utils.sds_strategy import get as strategy_get
+
+        max_gap = strategy_get("RECONSTRUCTOR_MAX_GAP", 15)
+        use_context = strategy_get("RECONSTRUCTOR_USE_CONTEXT_FILTER", True)
     except Exception:
-        RECONSTRUCTOR_MAX_GAP = 15
-        RECONSTRUCTOR_USE_CONTEXT_FILTER = False
+        max_gap = 15
+        use_context = False
     return CASReconstructor(
-        max_gap=RECONSTRUCTOR_MAX_GAP,
+        max_gap=max_gap,
         try_ocr_corrections=False,
-        use_context_filter=RECONSTRUCTOR_USE_CONTEXT_FILTER,
+        use_context_filter=use_context,
     )
 
 
@@ -495,9 +498,9 @@ class RobustCASExtractor:
             full_text, tables = _pdfplumber_extract(pdf_bytes)
             use_fallback_only = False
             try:
-                from config import USE_RECONSTRUCTOR_AS_FALLBACK_ONLY
+                from utils.sds_strategy import get as strategy_get
 
-                use_fallback_only = USE_RECONSTRUCTOR_AS_FALLBACK_ONLY
+                use_fallback_only = strategy_get("USE_RECONSTRUCTOR_AS_FALLBACK_ONLY", True)
             except Exception:
                 pass
 

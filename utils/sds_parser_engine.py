@@ -153,16 +153,22 @@ class SDSParserEngine:
             n += 3
         if c.section == 3:
             n += 1
+        if 1 in (c.sections or []) or c.section == 1:
+            n += 1  # Section 1 anchor is valuable
         return n
 
     def _merge_cas_extractions(self, a: CASExtraction, b: CASExtraction) -> CASExtraction:
-        """Prefer richer row; fill missing name/conc/context; max confidence."""
+        """Prefer richer row; fill missing name/conc/context; max confidence; merge sections."""
         primary, secondary = (a, b) if self._richness(a) >= self._richness(b) else (b, a)
+        sec_a = a.sections if a.sections else ([a.section] if a.section is not None else [])
+        sec_b = b.sections if b.sections else ([b.section] if b.section is not None else [])
+        merged_sections = sorted(set(sec_a + sec_b))
         out = CASExtraction(
             cas=primary.cas,
             chemical_name=(primary.chemical_name or secondary.chemical_name or None),
             concentration=(primary.concentration or secondary.concentration or None),
             section=primary.section if primary.section is not None else secondary.section,
+            sections=merged_sections,
             method=primary.method,
             confidence=max(primary.confidence, secondary.confidence),
             context=primary.context or secondary.context,
@@ -231,6 +237,7 @@ class SDSParserEngine:
                             chemical_name=chemical or None,
                             concentration=concentration,
                             section=3,
+                            sections=[3],
                             method="html_table_parsing",
                             confidence=0.98,
                             context=ctx,
@@ -299,6 +306,7 @@ class SDSParserEngine:
                     chemical_name=(chemical.strip() if chemical else None) or None,
                     concentration=concentration,
                     section=3,
+                    sections=[3],
                     method="pipe_table_parsing",
                     confidence=0.95,
                     context=" | ".join(cells)[:280],
@@ -348,6 +356,7 @@ class SDSParserEngine:
                     chemical_name=chem or None,
                     concentration=concentration,
                     section=section,
+                    sections=[section],
                     method="delimiter_table_parsing",
                     confidence=0.93 if section == 3 else 0.85,
                     context=" | ".join(str(x) for x in row)[:280],
@@ -385,6 +394,7 @@ class SDSParserEngine:
                                 chemical_name=pending_name.strip() or None,
                                 concentration=None,
                                 section=3,
+                                sections=[3],
                                 method="orphan_cas_line",
                                 confidence=0.88,
                                 context=line,
@@ -423,6 +433,7 @@ class SDSParserEngine:
                     chemical_name=name,
                     concentration=concentration,
                     section=3,
+                    sections=[3],
                     method="line_composition_parsing",
                     confidence=0.9,
                     context=line[:300],
@@ -474,6 +485,11 @@ class SDSParserEngine:
         store: dict[str, CASExtraction] = {}
         order: list[str] = []
 
+        # 0) Section 1 anchor - product CAS from Identification (merge with Section 3)
+        sec1 = sections.get(1, "") or ""
+        for item in self._extract_section1_cas(sec1):
+            self._put_cas(store, order, item)
+
         # 1) Section 3 enhanced composition (names + concentrations + section id)
         sec3 = sections.get(3, "") or ""
         for item in self._extract_composition_from_section3(sec3):
@@ -503,6 +519,7 @@ class SDSParserEngine:
                         chemical_name=name,
                         concentration=conc,
                         section=3,
+                        sections=[3],
                         method="llm_ollama",
                         confidence=0.9,
                         validated=True,
@@ -518,9 +535,11 @@ class SDSParserEngine:
             if not cas:
                 continue
             norm = cas_validator.normalize_cas_input(cas) or cas
+            sec = 3 if 3 in sections else None
             item = CASExtraction(
                 cas=norm,
-                section=3 if 3 in sections else None,
+                section=sec,
+                sections=[sec] if sec is not None else [],
                 method="focused_regex",
                 confidence=0.95,
                 validated=cas_validator.is_valid_cas_format(norm),
@@ -552,6 +571,7 @@ class SDSParserEngine:
                                 cas=norm,
                                 chemical_name=chem or None,
                                 section=sec,
+                                sections=[sec],
                                 method="table_parsing",
                                 confidence=0.82 if sec == 15 else 0.78,
                                 context=" | ".join(str(x) for x in row)[:220],
@@ -705,6 +725,46 @@ class SDSParserEngine:
             if 3 <= len(s) <= 120:
                 return s
         return None
+
+    def _extract_section1_cas(self, section_text: str) -> list[CASExtraction]:
+        """
+        Extract CAS numbers from Section 1 (Identification). Section 1 often lists
+        product CAS; merging with Section 3 improves confidence.
+        """
+        if not (section_text or "").strip():
+            return []
+        results: list[CASExtraction] = []
+        seen: set[str] = set()
+        for m in self.patterns["cas"].finditer(section_text):
+            cas = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+            norm = cas_validator.normalize_cas_input(cas) or cas
+            if not self._validate_cas_checksum(norm) or norm in seen:
+                continue
+            seen.add(norm)
+            # Try to get chemical name from nearby context (Product name:, CAS No. line, etc.)
+            start = max(0, m.start() - 120)
+            end = min(len(section_text), m.end() + 80)
+            ctx = section_text[start:end]
+            name: Optional[str] = None
+            prod_match = re.search(r"(?:Product\s*name|Product\s*identifier|Synonyms?)[:\s]+([^\n]{3,80})", ctx, re.IGNORECASE)
+            if prod_match:
+                name = prod_match.group(1).strip() or None
+            results.append(
+                CASExtraction(
+                    cas=norm,
+                    chemical_name=name,
+                    concentration=None,
+                    section=1,
+                    sections=[1],
+                    method="section1_anchor",
+                    confidence=0.92,
+                    context=ctx[:200],
+                    validated=True,
+                )
+            )
+        if results:
+            self.methods_used.append("section1_anchor")
+        return results
 
     def _validate_cas_checksum(self, cas: str) -> bool:
         if not cas or not re.match(r"^\d{1,7}-\d{2}-\d$", cas):

@@ -25,11 +25,32 @@ tesseract --version
 
 ### Poppler (for pdf2image)
 
-pdf2image needs Poppler to render PDF pages to images.
+pdf2image needs Poppler to render PDF pages to images. If you see **`Unable to get page count. Is poppler installed and in PATH?`**, Poppler is missing or not found.
 
-- **Windows:** Download [Poppler for Windows](https://github.com/oschwartz10612/poppler-windows/releases/) and add the `bin` folder to `PATH`, or use Conda: `conda install -c conda-forge poppler`
+- **Windows (recommended):**
+  1. Download a release from [Poppler for Windows](https://github.com/oschwartz10612/poppler-windows/releases/) and extract it (e.g. to `C:\Tools\poppler`).
+  2. Find the **`bin`** folder that contains `pdfinfo.exe` and `pdftoppm.exe` (often `...\poppler-xx\Library\bin`).
+  3. Either:
+     - Add that **`bin`** folder to your user **PATH**, **restart the terminal**, then run the app again, **or**
+     - Set an environment variable (no PATH edit):  
+       `HAZQUERY_POPPLER_PATH=C:\Tools\poppler\Library\bin`  
+       (use your real path; must be the **`bin`** directory).
+  4. Optional: in PowerShell for one session only:  
+     `$env:HAZQUERY_POPPLER_PATH = "C:\Tools\poppler\Library\bin"`
+- **Alternative:** `conda install -c conda-forge poppler` (then ensure Conda’s `bin` is on PATH when you run Python).
 - **macOS:** `brew install poppler`
 - **Linux:** `sudo apt install poppler-utils`
+
+Check (after PATH or env is set):
+
+```bash
+pdfinfo -v
+```
+
+### Faster OCR (optional)
+
+- Env **`HAZQUERY_OCR_DPI`** (default **200**): lower values (e.g. **120**–**150**) speed up `pdf2image` + Tesseract at the cost of slightly worse text for scans.
+- Batch script: `python run_batch_extract.py --fast --ocr-dpi 150`
 
 ---
 

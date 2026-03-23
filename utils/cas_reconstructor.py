@@ -44,19 +44,30 @@ def _normalize_text(text: str) -> str:
 
 def _looks_like_date(cas: str) -> bool:
     """
-    Reject CAS that clearly look like dates: 0-XX-X (e.g. 0-31-4) or 19xx/20xx-XX-X.
+    Reject CAS that clearly look like dates to avoid false positives:
+    - 0-XX-X (e.g. 0-31-4)
+    - 19xx/20xx-XX-X (years)
+    - Only when first part is exactly 2 digits (01-12): treat as month-day if second is 01-31
     """
     if not cas or "-" not in cas:
         return False
     parts = cas.split("-")
     if len(parts) != 3:
         return False
-    p1 = parts[0]
-    if p1 == "0":  # 0-31-4, 0-10-0
+    p1, p2 = parts[0], parts[1]
+    if p1 == "0":
         return True
     if len(p1) == 4 and p1.startswith(("19", "20")):
         try:
             if 1900 <= int(p1) <= 2099:
+                return True
+        except ValueError:
+            pass
+    # Month-day: only when first is 01-12 (2 digits) and second 01-31 (2 digits)
+    if len(p1) == 2 and len(p2) == 2:
+        try:
+            m, d = int(p1), int(p2)
+            if 1 <= m <= 12 and 1 <= d <= 31:
                 return True
         except ValueError:
             pass

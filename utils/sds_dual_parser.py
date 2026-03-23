@@ -1,9 +1,8 @@
 """
-Dual SDS parser (A + B) with DB cross-reference and optional name-CAS validation.
+Dual SDS parser (A + B) with PubChem name-CAS validation.
 
 - Parser A: SDSParser (pypdf + sds_regex_extractor + optional Docling)
 - Parser B: extract_sds_for_llm (pypdf + pdfplumber fallback + regex)
-- Cross-reference: chemical_db.get_dsstox_by_cas(cas) -> recognized
 - Name validation: PubChem synonyms vs SDS chemical_name when available
 """
 
@@ -41,11 +40,13 @@ def _run_parser_a(pdf_bytes: bytes) -> tuple[set[str], dict[str, dict[str, Any]]
             continue
         cas_set.add(c)
         if c not in cas_to_row or (ext.chemical_name or ext.concentration):
-            cas_to_row[c] = {
+            sections = ext.sections if ext.sections else ([ext.section] if ext.section is not None else [])
+        cas_to_row[c] = {
                 "cas": c,
                 "chemical_name": (ext.chemical_name or "").strip() or None,
                 "concentration": (ext.concentration or "").strip() or None,
                 "section": ext.section,
+                "sections": sections,
                 "method": ext.method or "parser_a",
                 "confidence": ext.confidence,
                 "validated": ext.validated,
@@ -81,16 +82,6 @@ def _is_valid_cas_format(cas: str) -> bool:
 
     norm = cas_validator.normalize_cas_input(cas)
     return bool(norm and cas_validator.is_valid_cas_format(norm))
-
-
-def _validate_cas_in_db(cas: str) -> bool:
-    """Check if CAS is in DSSTox (recognized)."""
-    try:
-        from utils import chemical_db
-
-        return chemical_db.get_dsstox_by_cas(cas) is not None
-    except Exception:
-        return False
 
 
 def _validate_cas_via_name(cas: str, sds_chemical_name: str) -> tuple[bool, Optional[str]]:
@@ -162,11 +153,10 @@ def merge_and_cross_reference(
         in_b = cas in cas_b
         source = "both" if (in_a and in_b) else ("parser_a" if in_a else "parser_b")
 
-        base = rows_a.get(cas, {"cas": cas, "chemical_name": None, "concentration": None})
+        base = rows_a.get(cas, {"cas": cas, "chemical_name": None, "concentration": None, "sections": []})
         chem_name = base.get("chemical_name") or ""
         concentration = base.get("concentration") or ""
-
-        recognized = _validate_cas_in_db(cas)
+        sections = base.get("sections") or []
 
         name_validated = False
         pubchem_name: Optional[str] = None
@@ -178,19 +168,19 @@ def merge_and_cross_reference(
             "chemical_name": chem_name or "",
             "concentration": concentration or "",
             "section": base.get("section"),
+            "sections": sections,
             "method": base.get("method", source),
             "confidence": base.get("confidence"),
             "validated": base.get("validated", False),
             "source": source,
-            "recognized": recognized,
             "name_validated": name_validated if chem_name else None,
             "pubchem_name": pubchem_name or "",
         })
 
     def sort_key(r: dict) -> tuple:
-        rec = 0 if r.get("recognized") else 1
+        name_ok = 0 if r.get("name_validated") else 1
         src = 0 if r.get("source") == "both" else (1 if "parser_a" in str(r.get("source", "")) else 2)
-        return (rec, src, (r.get("cas") or ""))
+        return (name_ok, src, (r.get("cas") or ""))
 
     rows.sort(key=sort_key)
     cas_list = [r["cas"] for r in rows]

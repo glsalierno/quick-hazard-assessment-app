@@ -64,23 +64,30 @@ USE_DOCLING = os.environ.get("USE_DOCLING", "1").strip().lower() in ("1", "true"
 USE_PUBCHEM_CAS_VALIDATION = os.environ.get("USE_PUBCHEM_CAS_VALIDATION", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
-# Only show CAS found in PubChem when gate is on. Default 0 = show all extracted (reliable extraction);
-# set to 1 to hide unverified (may yield 0 CAS if PubChem times out or rate limits).
-SHOW_ONLY_PUBCHEM_VERIFIED = os.environ.get("SHOW_ONLY_PUBCHEM_VERIFIED", "0").strip().lower() in (
+# Only show CAS found in PubChem. Default 1 = strict: no invalid or unverified CAS shown.
+# Set to 0 to show all extracted (may include unverified when PubChem times out).
+SHOW_ONLY_PUBCHEM_VERIFIED = os.environ.get("SHOW_ONLY_PUBCHEM_VERIFIED", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
 # Minimum confidence (0–1) to show in SDS UI. Set to 0 to show all verified; 0.2 hides very low-confidence.
 MIN_CAS_CONFIDENCE = float(os.environ.get("MIN_CAS_CONFIDENCE", "0.0"))
 
-# Reconstructor: run only when table/regex find zero CAS. Off by default to preserve extraction (set =1 to reduce false positives).
-USE_RECONSTRUCTOR_AS_FALLBACK_ONLY = os.environ.get("USE_RECONSTRUCTOR_AS_FALLBACK_ONLY", "0").strip().lower() in (
+# Reconstructor: run ONLY when table/regex find zero CAS. Prevents "making up" CAS from random digit sequences.
+USE_RECONSTRUCTOR_AS_FALLBACK_ONLY = os.environ.get("USE_RECONSTRUCTOR_AS_FALLBACK_ONLY", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
-RECONSTRUCTOR_MAX_GAP = int(os.environ.get("RECONSTRUCTOR_MAX_GAP", "25"))
-RECONSTRUCTOR_USE_CONTEXT_FILTER = os.environ.get("RECONSTRUCTOR_USE_CONTEXT_FILTER", "").strip().lower() in (
+RECONSTRUCTOR_MAX_GAP = int(os.environ.get("RECONSTRUCTOR_MAX_GAP", "10"))
+# Require CAS-like context (composition, ingredient, CAS, etc.) when reconstructing — avoids fake CAS from unrelated digits.
+RECONSTRUCTOR_USE_CONTEXT_FILTER = os.environ.get("RECONSTRUCTOR_USE_CONTEXT_FILTER", "1").strip().lower() in (
     "1", "true", "yes", "on",
 )
 USE_OCR = os.environ.get("USE_OCR", "").strip().lower() in ("1", "true", "yes", "on")
+
+# SDS CAS upload (Streamlit): only ``markitdown_fast`` or ``hybrid_md_ocr`` (see docs/SDS_EXTRACTION_PIPELINES.md).
+# Legacy values (e.g. ``default``) are normalized to hybrid at runtime.
+DEFAULT_SDS_EXTRACTION_PIPELINE = (
+    (os.environ.get("HAZQUERY_DEFAULT_SDS_PIPELINE") or "hybrid_md_ocr").strip() or "hybrid_md_ocr"
+)
 
 # QSAR Toolbox (OECD + VEGA/OPERA) — local WebSuite must be running. Windows only.
 # Set port (e.g. 51946) or leave None to disable. See https://github.com/glsalierno/PyQSARToolbox

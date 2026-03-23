@@ -4,7 +4,6 @@ Unified chemical input: typed CAS/name or SDS PDF -> normalized identifiers for 
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass, field
 from typing import Any, List, Optional, Tuple
 
@@ -29,13 +28,20 @@ _METHOD_WEIGHTS: dict[str, float] = {
     "docling_distilbert": 0.15,
     "table": 0.15,
     "ocr_fallback": -0.1,
+    "section1_anchor": 0.15,
+    "markitdown_regex": 0.12,
+    "markitdown_bert": 0.14,
+    "markitdown_hybrid_primary": 0.13,
+    "ocr_tesseract_regex": 0.08,
+    "ocr_easyocr_regex": 0.09,
+    "ocr_hybrid_fallback": 0.06,
 }
 
 
 def _calculate_confidence(row: dict[str, Any], pubchem_result: dict[str, Any]) -> float:
     """
-    Compute confidence score (0–1) from checksum, PubChem, method, and context.
-    DSSTox cross-check disabled; validation relies on PubChem only.
+    Compute confidence score (0–1) from checksum, PubChem, method, context,
+    name-CAS validation (Phase 2), and multi-section evidence (Phase 3).
     """
     cas = (row.get("cas") or "").strip()
     if not cas:
@@ -52,6 +58,15 @@ def _calculate_confidence(row: dict[str, Any], pubchem_result: dict[str, Any]) -
     # PubChem: use boost from validator (0.2 if found, 0.0 if not, 0.0 if unknown)
     confidence += pubchem_result.get("confidence_boost", 0.0)
 
+    # Phase 2: Name-CAS cross-check via PubChem (+0.15 when SDS name matches PubChem synonyms)
+    if row.get("name_validated"):
+        confidence += 0.15
+
+    # Phase 3: Multi-section evidence – CAS in both Section 1 and Section 3 (+0.1)
+    sections = row.get("sections") or []
+    if 1 in sections and 3 in sections:
+        confidence += 0.1
+
     # Method quality
     method = row.get("method") or ""
     confidence += _METHOD_WEIGHTS.get(method, 0.0)
@@ -67,21 +82,83 @@ def _calculate_confidence(row: dict[str, Any], pubchem_result: dict[str, Any]) -
     return max(0.1, min(1.0, confidence))
 
 
+# Methods that extract CAS from composition tables/sections (Section 1, 3) - high trust
+_COMPOSITION_METHODS: frozenset[str] = frozenset({
+    "section1_anchor", "composition_section3", "html_table_parsing", "pipe_table_parsing",
+    "delimiter_table_parsing", "line_composition_parsing", "orphan_cas_line", "table_parsing",
+    "docling", "docling_table", "docling_distilbert",
+    "markitdown_regex", "markitdown_bert", "markitdown_hybrid_primary",
+    "ocr_tesseract_regex", "ocr_easyocr_regex", "ocr_hybrid_fallback",
+})
+# Methods that infer CAS from digit sequences / full-text scan - high false positive risk
+_LOW_TRUST_METHODS: frozenset[str] = frozenset({
+    "reconstructor", "robust_fragment", "fragment_reconstruction",
+})
+
+
+def _filter_madeup_cas(cas_list: List[str], rows: List[dict[str, Any]]) -> Tuple[List[str], List[dict[str, Any]]]:
+    """
+    When composition-sourced CAS exist, exclude CAS from low-trust methods (fragment
+    reconstruction, reconstructor) which often produce false positives from random
+    digit sequences (dates, IDs, page numbers). Keep low-trust CAS only when they
+    are the sole source (no composition CAS found).
+    """
+    if not rows or not cas_list:
+        return cas_list, rows
+    has_composition = any(
+        (r.get("method") or "") in _COMPOSITION_METHODS for r in rows
+    )
+    if not has_composition:
+        return cas_list, rows
+    # Drop rows whose method is low-trust when we have composition CAS
+    row_by_cas = {r.get("cas", ""): r for r in rows}
+    filtered_rows: List[dict[str, Any]] = []
+    filtered_cas: List[str] = []
+    for cas in cas_list:
+        r = row_by_cas.get(cas, {})
+        method = (r.get("method") or "").strip()
+        if method in _LOW_TRUST_METHODS:
+            continue  # Exclude fragment/reconstructor when composition CAS exist
+        filtered_rows.append(r)
+        filtered_cas.append(cas)
+    return filtered_cas, filtered_rows
+
+
 def _score_cas_confidence(
     cas_list: List[str], rows: List[dict[str, Any]]
 ) -> Tuple[List[str], List[dict[str, Any]]]:
     """
-    Score CAS with PubChem-only validation. Invalid CAS (not found in PubChem) are hidden.
-    Sort by confidence (high first). DSSTox cross-check disabled.
+    Score CAS with PubChem validation. Never show invalid or made-up CAS:
+    - Hard filter: drop any CAS that fails checksum (no exceptions)
+    - Filter: exclude fragment/reconstructor CAS when composition CAS exist
+    - When gate on: only show PubChem-verified CAS
     """
-    from config import MIN_CAS_CONFIDENCE, SHOW_ONLY_PUBCHEM_VERIFIED, USE_PUBCHEM_CAS_VALIDATION
+    from utils.sds_strategy import get as strategy_get
+
+    MIN_CAS_CONFIDENCE = strategy_get("MIN_CAS_CONFIDENCE", 0.0)
+    SHOW_ONLY_PUBCHEM_VERIFIED = strategy_get("SHOW_ONLY_PUBCHEM_VERIFIED", True)
+    USE_PUBCHEM_CAS_VALIDATION = strategy_get("USE_PUBCHEM_CAS_VALIDATION", True)
     from utils.pubchem_validator import get_pubchem_validator
 
-    validator = get_pubchem_validator()
+    # Filter made-up CAS: when composition sources found CAS, drop fragment/reconstructor-only
+    cas_list, rows = _filter_madeup_cas(cas_list, rows)
+
+    # Hard filter: NEVER show CAS that fails checksum — avoid invalid/made-up CAS
+    valid_cas_list: List[str] = []
+    valid_rows: List[dict[str, Any]] = []
     row_by_cas = {r.get("cas", ""): r for r in rows}
+    for cas in cas_list:
+        if not _validate_checksum(cas):
+            continue
+        valid_cas_list.append(cas)
+        if cas in row_by_cas:
+            valid_rows.append(dict(row_by_cas[cas]))
+
+    validator = get_pubchem_validator()
+    row_by_cas = {r.get("cas", ""): r for r in valid_rows}
 
     enriched: List[dict[str, Any]] = []
-    for cas in cas_list:
+    for cas in valid_cas_list:
         r = dict(row_by_cas.get(cas, {}))
         r["cas"] = cas
 
@@ -96,6 +173,18 @@ def _score_cas_confidence(
             r["pubchem_verified"] = None
             r["pubchem_status"] = "skipped"
             r["_pubchem_result"] = {"confidence_boost": 0.0}
+
+        # Phase 2: Name-CAS cross-check via PubChem when SDS chemical name is available
+        chem_name = (r.get("chemical_name") or "").strip()
+        if chem_name:
+            try:
+                from utils.sds_dual_parser import _validate_cas_via_name
+                name_match, _ = _validate_cas_via_name(cas, chem_name)
+                r["name_validated"] = name_match
+            except Exception:
+                r["name_validated"] = False
+        else:
+            r["name_validated"] = None
 
         r["confidence"] = _calculate_confidence(r, r.get("_pubchem_result", {}))
         r.pop("_pubchem_result", None)
@@ -122,38 +211,18 @@ class ChemicalInput:
     cas_numbers: list[str] = field(default_factory=list)
     source_label: Optional[str] = None
     extraction_rows: list[dict[str, Any]] = field(default_factory=list)
+    # Set when MarkItDown/hybrid pipeline raises (see metrics["error"] in alternative_extraction)
+    extraction_error: Optional[str] = None
 
     def has_multiple_cas(self) -> bool:
         return len(self.cas_numbers) > 1
-
-
-def _use_pure_cas_bert_pipeline() -> bool:
-    """Session toggle (Streamlit) or HAZQUERY_PURE_CAS_BERT=1."""
-    if os.getenv("HAZQUERY_PURE_CAS_BERT", "").strip().lower() in ("1", "true", "yes", "on"):
-        return True
-    try:
-        return bool(st.session_state.get("use_pure_cas_bert"))
-    except Exception:
-        return False
-
-
-def _use_dual_parser_crossref() -> bool:
-    """Session toggle for dual parser + DB cross-reference."""
-    if os.getenv("HAZQUERY_DUAL_PARSER", "").strip().lower() in ("1", "true", "yes", "on"):
-        return True
-    try:
-        return bool(st.session_state.get("use_dual_parser_crossref"))
-    except Exception:
-        return False
 
 
 class UnifiedInputHandler:
     """Routes text or uploaded PDF to a ChemicalInput."""
 
     def __init__(self) -> None:
-        from utils.sds_parser import get_sds_parser
-
-        self._sds_parser = get_sds_parser()
+        pass
 
     def process_text(self, text: str) -> Optional[ChemicalInput]:
         """Typed CAS or chemical name (same rules as main form)."""
@@ -179,8 +248,8 @@ class UnifiedInputHandler:
 
     def process_sds_pdf(self, uploaded_file: Any) -> Optional[ChemicalInput]:
         """
-        Extract CAS list from SDS using unified parser.
-        uploaded_file: Streamlit UploadedFile with .name and .getvalue().
+        Extract CAS from SDS PDF via **MarkItDown + regex** or **Hybrid** (MarkItDown → OCR).
+        See ``docs/SDS_EXTRACTION_PIPELINES.md``. uploaded_file: Streamlit UploadedFile.
         """
         if uploaded_file is None:
             return None
@@ -193,158 +262,59 @@ class UnifiedInputHandler:
             "input_handler.process_sds_pdf",
             {"filename": getattr(uploaded_file, "name", None), "bytes": len(pdf_bytes)},
         )
-        if _use_pure_cas_bert_pipeline():
-            return self._process_sds_pdf_pure_bert(uploaded_file, pdf_bytes)
-        if _use_dual_parser_crossref():
-            return self._process_sds_pdf_dual_parser(uploaded_file, pdf_bytes)
 
-        return self._process_sds_pdf_single(uploaded_file, pdf_bytes)
+        try:
+            from utils.alternative_extraction import get_extraction_pipeline_mode
 
-    def _process_sds_pdf_single(self, uploaded_file: Any, pdf_bytes: bytes) -> ChemicalInput:
-        """Single parser (A only) - default path."""
-        parse_result = self._sds_parser.parse_pdf(pdf_bytes)
-        if not parse_result or not parse_result.cas_numbers:
-            return ChemicalInput(
-                input_type="sds_single",
-                primary="",
-                cas_numbers=[],
-                source_label=getattr(uploaded_file, "name", None) or "SDS.pdf",
-                extraction_rows=[],
-            )
+            mode = get_extraction_pipeline_mode()
+        except Exception:
+            mode = "hybrid_md_ocr"
 
-        rows: list[dict[str, Any]] = []
-        cas_list: list[str] = []
-        seen: set[str] = set()
-        best: tuple[float, str] = (-1.0, "")
-        for ext in parse_result.cas_numbers:
-            c = (ext.cas or "").strip()
-            if not c or c in seen:
-                continue
-            seen.add(c)
-            cas_list.append(c)
-            conf = float(ext.confidence) if ext.confidence is not None else 0.0
-            if conf > best[0]:
-                best = (conf, c)
-            rows.append(
-                {
-                    "cas": c,
-                    "chemical_name": ext.chemical_name or "",
-                    "concentration": ext.concentration or "",
-                    "section": ext.section,
-                    "method": ext.method,
-                    "confidence": ext.confidence,
-                    "validated": ext.validated,
-                    "context": ext.context or "",
-                    "warnings": ", ".join(ext.warnings) if ext.warnings else "",
-                }
-            )
+        return self._process_sds_pdf_alternative(uploaded_file, pdf_bytes, mode)
 
-        cas_list, rows = _score_cas_confidence(cas_list, rows)
-        primary = best[1] if best[1] and best[1] in cas_list else (cas_list[0] if cas_list else "")
-        in_type = "sds_multi" if len(cas_list) > 1 else "sds_single"
-        return ChemicalInput(
-            input_type=in_type,
-            primary=primary,
-            cas_numbers=cas_list,
-            source_label=getattr(uploaded_file, "name", None) or "SDS.pdf",
-            extraction_rows=rows,
-        )
-
-    def _process_sds_pdf_pure_bert(self, uploaded_file: Any, pdf_bytes: bytes) -> Optional[ChemicalInput]:
-        """Docling + DistilBERT only (see utils/cas_extractor.py)."""
-        from utils.cas_extractor import get_pure_cas_extractor, is_pure_cas_bert_available
+    def _process_sds_pdf_alternative(self, uploaded_file: Any, pdf_bytes: bytes, mode: str) -> ChemicalInput:
+        """MarkItDown / OCR / hybrid pipelines with shared scoring."""
+        from utils.alternative_extraction import run_pipeline_with_metrics
         from utils.sds_debug import sds_debug_log
 
+        rows, metrics = run_pipeline_with_metrics(pdf_bytes, mode)
         sds_debug_log(
-            "input_handler.pure_bert",
-            {"status": is_pure_cas_bert_available(), "filename": getattr(uploaded_file, "name", None)},
+            "input_handler.alternative",
+            {"mode": mode, "metrics": metrics, "n_rows": len(rows)},
         )
-        extractor = get_pure_cas_extractor()
-        bert_rows = extractor.extract(pdf_bytes)
-        sds_debug_log(
-            "input_handler.pure_bert_result",
-            {"n_rows": len(bert_rows), "cas_list": [r.cas for r in bert_rows]},
-        )
-        rows: list[dict[str, Any]] = []
         cas_list: list[str] = []
         seen: set[str] = set()
         best: tuple[float, str] = (-1.0, "")
-        for r in bert_rows:
-            c = (r.cas or "").strip()
+        for r in rows:
+            c = (r.get("cas") or "").strip()
             if not c or c in seen:
                 continue
             seen.add(c)
             cas_list.append(c)
-            conf = float(r.confidence)
+            conf = float(r.get("confidence") or 0.0)
             if conf > best[0]:
                 best = (conf, c)
-            rows.append(
-                {
-                    "cas": c,
-                    "chemical_name": r.chemical_name or "",
-                    "concentration": r.concentration or "",
-                    "section": r.source_page,
-                    "method": "docling_distilbert",
-                    "confidence": r.confidence,
-                    "validated": True,
-                    "context": "",
-                    "warnings": "",
-                }
-            )
+
+        raw_count_before_gate = len(cas_list)
         cas_list, rows = _score_cas_confidence(cas_list, rows)
-        label = getattr(uploaded_file, "name", None) or "SDS.pdf"
         primary = best[1] if best[1] and best[1] in cas_list else (cas_list[0] if cas_list else "")
         in_type = "sds_multi" if len(cas_list) > 1 else "sds_single"
+        label = getattr(uploaded_file, "name", None) or "SDS.pdf"
+        err = metrics.get("error")
+        filtered_note: Optional[str] = None
+        if not err and raw_count_before_gate > 0 and not cas_list:
+            filtered_note = (
+                f"Extractor found {raw_count_before_gate} checksum-valid CAS, but all were removed by "
+                "the PubChem / confidence gate (see SHOW_ONLY_PUBCHEM_VERIFIED, MIN_CAS_CONFIDENCE). "
+                "Try SHOW_ONLY_PUBCHEM_VERIFIED=0 temporarily to confirm."
+            )
         return ChemicalInput(
             input_type=in_type if cas_list else "sds_single",
             primary=primary,
             cas_numbers=cas_list,
             source_label=label,
             extraction_rows=rows,
-        )
-
-    def _process_sds_pdf_dual_parser(self, uploaded_file: Any, pdf_bytes: bytes) -> Optional[ChemicalInput]:
-        """Run both parsers (A + B), merge, cross-reference with DB and name validation."""
-        try:
-            from utils.sds_dual_parser import merge_and_cross_reference
-        except ImportError:
-            return None
-
-        from utils.sds_debug import sds_debug_log
-
-        sds_debug_log(
-            "input_handler.dual_parser",
-            {"filename": getattr(uploaded_file, "name", None), "bytes": len(pdf_bytes)},
-        )
-        try:
-            cas_list, rows = merge_and_cross_reference(pdf_bytes, use_name_validation=True)
-        except Exception as e:
-            sds_debug_log("input_handler.dual_parser_error", {"error": str(e)})
-            return self._process_sds_pdf_single(uploaded_file, pdf_bytes)
-        sds_debug_log(
-            "input_handler.dual_parser_result",
-            {"n_cas": len(cas_list), "recognized": sum(1 for r in rows if r.get("recognized"))},
-        )
-
-        cas_list, rows = _score_cas_confidence(cas_list, rows)
-
-        if not cas_list:
-            return ChemicalInput(
-                input_type="sds_single",
-                primary="",
-                cas_numbers=[],
-                source_label=getattr(uploaded_file, "name", None) or "SDS.pdf",
-                extraction_rows=[],
-            )
-
-        primary = cas_list[0]
-        in_type = "sds_multi" if len(cas_list) > 1 else "sds_single"
-        return ChemicalInput(
-            input_type=in_type,
-            primary=primary,
-            cas_numbers=cas_list,
-            source_label=getattr(uploaded_file, "name", None) or "SDS.pdf",
-            extraction_rows=rows,
+            extraction_error=str(err) if err else filtered_note,
         )
 
 

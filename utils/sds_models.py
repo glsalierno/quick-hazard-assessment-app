@@ -17,6 +17,7 @@ class CASExtraction:
     chemical_name: Optional[str] = None
     concentration: Optional[str] = None
     section: Optional[int] = None
+    sections: list[int] = field(default_factory=list)  # sections where CAS appears (for multi-section evidence)
     method: str = "regex"
     confidence: float = 0.8
     context: Optional[str] = None

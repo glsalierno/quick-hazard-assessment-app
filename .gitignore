@@ -23,6 +23,17 @@ Thumbs.db
 # Local reports / outputs (optional)
 *.log
 reports/
+artifacts/
+verification_full.txt
+verification_output.txt
+verification_results.json
+
+# CAS BERT weights (too large for GitHub; train with scripts/train_cas_bert.py or use Git LFS if needed)
+models/cas_bert/*.safetensors
+models/cas_bert/pytorch_model.bin
+models/cas_bert/*.bin
+# PDF extraction cache (MarkItDown / OCR artifacts)
+cache/
 
 # Do NOT ignore DSS/ — the DSSTox mapping is tracked via Git LFS for publishing.
 

@@ -79,12 +79,12 @@ def main() -> int:
                 "error": err,
             }
         )
-        print(f"[{i}/{len(pdfs)}] {pdf.name}: n_cas={len(cas_out)} ({elapsed:.1f}s){' ERR: ' + err if err else ''}")
-
-    with open(args.out, "w", newline="", encoding="utf-8") as f:
-        w = csv.DictWriter(f, fieldnames=["file", "seconds", "n_cas", "cas", "error"])
-        w.writeheader()
-        w.writerows(rows)
+        print(f"[{i}/{len(pdfs)}] {pdf.name}: n_cas={len(cas_out)} ({elapsed:.1f}s){' ERR: ' + err if err else ''}", flush=True)
+        # Rewrite CSV after each file so partial results survive long runs / crashes
+        with open(args.out, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=["file", "seconds", "n_cas", "cas", "error"])
+            w.writeheader()
+            w.writerows(rows)
 
     total = sum(1 for r in rows if int(r["n_cas"]) > 0)
     print(f"\nDone: {total}/{len(rows)} PDFs with >=1 CAS. CSV: {args.out}")

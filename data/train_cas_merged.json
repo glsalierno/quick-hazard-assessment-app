@@ -1,0 +1,50 @@
+[
+  {
+    "text": "Acetone 67-64-1 100 wt%",
+    "cas_substring": "67-64-1"
+  },
+  {
+    "text": "Water (7732-18-5) balance",
+    "cas_substring": "7732-18-5"
+  },
+  {
+    "text": "Component A — CAS 108-88-3 — 15-25 %",
+    "cas_substring": "108-88-3"
+  },
+  {
+    "text": "Trade secret mixture",
+    "cas_substring": ""
+  },
+  {
+    "text": "Ethanol | 64-17-5 | 30%",
+    "cas_substring": "64-17-5"
+  },
+  {
+    "text": "534-22-5",
+    "cas_substring": "534-22-5"
+  },
+  {
+    "text": "692-49-8",
+    "cas_substring": "692-49-8"
+  },
+  {
+    "text": "86508-42-1",
+    "cas_substring": "86508-42-1"
+  },
+  {
+    "text": "2-Methylfuran",
+    "cas_substring": ""
+  },
+  {
+    "text": "CAS No. 108-88-3",
+    "cas_substring": "108-88-3"
+  },
+  {
+    "text": "CAS: 7732-18-5",
+    "cas_substring": "7732-18-5"
+  },
+  {
+    "text": "wt.% 10 - 20",
+    "cas_substring": ""
+  }
+]

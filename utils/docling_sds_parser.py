@@ -86,6 +86,13 @@ def docling_status_message() -> str:
     return "Docling available for PDF table extraction."
 
 
+def __getattr__(name: str) -> Any:
+    """Lazy export so ``from utils.docling_sds_parser import DocumentStream`` works for cas_extractor."""
+    if name == "DocumentStream":
+        return _try_import_docling().get("DocumentStream")
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 def _validate_cas_checksum(cas: str) -> bool:
     if not cas or not re.match(r"^\d{1,7}-\d{2}-\d$", cas):
         return False
