@@ -1,3 +1,6 @@
 libxrender1
 libxext6
 libx11-6
+# PDF rasterization (pdf2image) and OCR — used by Hybrid SDS pipeline on Streamlit Cloud (Debian)
+poppler-utils
+tesseract-ocr

@@ -126,10 +126,10 @@ class MarkItDownParser:
     def _get_markitdown(self) -> Any:
         if self._md is not None:
             return self._md
-        try:
-            from markitdown import MarkItDown
-        except ImportError as e:
-            raise RuntimeError("markitdown not installed. pip install 'markitdown[pdf]'") from e
+        from utils.markitdown_check import require_markitdown
+
+        require_markitdown()
+        from markitdown import MarkItDown
         self._md = MarkItDown(enable_plugins=False)
         return self._md
 

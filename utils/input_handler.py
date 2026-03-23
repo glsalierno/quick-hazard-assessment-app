@@ -1,5 +1,14 @@
 """
 Unified chemical input: typed CAS/name or SDS PDF -> normalized identifiers for assessment.
+
+**Typed CAS / name (main form in ``app.py``)** uses ``ChemicalAssessmentService.assess`` only.
+That path never calls ``_score_cas_confidence``.
+
+**SDS PDF upload** uses MarkItDown / hybrid pipelines, then ``_score_cas_confidence`` for
+checksum + optional PubChem filtering. Gate knobs (``SHOW_ONLY_PUBCHEM_VERIFIED``,
+``MIN_CAS_CONFIDENCE``) are read from ``config`` only — not ``sds_strategy`` session
+presets — so sidebar “strategy” testers for legacy parsers do not strip SDS rows or
+affect typed-CAS assessment.
 """
 
 from __future__ import annotations
@@ -18,6 +27,27 @@ def _validate_checksum(cas: str) -> bool:
         return False
     _, check_ok = cas_validator.validate_cas_relaxed(str(cas).strip())
     return check_ok
+
+
+def _norm_cas_key(cas: str) -> str:
+    """Normalize CAS for dict lookup (hyphens, spacing) so rows match scored cas_list."""
+    s = (cas or "").strip()
+    if not s:
+        return ""
+    return cas_validator.normalize_cas_input(s) or s
+
+
+def _rows_by_norm_cas(rows: List[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """Map normalized CAS → row (last wins)."""
+    out: dict[str, dict[str, Any]] = {}
+    for r in rows:
+        c = (r.get("cas") or "").strip()
+        if not c:
+            continue
+        k = _norm_cas_key(c)
+        if k:
+            out[k] = r
+    return out
 
 
 _METHOD_WEIGHTS: dict[str, float] = {
@@ -111,11 +141,11 @@ def _filter_madeup_cas(cas_list: List[str], rows: List[dict[str, Any]]) -> Tuple
     if not has_composition:
         return cas_list, rows
     # Drop rows whose method is low-trust when we have composition CAS
-    row_by_cas = {r.get("cas", ""): r for r in rows}
+    row_by_cas = _rows_by_norm_cas(rows)
     filtered_rows: List[dict[str, Any]] = []
     filtered_cas: List[str] = []
     for cas in cas_list:
-        r = row_by_cas.get(cas, {})
+        r = row_by_cas.get(_norm_cas_key(cas), {})
         method = (r.get("method") or "").strip()
         if method in _LOW_TRUST_METHODS:
             continue  # Exclude fragment/reconstructor when composition CAS exist
@@ -131,22 +161,36 @@ def _score_cas_confidence(
     Score CAS with PubChem validation. Never show invalid or made-up CAS:
     - Hard filter: drop any CAS that fails checksum (no exceptions)
     - Filter: exclude fragment/reconstructor CAS when composition CAS exist
-    - When gate on: only show PubChem-verified CAS
+    - When gate on: hide only untrusted extractions that PubChem rejects (see gate below)
     """
-    from utils.sds_strategy import get as strategy_get
+    # Use ``config`` for gate knobs — not ``sds_strategy`` session presets (those target the
+    # legacy unified parser; a "strict" preset was forcing SHOW_ONLY_PUBCHEM_VERIFIED and
+    # clearing all MarkItDown SDS rows).
+    import config as _cfg
 
-    MIN_CAS_CONFIDENCE = strategy_get("MIN_CAS_CONFIDENCE", 0.0)
-    SHOW_ONLY_PUBCHEM_VERIFIED = strategy_get("SHOW_ONLY_PUBCHEM_VERIFIED", True)
-    USE_PUBCHEM_CAS_VALIDATION = strategy_get("USE_PUBCHEM_CAS_VALIDATION", True)
+    MIN_CAS_CONFIDENCE = float(getattr(_cfg, "MIN_CAS_CONFIDENCE", 0.0))
+    SHOW_ONLY_PUBCHEM_VERIFIED = bool(getattr(_cfg, "SHOW_ONLY_PUBCHEM_VERIFIED", False))
+    USE_PUBCHEM_CAS_VALIDATION = bool(getattr(_cfg, "USE_PUBCHEM_CAS_VALIDATION", True))
     from utils.pubchem_validator import get_pubchem_validator
 
     # Filter made-up CAS: when composition sources found CAS, drop fragment/reconstructor-only
     cas_list, rows = _filter_madeup_cas(cas_list, rows)
 
+    # Normalize CAS so row lookup matches MarkItDown output (hyphen variants)
+    _seen_norm: set[str] = set()
+    _deduped: List[str] = []
+    for c in cas_list:
+        k = _norm_cas_key(c)
+        if not k or k in _seen_norm:
+            continue
+        _seen_norm.add(k)
+        _deduped.append(k)
+    cas_list = _deduped
+
     # Hard filter: NEVER show CAS that fails checksum — avoid invalid/made-up CAS
     valid_cas_list: List[str] = []
     valid_rows: List[dict[str, Any]] = []
-    row_by_cas = {r.get("cas", ""): r for r in rows}
+    row_by_cas = _rows_by_norm_cas(rows)
     for cas in cas_list:
         if not _validate_checksum(cas):
             continue
@@ -155,17 +199,30 @@ def _score_cas_confidence(
             valid_rows.append(dict(row_by_cas[cas]))
 
     validator = get_pubchem_validator()
-    row_by_cas = {r.get("cas", ""): r for r in valid_rows}
+    row_by_cas = _rows_by_norm_cas(valid_rows)
+    # Fallback: single extraction method for the batch if a row lost its method key
+    _batch_method = ""
+    if rows:
+        _batch_method = str((rows[0] or {}).get("method") or "").strip()
 
     enriched: List[dict[str, Any]] = []
     for cas in valid_cas_list:
         r = dict(row_by_cas.get(cas, {}))
         r["cas"] = cas
+        if not (r.get("method") or "").strip() and _batch_method:
+            r["method"] = _batch_method
 
         if USE_PUBCHEM_CAS_VALIDATION:
             check = validator.validate(cas)
-            r["pubchem_verified"] = check["exists"] is True
-            r["pubchem_status"] = "verified" if check["exists"] is True else ("unknown" if check["exists"] is None else "not_found")
+            ex = check.get("exists")
+            # Tri-state: None = lookup failed (network); do not treat like "not in PubChem"
+            if ex is True:
+                r["pubchem_verified"] = True
+            elif ex is None:
+                r["pubchem_verified"] = None
+            else:
+                r["pubchem_verified"] = False
+            r["pubchem_status"] = "verified" if ex is True else ("unknown" if ex is None else "not_found")
             if check.get("name") and not r.get("chemical_name"):
                 r["chemical_name"] = check["name"]
             r["_pubchem_result"] = check
@@ -189,9 +246,14 @@ def _score_cas_confidence(
         r["confidence"] = _calculate_confidence(r, r.get("_pubchem_result", {}))
         r.pop("_pubchem_result", None)
 
-        # Filter invalid: only show PubChem-verified CAS when gate is on
-        if SHOW_ONLY_PUBCHEM_VERIFIED and USE_PUBCHEM_CAS_VALIDATION and r["pubchem_verified"] is not True:
-            continue
+        # When gate on: hide CAS only if PubChem says "not found" *and* extraction is low-trust.
+        # Keep verified, unknown (API failure), and checksum-valid MarkItDown/OCR/composition rows.
+        if SHOW_ONLY_PUBCHEM_VERIFIED and USE_PUBCHEM_CAS_VALIDATION:
+            pv = r["pubchem_verified"]
+            if pv is False:
+                method = (r.get("method") or "").strip() or _batch_method
+                if method not in _COMPOSITION_METHODS or not _validate_checksum(cas):
+                    continue
         enriched.append(r)
 
     enriched.sort(key=lambda x: float(x.get("confidence", 0)), reverse=True)
@@ -305,8 +367,8 @@ class UnifiedInputHandler:
         if not err and raw_count_before_gate > 0 and not cas_list:
             filtered_note = (
                 f"Extractor found {raw_count_before_gate} checksum-valid CAS, but all were removed by "
-                "the PubChem / confidence gate (see SHOW_ONLY_PUBCHEM_VERIFIED, MIN_CAS_CONFIDENCE). "
-                "Try SHOW_ONLY_PUBCHEM_VERIFIED=0 temporarily to confirm."
+                "filters (PubChem gate if SHOW_ONLY_PUBCHEM_VERIFIED=1, or MIN_CAS_CONFIDENCE too high). "
+                "Defaults: SHOW_ONLY_PUBCHEM_VERIFIED=0, MIN_CAS_CONFIDENCE=0."
             )
         return ChemicalInput(
             input_type=in_type if cas_list else "sds_single",

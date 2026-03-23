@@ -57,7 +57,7 @@ def get(key: str, default: Any = None) -> Any:
         "USE_OCR": ("USE_OCR", lambda v: (v or "").strip().lower() in ("1", "true", "yes", "on")),
         "USE_ROBUST_CAS_EXTRACTOR": ("USE_ROBUST_CAS_EXTRACTOR", lambda v: (v or "1").strip().lower() in ("1", "true", "yes", "on")),
         "USE_PUBCHEM_CAS_VALIDATION": ("USE_PUBCHEM_CAS_VALIDATION", lambda v: (v or "1").strip().lower() in ("1", "true", "yes", "on")),
-        "SHOW_ONLY_PUBCHEM_VERIFIED": ("SHOW_ONLY_PUBCHEM_VERIFIED", lambda v: (v or "1").strip().lower() in ("1", "true", "yes", "on")),
+        "SHOW_ONLY_PUBCHEM_VERIFIED": ("SHOW_ONLY_PUBCHEM_VERIFIED", lambda v: (v or "0").strip().lower() in ("1", "true", "yes", "on")),
         "USE_RECONSTRUCTOR_AS_FALLBACK_ONLY": ("USE_RECONSTRUCTOR_AS_FALLBACK_ONLY", lambda v: (v or "1").strip().lower() in ("1", "true", "yes", "on")),
         "RECONSTRUCTOR_USE_CONTEXT_FILTER": ("RECONSTRUCTOR_USE_CONTEXT_FILTER", lambda v: (v or "1").strip().lower() in ("1", "true", "yes", "on")),
         "RECONSTRUCTOR_MAX_GAP": ("RECONSTRUCTOR_MAX_GAP", lambda v: int(v or "15")),
