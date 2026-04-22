@@ -49,7 +49,6 @@ def draw_molecule_canonical(
     highlight_atoms: Optional[list[int]] = None,
     highlight_bonds: Optional[list[int]] = None,
     explicit_hydrogens: bool = False,
-    atom_labels: bool = False,
 ) -> Optional["Image.Image"]:
     """
     Generate a canonical molecular drawing using RDKit.
@@ -68,8 +67,6 @@ def draw_molecule_canonical(
         List of bond indices to highlight
     explicit_hydrogens : bool
         Whether to show explicit H atoms
-    atom_labels : bool
-        Whether to show atom indices (for debugging)
 
     Returns:
     --------

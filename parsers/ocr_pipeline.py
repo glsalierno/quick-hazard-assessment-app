@@ -167,7 +167,6 @@ def ocr_tesseract_then_easyocr_fallback(
     *,
     dpi: Optional[int] = None,
     psm: int = 6,
-    min_chars_per_page: int = 50,
 ) -> tuple[str, str]:
     """
     Run Tesseract; for pages with little text, try EasyOCR (similar to sds_pdf_utils.extract_text_via_ocr).

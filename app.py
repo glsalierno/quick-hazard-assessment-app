@@ -24,9 +24,9 @@ from utils.markitdown_check import is_markitdown_available
 from utils.sds_integration import apply_assessment_query
 
 try:
-    from utils import sds_compare, sds_pdf_utils, sds_regex_extractor
+    from utils import sds_pdf_utils, sds_regex_extractor
 except ImportError:
-    sds_compare = sds_pdf_utils = sds_regex_extractor = None  # optional: SDS PDF flow (v1.4)
+    sds_pdf_utils = sds_regex_extractor = None  # optional: SDS PDF flow (v1.4)
 
 try:
     from utils import carcinogenic_potency_client
