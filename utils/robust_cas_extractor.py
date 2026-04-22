@@ -224,7 +224,7 @@ def _reconstruct_from_digit_sequences(text: str) -> list[tuple[str, int]]:
     return results
 
 
-def _extract_cas_from_text(text: str, source_page: Optional[int] = None) -> list[CASExtraction]:
+def _extract_cas_from_text(text: str) -> list[CASExtraction]:
     """
     Stage 4: Extract CAS from text using adversarial patterns + fragment reconstruction.
     Returns list of CASExtraction with context.

@@ -153,7 +153,7 @@ def _table_composition_score(headers_lower: list[str]) -> int:
     return score
 
 
-def _dataframe_to_cas_extractions(df: Any, table_index: int) -> list[CASExtraction]:
+def _dataframe_to_cas_extractions(df: Any) -> list[CASExtraction]:
     """Parse a Docling-exported DataFrame for composition rows."""
     out: list[CASExtraction] = []
     if df is None or getattr(df, "empty", True):
@@ -375,7 +375,7 @@ def extract_composition_from_pdf(
     for sc, _ix, table_df in scored:
         if sc < 2 and len(scored) > 1:
             continue
-        for ext in _dataframe_to_cas_extractions(table_df, _ix):
+        for ext in _dataframe_to_cas_extractions(table_df):
             k = cas_validator.normalize_cas_input(ext.cas) or ext.cas
             if k in seen:
                 continue
@@ -391,7 +391,7 @@ def extract_composition_from_pdf(
                     table_df = table.export_to_dataframe()
             except Exception:
                 continue
-            for ext in _dataframe_to_cas_extractions(table_df, table_ix):
+            for ext in _dataframe_to_cas_extractions(table_df):
                 k = cas_validator.normalize_cas_input(ext.cas) or ext.cas
                 if k in seen:
                     continue

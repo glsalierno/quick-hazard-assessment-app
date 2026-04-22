@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from io import BytesIO
 from pathlib import Path
 from typing import Any, Optional
@@ -160,7 +161,6 @@ def extract_text_via_ocr(
     pdf_bytes: bytes,
     use_easyocr_fallback: bool = True,
     dpi: Optional[int] = None,
-    lang: str = "eng",
 ) -> str:
     """
     Render PDF to images and run OCR (Tesseract; EasyOCR per-page fallback if enabled).
@@ -238,7 +238,16 @@ def normalize_whitespace(text: str) -> str:
     """Collapse repeated whitespace for more stable regex extraction."""
     if not text:
         return ""
-    return " ".join(text.replace("\r", "\n").split())
+    collapsed = " ".join(text.replace("\r", "\n").split())
+    # Embedded PDF text often becomes one long line; section parsers expect headers
+    # at line boundaries. Re-insert newlines before OSHA/GHS-style "Section N:" blocks.
+    restored = re.sub(
+        r"(?<=.)\b(Section\s+(?:1[0-6]|[1-9])\s*[:\.]?(?=\s|$))",
+        r"\n\1",
+        collapsed,
+        flags=re.IGNORECASE,
+    )
+    return restored.strip()
 
 
 def extract_tables_from_text(text: str) -> list[list[list[str]]]:
