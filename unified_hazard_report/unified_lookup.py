@@ -5,6 +5,10 @@ from __future__ import annotations
 from typing import Any
 
 from unified_hazard_report.data_context import OfflineDataContext
+from unified_hazard_report.iuclid_cache import (
+    load_cached_normalized_endpoints_for_uuids,
+    load_cached_snippets_for_uuids,
+)
 from unified_hazard_report.iuclid_extractor import extract_endpoints_for_uuid
 from unified_hazard_report.legacy_adapter import get_legacy_hazards
 from ingest.crosswalk import normalize_cas
@@ -55,9 +59,60 @@ def unified_lookup(cas_number: str, ctx: OfflineDataContext) -> dict[str, Any]:
             row["uuid"] = uid
             endpoint_rows.append(row)
 
+    cached_cl_rows, cached_endpoint_rows = load_cached_snippets_for_uuids(uuids)
+    cached_normalized_endpoints = load_cached_normalized_endpoints_for_uuids(uuids)
+    if cached_endpoint_rows:
+        endpoint_rows = [
+            {
+                "uuid": r.get("uuid"),
+                "endpoint_name": r.get("endpoint_name"),
+                "endpoint_name_label": r.get("endpoint_name_label"),
+                "result": r.get("result_value"),
+                "result_label": r.get("result_value_label"),
+                "units": r.get("unit"),
+                "units_label": r.get("unit_label"),
+                "species": r.get("species"),
+                "species_label": r.get("species_label"),
+                "source_tag": r.get("source_tag"),
+            }
+            for r in cached_endpoint_rows
+        ]
+
     if not ctx.cl_hazards_df.empty and uid_set and "substance_uuid" in ctx.cl_hazards_df.columns:
         cdf = ctx.cl_hazards_df[ctx.cl_hazards_df["substance_uuid"].astype(str).isin(uid_set)]
         cl_rows = cdf.to_dict(orient="records")
+
+    if cached_cl_rows:
+        cl_rows.extend(
+            {
+                "substance_uuid": r.get("uuid"),
+                "hazard_class": r.get("hazard_class"),
+                "hazard_class_label": r.get("hazard_class_label"),
+                "hazard_category": r.get("hazard_category"),
+                "hazard_category_label": r.get("hazard_category_label"),
+                "h_statement_code": r.get("hazard_code"),
+                "h_statement_code_label": r.get("hazard_code_label"),
+                "h_statement_text": r.get("hazard_statement"),
+                "h_statement_text_label": r.get("hazard_statement_label"),
+                "supplemental_info": r.get("source_tag") or "iuclid_snippet_cache",
+            }
+            for r in cached_cl_rows
+        )
+        deduped: list[dict[str, Any]] = []
+        seen: set[tuple[str, str, str, str, str]] = set()
+        for r in cl_rows:
+            key = (
+                str(r.get("substance_uuid") or ""),
+                str(r.get("hazard_class") or ""),
+                str(r.get("hazard_category") or ""),
+                str(r.get("h_statement_code") or ""),
+                str(r.get("h_statement_text") or "")[:180],
+            )
+            if key in seen:
+                continue
+            seen.add(key)
+            deduped.append(r)
+        cl_rows = deduped
 
     return {
         "cas": cas_norm,
@@ -65,5 +120,6 @@ def unified_lookup(cas_number: str, ctx: OfflineDataContext) -> dict[str, Any]:
         "iuclid_uuids": uuids,
         "iuclid_substances": substance_rows,
         "iuclid_endpoints": endpoint_rows,
+        "iuclid_endpoints_normalized": cached_normalized_endpoints,
         "iuclid_cl_rows": cl_rows,
     }

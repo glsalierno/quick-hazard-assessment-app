@@ -7,17 +7,12 @@ from __future__ import annotations
 
 from typing import Optional, Tuple
 
-# PyPI (default). Fork for source/contrib: https://github.com/glsalierno/markitdown
+# PyPI (default). Optional: install from a Git fork if you need unreleased fixes.
 _INSTALL_PYPI = "pip install 'markitdown[pdf]'"
-_INSTALL_GIT = (
-    'pip install "markitdown[pdf] @ git+https://github.com/glsalierno/markitdown.git'
-    '#subdirectory=packages/markitdown"'
-)
 _PUBLIC_MSG = (
     "MarkItDown is required for SDS PDF parsing (PDF → Markdown → CAS regex). "
     f"Install: `{_INSTALL_PYPI}` "
-    "(or from GitHub [glsalierno/markitdown](https://github.com/glsalierno/markitdown): "
-    f"`{_INSTALL_GIT}`)"
+    "(optional: install from the upstream MarkItDown repository if you need a pre-release build)."
 )
 
 

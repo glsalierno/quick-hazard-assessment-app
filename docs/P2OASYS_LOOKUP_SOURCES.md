@@ -86,8 +86,7 @@ See **utils/iarc_lookup.py**: `load_iarc_from_iarc_folder(iarc_dir)`. **utils/at
 
 **Use in P2OASys:** Endpoint data (physicochemical, toxicity, fate) from the **OECD QSAR Toolbox** with **VEGA** (and optionally OPERA) add-ons. All run locally; no cloud API key.
 
-- **Requires:** [QSAR Toolbox](https://qsartoolbox.org/download/) installed (Windows only), **WebSuite** running, and [PyQSARToolbox](https://github.com/glsalierno/PyQSARToolbox):  
-  `pip install git+https://github.com/glsalierno/PyQSARToolbox.git`
+- **Requires:** [QSAR Toolbox](https://qsartoolbox.org/download/) installed (Windows only), **WebSuite** running, and a **PyQSARToolbox** client library (install from PyPI or your approved package source).
 - **Config:** Set `QSAR_TOOLBOX_PORT` to the port shown when WebSuite starts (e.g. `51946`). The app connects to `http://127.0.0.1:<port>`.
 - **Flow:** Search by CAS (or SMILES), retrieve all endpoint data, merge into `extra_sources` for P2OASys and show in the Hazard tab as “QSAR Toolbox (VEGA)”.
 - **Module:** `utils.qsar_toolbox_client` — `is_available(port)`, `fetch_by_cas(cas, port)`, `toolbox_results_to_extra_sources(rows)`.

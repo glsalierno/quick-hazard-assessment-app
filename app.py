@@ -53,11 +53,17 @@ st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sideb
 
 MARKITDOWN_OK, _MARKITDOWN_ERR = is_markitdown_available()
 
-# Offline REACH / IUCLID: mirror secrets into os.environ before any ingest reads env (optional package).
+# Offline REACH / IUCLID: mirror ``.streamlit/secrets.toml`` + ``st.secrets`` into os.environ (optional package).
 try:
-    from unified_hazard_report.iuclid_integration import sync_offline_secrets_from_st_secrets
+    from unified_hazard_report.iuclid_integration import offline_archive_fingerprint, sync_offline_secrets_from_st_secrets
 
     sync_offline_secrets_from_st_secrets()
+    if os.getenv("HAZQUERY_DEBUG_OFFLINE_SYNC", "").strip().lower() in ("1", "true", "yes", "on"):
+        _la = offline_archive_fingerprint()
+        logging.getLogger(__name__).info(
+            "HAZQUERY_DEBUG_OFFLINE_SYNC: OFFLINE_LOCAL_ARCHIVE length=%s (chars after sync)",
+            len(_la),
+        )
 except Exception:
     pass
 
@@ -1016,7 +1022,10 @@ if current_query:
                         st.caption("Toolbox is running but no endpoint data returned for this CAS. Try SMILES search or check Toolbox databases.")
             elif qsar_toolbox_client and _qtb_port and not qsar_toolbox_client.is_available(_qtb_port):
                 with st.expander("🧪 QSAR Toolbox (VEGA)", expanded=False):
-                    st.caption("Start **QSAR Toolbox WebSuite** and set `QSAR_TOOLBOX_PORT` (e.g. 51946) to use local VEGA data. Install: `pip install git+https://github.com/glsalierno/PyQSARToolbox.git`")
+                    st.caption(
+                        "Start **QSAR Toolbox WebSuite** and set `QSAR_TOOLBOX_PORT` (e.g. 51946) to use local VEGA data. "
+                        "Install **PyQSARToolbox** from PyPI or from the upstream repository (see OECD QSAR Toolbox documentation)."
+                    )
             elif qsar_toolbox_client and not _qtb_port:
                 with st.expander("🧪 QSAR Toolbox (VEGA)", expanded=False):
                     st.caption("Set **QSAR_TOOLBOX_PORT** (e.g. 51946) in env or config and start QSAR Toolbox WebSuite to use local VEGA data (Windows).")
@@ -1032,6 +1041,7 @@ if current_query:
                 **Toxicity & hazard data**
                 - **ToxValDB (local)**: quantitative toxicity values from COMPTOX Excel → SQLite (no API key).
                 - **Carcinogenic Potency Database (CPDB, local)**: TD50 and experiment data from CPDB SQLite (built via `scripts/build_carcinogenic_potency_from_cpdb_tabs.py`).
+                - **ECHA / IUCLID (offline)**: dossier index (`uuid`, identifiers, infocard links) and parsed `Document.i6d` snippets from local `.zip`/`.7z`/`.i6z` snapshots.
                 - **IARC**: classifications from the **iarc folder** (e.g. `fastP2OASys/iarc`) or optional CSV (`P2OASYS_IARC_CSV_PATH`).
                 - **ODP/GWP**: optional CSV (`P2OASYS_ODP_GWP_CSV_PATH`) for ozone depletion and global warming potential.
                 - **IPCC GWP 100-year**: from **atmo folder** (e.g. `fastP2OASys/atmo`) Federal LCA Commons parquet.
@@ -1041,14 +1051,13 @@ if current_query:
                 - **Hazard scrapers** (optional): ECHA CHEM, Danish QSAR, VEGA API, NIH NICEATM ICE — via `utils.hazard_scrapers` and CLI `scripts/run_unified_hazard_scraper.py`.
 
                 **SDS**
-                - **SDS PDF**: regex extraction (GHS, CAS, quantitative values) in the **SDS PDF comparison** section; optional Ollama/LLM extraction when available.
+                - **SDS PDF**: regex extraction (GHS, CAS, quantitative values) in the **SDS PDF comparison** section.
 
                 **P2OASys scoring**
                 - **Hazard matrix**: internal configuration used for mapping endpoints to scores (not user-facing).
 
                 **Summarization (optional)**
-                - **Ollama** (local): one-sentence summaries for ecotoxicity excerpts and CPDB (no API key).
-                - **OpenAI** (optional): `OPENAI_API_KEY` for gpt-4o-mini summarization when set in app secrets.
+                - **Rule-based/local app summaries**: endpoint rollups and one-line synthesis shown in the report views.
                 """)
         else:
             st.error(f"No data found for '{current_query}'. Please check the input.")
@@ -1126,7 +1135,7 @@ if current_query:
                 overall_max = p2oasys_aggregate.aggregate_category_scores(scores, "max")
                 overall_mean = p2oasys_aggregate.aggregate_category_scores(scores, "mean")
                 overall_weighted = p2oasys_aggregate.aggregate_category_scores(scores, "weighted_mean")
-                n_cat, cat_names = p2oasys_aggregate.count_scored_categories(scores)
+                n_cat, _ = p2oasys_aggregate.count_scored_categories(scores)
                 st.subheader("P2OASys itemized scoring")
                 st.caption(
                     "Scores 2–10 (higher = more hazardous). Data from PubChem, ToxValDB, CPDB, IARC/ODP/GWP lookups, and QSAR Toolbox (VEGA) when available."

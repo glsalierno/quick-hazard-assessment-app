@@ -41,7 +41,7 @@ class BaseHazardScraper(ABC):
             session.mount("http://", adapter)
             session.mount("https://", adapter)
         session.headers.update({
-            "User-Agent": "Mozilla/5.0 (compatible; HazardScraper/1.0; +https://github.com/glsalierno/quick-hazard-assessment-app)",
+            "User-Agent": "Mozilla/5.0 (compatible; HazardScraper/1.0; +https://echa.europa.eu/)",
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             "Accept-Language": "en-US,en;q=0.9",
         })

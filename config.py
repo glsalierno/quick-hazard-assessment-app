@@ -16,19 +16,19 @@ DSSTOX_MAPPING_FILENAMES = ("cas_dtxsid_mapping.csv",)
 
 # Local SQLite chemical DB (DSSTox + ToxValDB); built by scripts/setup_chemical_db.py
 DATA_DIR = os.path.join(REPO_ROOT, "data")
-CHEMICAL_DB_PATH = os.path.join(DATA_DIR, "chemical_db.sqlite")
+CHEMICAL_DB_PATH = os.environ.get("CHEMICAL_DB_PATH", os.path.join(DATA_DIR, "chemical_db.sqlite"))
 
 # P2OASys hazard scoring matrix (TURI). Place "Hazard Matrix Group Review 9-19-23.xlsx" in data/ or set path.
 # See https://p2oasys.turi.org/chemical/hazard-score-matrix
 P2OASYS_MATRIX_FILENAME = "Hazard Matrix Group Review 9-19-23.xlsx"
-P2OASYS_MATRIX_PATH = os.path.join(DATA_DIR, P2OASYS_MATRIX_FILENAME)
+P2OASYS_MATRIX_PATH = os.environ.get("P2OASYS_MATRIX_PATH", os.path.join(DATA_DIR, P2OASYS_MATRIX_FILENAME))
 # Optional lookup CSVs for P2OASys (see docs/P2OASYS_LOOKUP_SOURCES.md). Set to None to disable.
 P2OASYS_IARC_CSV_PATH = os.environ.get("P2OASYS_IARC_CSV", os.path.join(DATA_DIR, "iarc_by_cas.csv"))
 P2OASYS_ODP_GWP_CSV_PATH = os.environ.get("P2OASYS_ODP_GWP_CSV", os.path.join(DATA_DIR, "odp_gwp_by_cas.csv"))
-# IPCC GWP 100-year from atmo folder (Federal LCA Commons parquet). Default: fastP2OASys/atmo.
-ATMO_DIR = os.environ.get("ATMO_DIR", os.path.join(REPO_ROOT, "..", "..", "fastP2OASys", "atmo"))
-# IARC classifications from iarc folder (CSV or Excel with CAS No. and Group). Default: fastP2OASys/iarc.
-IARC_DIR = os.environ.get("IARC_DIR", os.path.join(REPO_ROOT, "..", "..", "fastP2OASys", "iarc"))
+# IPCC GWP 100-year (Federal LCA Commons parquet). Place files under ``data/atmo`` or set ``ATMO_DIR``.
+ATMO_DIR = os.environ.get("ATMO_DIR", os.path.join(REPO_ROOT, "data", "atmo"))
+# IARC classifications (CSV or Excel with CAS No. and Group). Place under ``data/iarc`` or set ``IARC_DIR``.
+IARC_DIR = os.environ.get("IARC_DIR", os.path.join(REPO_ROOT, "data", "iarc"))
 
 # COMPTOX public data folders (Excel and MySQL dump) — used by setup script
 COMPTOX_EXCEL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data Excel Files Folder)", "Data Excel Files")
@@ -38,8 +38,8 @@ COMPTOX_MYSQL_DIR = os.path.join(REPO_ROOT, "COMPTOX_Public (Data MySQL Dump Fil
 APP_TITLE = "Quick Hazard Assessment"
 ZENODO_DOI = "10.5281/zenodo.19056294"
 
-# SDS example PDFs (sibling folder when running from GHhaz4/quick-hazard-assessment-app)
-SDS_EXAMPLES_DIR = os.environ.get("SDS_EXAMPLES_DIR", os.path.join(REPO_ROOT, "..", "sds examples"))
+# SDS example PDFs — place sample PDFs in ``sds_examples/`` at the repo root or set ``SDS_EXAMPLES_DIR``.
+SDS_EXAMPLES_DIR = os.environ.get("SDS_EXAMPLES_DIR", os.path.join(REPO_ROOT, "sds_examples"))
 
 # Local LLM (Ollama) — for SDS extraction/summarization when running locally (no API key).
 # Not used on Streamlit Cloud. See docs/OLLAMA_SETUP.md.
@@ -90,13 +90,17 @@ DEFAULT_SDS_EXTRACTION_PIPELINE = (
 )
 
 # QSAR Toolbox (OECD + VEGA/OPERA) — local WebSuite must be running. Windows only.
-# Set port (e.g. 51946) or leave None to disable. See https://github.com/glsalierno/PyQSARToolbox
+# Set port (e.g. 51946) or leave None to disable. See OECD QSAR Toolbox / PyQSARToolbox packaging notes in the README.
 QSAR_TOOLBOX_PORT = os.environ.get("QSAR_TOOLBOX_PORT", None)
 if QSAR_TOOLBOX_PORT is not None:
     try:
         QSAR_TOOLBOX_PORT = int(QSAR_TOOLBOX_PORT)
     except (TypeError, ValueError):
         QSAR_TOOLBOX_PORT = None
+
+# Optional IUCLID format package folder for decoding phrase/picklist codes (extracted format bundle).
+# Leave unset to skip phrase decoding beyond built-in fallbacks; set ``IUCLID_FORMAT_DIR`` to the extracted folder.
+IUCLID_FORMAT_DIR = os.environ.get("IUCLID_FORMAT_DIR", "") or ""
 
 # Example chemicals for quick buttons (CAS, label)
 EXAMPLE_CHEMICALS = [

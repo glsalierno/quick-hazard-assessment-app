@@ -6,8 +6,8 @@
 
 ## Context
 
-- **Repo:** `glsalierno/quick-hazard-assessment-app` (branch `v1.3` has the current work).
-- **App:** Streamlit; runs on Streamlit Cloud (`quick-hazard-assessment-v1-3.streamlit.app`) and locally.
+- **Repo:** your fork or clone of this application (use your own default branch).
+- **App:** Streamlit; can run on Streamlit Community Cloud and locally.
 - **v1.3 already has:** CPDB (Carcinogenic Potency Database) SQLite + client + UI with decoded labels; rule-based CPDB summary; optional **OpenAI gpt-4o-mini** summarization when `OPENAI_API_KEY` is set (ecotoxicity excerpts, CPDB one-sentence summary).
 - **Goal for v1.4:** Add a **local, embedded, small LLM** that works **without any API key** (e.g. when the user runs the app locally with Ollama or a Python-bound small model), to:
   - Explain toxicity/CPDB endpoints in plain language.
