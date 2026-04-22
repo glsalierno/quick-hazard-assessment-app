@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """
-Evaluate SDS parsing: text extraction + SDSParserEngine vs engine+Docling merge.
+Evaluate SDS parsing: text extraction + SDSParserEngine vs engine+Docling merge,
+or full-app ``SDSParser.parse_pdf`` (regex + section engine + Docling/robust merges per config).
 
 Run from repo root:
   cd quick-hazard-assessment-app
   python scripts/eval_sds_parsing.py --sds-dir "../sds examples"
+
+  # Same CAS pipeline as the Streamlit upload (recommended for batch CAS tests):
+  set HAZQUERY_DISABLE_DOCLING=1
+  python scripts/eval_sds_parsing.py --mode sdsparser --sds-dir "../sds examples" --out-csv reports/sds_cas_batch.csv
 
 Docling is slow (models + per-PDF CPU). Use --docling-max N to cap how many PDFs
 run the merged pipeline; all PDFs still get the fast regex/engine path.
@@ -23,6 +28,11 @@ def _setup_path() -> Path:
     app_root = Path(__file__).resolve().parent.parent
     sys.path.insert(0, str(app_root))
     return app_root
+
+
+def _pdf_paths(sds_dir: Path) -> list[Path]:
+    pdfs = sorted({*sds_dir.glob("*.pdf"), *sds_dir.glob("*.PDF")}, key=lambda p: p.name.lower())
+    return pdfs
 
 
 def _cas_summary(rows: list) -> str:
@@ -47,7 +57,7 @@ def main() -> int:
     parser.add_argument(
         "--sds-dir",
         type=Path,
-        default=Path(r"C:\Users\glsal\OneDrive - UMass Lowell\TURI\Research\QSAR\hazquery\GHhaz4\sds examples"),
+        default=app_root / "sds_examples",
         help="Folder containing SDS PDFs",
     )
     parser.add_argument(
@@ -67,6 +77,18 @@ def main() -> int:
         action="store_true",
         help="Allow pdf2image/Tesseract when embedded text is short (slow; needs Poppler)",
     )
+    parser.add_argument(
+        "--mode",
+        choices=("engine", "sdsparser"),
+        default="engine",
+        help="engine: extract text + SDSParserEngine only. sdsparser: SDSParser.parse_pdf (app-equivalent CAS path).",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=0,
+        help="Max PDFs to process (0 = all). Applies to both modes.",
+    )
     args = parser.parse_args()
 
     sds_dir: Path = args.sds_dir
@@ -74,12 +96,17 @@ def main() -> int:
         print(f"ERROR: not a directory: {sds_dir}", file=sys.stderr)
         return 1
 
+    if args.mode == "sdsparser":
+        return _run_sdsparser_mode(sds_dir, args.out_csv, args.limit)
+
     from utils import sds_pdf_utils
     from utils.docling_sds_parser import docling_status_message, is_docling_available
     from utils.sds_parser import _merge_docling_cas_extractions
     from utils.sds_parser_engine import SDSParserEngine
 
-    pdfs = sorted(sds_dir.glob("*.pdf"))
+    pdfs = _pdf_paths(sds_dir)
+    if args.limit:
+        pdfs = pdfs[: args.limit]
     if not pdfs:
         print(f"No PDFs in {sds_dir}")
         return 1
@@ -189,6 +216,113 @@ def main() -> int:
     for r in rows_out[:5]:
         print(f"### {r['file']}\n")
         print(f"{r['sample_cas_engine']}\n")
+
+    return 0
+
+
+def _run_sdsparser_mode(sds_dir: Path, out_csv: Path | None, limit: int) -> int:
+    """Batch ``SDSParser().parse_pdf`` — same entry point as the Streamlit SDS upload (CAS focus)."""
+    import logging
+    import os
+
+    os.environ.setdefault("STREAMLIT_SERVER_HEADLESS", "true")
+    os.environ.setdefault("STREAMLIT_BROWSER_GATHER_USAGE_STATS", "false")
+    for _name in ("streamlit", "streamlit.runtime", "streamlit.runtime.scriptrunner_utils"):
+        logging.getLogger(_name).setLevel(logging.CRITICAL)
+
+    pdfs = _pdf_paths(sds_dir)
+    if limit:
+        pdfs = pdfs[:limit]
+    if not pdfs:
+        print(f"No PDFs in {sds_dir}")
+        return 1
+
+    from utils.docling_sds_parser import docling_status_message
+    from utils.sds_parser import SDSParser
+
+    print("# SDS parsing - SDSParser.parse_pdf (app pipeline)\n")
+    print(f"- **SDS directory:** `{sds_dir}`")
+    print(f"- **PDF count:** {len(pdfs)}")
+    print(f"- **Docling:** {docling_status_message()}")
+    print("- **Embedded text only:** `parse_pdf` does not enable OCR on short text (use `--mode engine --allow-ocr` to benchmark text extraction separately).\n")
+
+    parser = SDSParser()
+    rows_out: list[dict[str, object]] = []
+
+    for i, pdf_path in enumerate(pdfs, 1):
+        name = pdf_path.name
+        pdf_bytes = pdf_path.read_bytes()
+        t0 = time.perf_counter()
+        res = parser.parse_pdf(pdf_bytes)
+        t_parse = time.perf_counter() - t0
+        if res is None:
+            rows_out.append(
+                {
+                    "file": name,
+                    "parse_ok": False,
+                    "n_cas": 0,
+                    "n_named": 0,
+                    "n_conc": 0,
+                    "n_validated": 0,
+                    "methods": "",
+                    "t_parse_s": round(t_parse, 3),
+                    "sample_cas": "—",
+                }
+            )
+            continue
+        cas_rows = res.cas_numbers
+        rows_out.append(
+            {
+                "file": name,
+                "parse_ok": True,
+                "n_cas": len(cas_rows),
+                "n_named": sum(1 for x in cas_rows if (x.chemical_name or "").strip()),
+                "n_conc": sum(1 for x in cas_rows if (x.concentration or "").strip()),
+                "n_validated": sum(1 for x in cas_rows if getattr(x, "validated", False)),
+                "methods": "|".join(sorted(set(res.methods_used))),
+                "t_parse_s": round(t_parse, 3),
+                "sample_cas": _cas_summary(cas_rows),
+            }
+        )
+        if i % 25 == 0:
+            print(f"  … processed {i}/{len(pdfs)}", flush=True)
+
+    if out_csv:
+        out_csv.parent.mkdir(parents=True, exist_ok=True)
+        with out_csv.open("w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=list(rows_out[0].keys()))
+            w.writeheader()
+            w.writerows(rows_out)
+        print(f"Wrote CSV: {out_csv}\n")
+
+    with_cas = sum(1 for r in rows_out if r["n_cas"] > 0)
+    no_cas = [r["file"] for r in rows_out if r["n_cas"] == 0 and r["parse_ok"]]
+    failed = [r["file"] for r in rows_out if not r["parse_ok"]]
+    total_cas = sum(int(r["n_cas"]) for r in rows_out)
+
+    print("## Summary (CAS)\n")
+    print(f"- **Parse returned a result:** {sum(1 for r in rows_out if r['parse_ok'])}/{len(rows_out)}")
+    print(f"- **PDFs with >= 1 CAS row:** {with_cas}/{len(rows_out)}")
+    print(f"- **Total CAS rows (sum across PDFs):** {total_cas}")
+    if failed:
+        print(f"- **Parse failed / no text ({len(failed)}):** {', '.join(failed[:12])}{' …' if len(failed) > 12 else ''}")
+    if no_cas:
+        print(f"- **Parsed OK but 0 CAS ({len(no_cas)}):** {', '.join(no_cas[:15])}{' …' if len(no_cas) > 15 else ''}")
+
+    print("\n## First rows (markdown)\n")
+    print("| File | #CAS | validated | w/ name | Methods (trunc) |")
+    print("|------|-----:|----------:|--------:|------------------|")
+    for r in rows_out[:15]:
+        m = (r["methods"] or "")[:44]
+        if len(str(r["methods"])) > 44:
+            m += "…"
+        print(
+            f"| {str(r['file'])[:36]} | {r['n_cas']} | {r['n_validated']} | {r['n_named']} | {m} |"
+        )
+
+    print("\n## Sample CAS (first 3 PDFs)\n")
+    for r in rows_out[:3]:
+        print(f"### {r['file']}\n\n{r['sample_cas']}\n")
 
     return 0
 

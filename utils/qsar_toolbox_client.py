@@ -1,7 +1,7 @@
 """
 Optional client for OECD QSAR Toolbox (with VEGA/OPERA) via PyQSARToolbox.
 Requires: QSAR Toolbox installed and WebSuite running locally (Windows).
-No API key; data comes from the local Toolbox. https://github.com/glsalierno/PyQSARToolbox
+No API key; data comes from the local Toolbox WebSuite (see OECD QSAR Toolbox documentation).
 """
 
 from __future__ import annotations
@@ -120,7 +120,7 @@ def fetch_by_cas(
     """
     cls = _import_toolbox()
     if cls is None:
-        logger.warning("PyQSARToolbox not installed; pip install git+https://github.com/glsalierno/PyQSARToolbox.git")
+        logger.warning("PyQSARToolbox not installed; install from PyPI or your package index (see README).")
         return []
     cas_int = _cas_to_int(cas)
     if not cas_int:

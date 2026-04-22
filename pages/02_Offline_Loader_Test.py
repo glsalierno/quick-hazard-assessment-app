@@ -21,51 +21,39 @@ import streamlit as st
 
 st.set_page_config(page_title="Offline ECHA loader", layout="wide")
 
-_SYNC_KEYS = (
-    "OFFLINE_LOCAL_ARCHIVE",
-    "OFFLINE_DOSSIER_INFO_XLSX",
-    "OFFLINE_DOSSIER_INFO_SHEET",
-    "OFFLINE_DATA_DIR",
-    "OFFLINE_CACHE_DIR",
-    "OFFLINE_SCRAPE_CL",
-    "OFFLINE_I6Z_USE_MP",
-    "OFFLINE_I6Z_MAX_WORKERS",
-    "OFFLINE_I6Z_MIN_FILES_FOR_MP",
-    "HAZQUERY_DISABLE_DOCLING",
-)
-
-
-def _sync_secrets_to_environ() -> None:
-    """Mirror ``st.secrets`` into ``os.environ`` when the variable is empty (loader uses ``os.getenv``)."""
-    try:
-        sec: Any = st.secrets
-    except (FileNotFoundError, RuntimeError, AttributeError):
-        return
-    for key in _SYNC_KEYS:
-        if (os.environ.get(key) or "").strip():
-            continue
-        try:
-            if key in sec:
-                val = sec[key]
-                os.environ[key] = str(val).strip() if val is not None else ""
-        except Exception:
-            continue
+from unified_hazard_report.iuclid_integration import OFFLINE_ENV_KEYS, sync_offline_secrets_from_st_secrets
 
 
 def _cfg(key: str, default: str = "") -> str:
     return (os.environ.get(key) or "").strip() or default
 
 
-_sync_secrets_to_environ()
+sync_offline_secrets_from_st_secrets()
+
+
+def _nonempty_col(df: Any, col: str) -> int:
+    if df is None or col not in df.columns:
+        return 0
+    s = df[col]
+    if s.dtype == object:
+        t = s.astype(str).str.strip()
+        return int(((t != "") & (t.lower() != "nan") & (t != "None")).sum())
+    return int(s.notna().sum())
+
 
 st.title("Offline ECHA / IUCLID loader")
+st.info(
+    "**Where this lives:** use the **sidebar** (pages menu) to open this page. "
+    "The main Quick Hazard Assessment flow in ``app.py`` does **not** show REACH/IUCLID dossiers yet — "
+    "only this page and the **unified hazard report** CLI (``unified_hazard_report/``) consume these snapshots."
+)
 st.caption(
     "Uses ``load_echa_from_offline()`` from ``ingest.offline_echa_loader`` (parallel i6z parse when enabled). "
     "First full build can take many minutes; snapshots under ``OFFLINE_CACHE_DIR`` make later loads fast."
 )
 
 st.subheader("Effective configuration")
-st.json({k: _cfg(k) or "(not set)" for k in _SYNC_KEYS})
+st.json({k: _cfg(k) or "(not set)" for k in OFFLINE_ENV_KEYS})
 
 la = _cfg("OFFLINE_LOCAL_ARCHIVE")
 if not la:
@@ -131,9 +119,35 @@ if "offline_substances" in st.session_state:
     elapsed = float(st.session_state.get("offline_elapsed_s", 0.0))
 
     c1, c2, c3 = st.columns(3)
-    c1.metric("Substances rows", len(substances_df))
-    c2.metric("Hazard / CL rows", len(hazards_df))
+    c1.metric("Dossier index rows (uuid)", len(substances_df))
+    c2.metric("C&L / GHS rows (from i6d)", len(hazards_df))
     c3.metric("Last run (s)", f"{elapsed:.2f}")
+
+    n_cas = _nonempty_col(substances_df, "cas_number")
+    n_ec = _nonempty_col(substances_df, "ec_number")
+    n_name = _nonempty_col(substances_df, "substance_name")
+
+    st.subheader("What is ECHA / IUCLID here?")
+    st.markdown(
+        """
+| Table | Meaning |
+|------|--------|
+| **Dossier index** (substances) | One row per **IUCLID dossier UUID** (`uuid`). `infocard_url` is the ECHA substance information link. CAS/EC/name usually come from **`Document.i6d`** and/or the **dossier-info XLSX** (`OFFLINE_DOSSIER_INFO_XLSX`). |
+| **C&L / hazards** | GHS / classification-like rows parsed from **`Document.i6d`** XML (heuristic). REACH **Study Results** dossiers often include **little or no** classifiable GHS in that XML, so this table can be **empty** even when the index has tens of thousands of UUIDs. |
+
+**If “Hazard / CL rows” is 0:** that is common for Study Results–only builds with `OFFLINE_SCRAPE_CL=false`. Your IUCLID/ECHA identifiers still appear in the **dossier index** (`uuid`, `infocard_url`, CAS when merged). For more hazard lines you can try **Force rebuild** after updating archives, point **`OFFLINE_DOSSIER_INFO_XLSX`** at ECHA’s companion workbook, or enable **`OFFLINE_SCRAPE_CL=true`** (slow; CHEM HTML is often sparse).
+        """
+    )
+    c4, c5, c6 = st.columns(3)
+    c4.metric("Rows with CAS", n_cas)
+    c5.metric("Rows with EC", n_ec)
+    c6.metric("Rows with name", n_name)
+
+    if len(hazards_df) == 0:
+        st.warning(
+            "The **C&L / GHS** snapshot is empty. Scroll down — **IUCLID dossier identifiers and ECHA links** "
+            "are in the **dossier index** table below (`uuid`, `infocard_url`, etc.), not in the hazards table."
+        )
 
     try:
         import psutil
@@ -143,10 +157,19 @@ if "offline_substances" in st.session_state:
     except Exception:
         pass
 
-    with st.expander("Preview substances", expanded=False):
-        st.dataframe(substances_df.head(50), use_container_width=True)
-    with st.expander("Preview hazards", expanded=False):
-        st.dataframe(hazards_df.head(50), use_container_width=True)
+    preview_cols = [c for c in ("uuid", "cas_number", "ec_number", "substance_name", "infocard_url") if c in substances_df.columns]
+    preview = substances_df[preview_cols] if preview_cols else substances_df
+
+    st.subheader("Dossier index preview (IUCLID UUID + ECHA identifiers)")
+    st.dataframe(preview.head(25), use_container_width=True, hide_index=True)
+
+    with st.expander("Full substances table (first 200 columns as-is)", expanded=False):
+        st.dataframe(substances_df.head(200), use_container_width=True)
+    with st.expander("C&L / GHS hazard rows (full preview)", expanded=len(hazards_df) > 0):
+        if len(hazards_df) == 0:
+            st.caption("No rows to show.")
+        else:
+            st.dataframe(hazards_df.head(200), use_container_width=True)
 
 st.divider()
 st.markdown(
