@@ -53,6 +53,14 @@ st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sideb
 
 MARKITDOWN_OK, _MARKITDOWN_ERR = is_markitdown_available()
 
+# Offline REACH / IUCLID: mirror secrets into os.environ before any ingest reads env (optional package).
+try:
+    from unified_hazard_report.iuclid_integration import sync_offline_secrets_from_st_secrets
+
+    sync_offline_secrets_from_st_secrets()
+except Exception:
+    pass
+
 # Session state: persist query and result to avoid re-fetching on every rerun
 if "query" not in st.session_state:
     st.session_state["query"] = None
@@ -532,6 +540,13 @@ if current_query:
                 st.markdown("**Data coverage by source**")
                 st.dataframe(hazard_report_utils.clean_dataframe(pd.DataFrame(coverage)), use_container_width=True, hide_index=True)
             st.markdown("---")
+
+            try:
+                from unified_hazard_report.iuclid_integration import render_reach_iuclid_panel
+
+                render_reach_iuclid_panel(str(clean_cas))
+            except Exception as exc:
+                logging.getLogger(__name__).debug("REACH / IUCLID panel skipped: %s", exc, exc_info=True)
 
             # --- Molecular structure at top ---
             if pubchem_data.get("smiles"):
