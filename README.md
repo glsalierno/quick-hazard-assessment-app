@@ -1,7 +1,7 @@
 
 # Quick Hazard Assessment — Streamlit App
 
-Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox local** (no API key required). Part of the [quick_hazard_assessment](https://github.com/glsalierno/quick_hazard_assessment) ecosystem.
+Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox** local data (no API key required for core lookups). Optional modules (offline REACH dossiers, local LLMs) are configured via environment variables.
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app)
 
@@ -17,7 +17,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 - **Download:** Report as CSV
 - **Citation:** Zenodo DOI reminder for research use
 
-*Enhanced predictions with OPERA QSAR are available in the [command-line version](https://github.com/glsalierno/quick_hazard_assessment); OPERA is not included in this Streamlit deployment.*
+*Enhanced predictions with OPERA QSAR may be available in a separate command-line workflow; OPERA is not bundled with this Streamlit deployment.*
 
 **v1.4 SDS upload:** **MarkItDown + regex** and **Hybrid** (MarkItDown → OCR if no CAS) only — see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md). Optional **local LLM** (Ollama) for other flows: [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
 
@@ -27,7 +27,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 1. **Clone and enter the repo**
    ```bash
-   git clone https://github.com/glsalierno/quick-hazard-assessment-app.git
+   git clone <YOUR_REPOSITORY_URL>
    cd quick-hazard-assessment-app
    ```
 
@@ -47,7 +47,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 4. **Run the app**
    ```bash
-   python -m streamlit run app.py
+   streamlit run app.py
    ```
    Open the URL shown in the terminal (usually http://localhost:8501).
 
@@ -59,7 +59,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
    - The app uses `OLLAMA_HOST` and `OLLAMA_MODEL` (see [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md)). Nothing is pushed to GitHub except instructions; models stay local.
 
 6. **Run SDS examples (batch)**
-   - If you have a folder of SDS PDFs (e.g. `sds examples` next to the app), from the repo root run:
+   - If you have a folder of SDS PDFs (e.g. `sds_examples/` in the repo root), from the repo root run:
      ```bash
      python scripts/run_sds_examples.py [--limit N] [--compare]
      ```
@@ -77,7 +77,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
    - Install: `pip install "markitdown[pdf]"` (see `requirements.txt`). **Default:** **Hybrid** (`hybrid_md_ocr`). Valid values: `hybrid_md_ocr` | `markitdown_fast`. Legacy env values (e.g. `default`, `ocr_tesseract`) are **remapped** to a supported pipeline.
    - Sidebar: **“SDS CAS extraction (v1.4 — two pipelines only)”** — **Hybrid** or **MarkItDown + regex**.
    - Caching: `cache/{sha256}/` (see `utils/cache_manager.py`). Env: `HAZQUERY_EXTRACTION_PIPELINE`, `HAZQUERY_DEFAULT_SDS_PIPELINE`, `HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`, `HAZQUERY_OCR_ENGINE`, `HAZQUERY_TESSERACT_PSM`.
-   - Benchmark: `python tests/test_extraction_pipelines.py --folder "../sds examples" --limit 20` → `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
+   - Benchmark: `python tests/test_extraction_pipelines.py --folder "sds_examples" --limit 20` → `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
 
 9. **Windows terminal PATH & pip script warnings**
    - If pip warns that scripts are installed outside `PATH`, open the integrated terminal **from this workspace** so `.vscode/settings.json` applies: it appends common **user** Python `Scripts` folders and sets `HF_HUB_DISABLE_SYMLINKS_WARNING=1` and `TF_ENABLE_ONEDNN_OPTS=0` to reduce Hugging Face / oneDNN noise.
@@ -86,9 +86,199 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 10. **SDS parsing agreement / accuracy report (batch)**
    - Compares **pure Docling + DistilBERT CAS** and **Docling-only composition** against the **unified SDS parser** (reference proxy, not human labels):
      ```bash
-     python scripts/sds_parsing_accuracy_report.py --folder "../sds examples" --out-dir artifacts
+     python scripts/sds_parsing_accuracy_report.py --folder "sds_examples" --out-dir artifacts
      ```
    - Optional: `--limit N` for a subset. Outputs `artifacts/sds_parsing_accuracy_report.md`, `.csv`, and `sds_parsing_accuracy_summary.json` (micro/macro F1, pooled TP/FP/FN).
+
+11. **IUCLID / offline REACH (optional)** — see [Offline REACH / IUCLID](#offline-reach--iuclid-optional) below.
+
+12. **P2OASys validation vs `fastP2OASys` reference CSVs (`--source fast`)**
+    - Compares **category-level** expert scores (columns = chemical **names**, not CAS) to scores from this app’s pipeline: `ChemicalAssessmentService` → `build_hazard_data` → `compute_p2oasys_scores`, with the same optional **IARC / ODP–GWP / IPCC** and **IUCLID** merges as the P2OASys tab (no QSAR Toolbox in the script).
+    - Default reference folder: sibling `../fastP2OASys/` under `hazquery` (override with `--reference-dir`).
+    - Run from the repo root:
+      ```bash
+      python scripts/validate_p2oasys_vs_fast_reference.py --source fast --limit 50 -o data/p2oasys_validation.csv
+      ```
+    - **Output CSV columns:** `reference_name`, `resolved_cas`, `category`, `computed_score`, `reference_score`, `absolute_error`, `diff`, `pipeline_note` (e.g. `lookups+IUCLID` vs `PubChem-only`), `matrix_kind` (`official` vs `placeholder`), `error`.
+    - **Interpretation:** Use the **official TURI matrix** (`P2OASYS_MATRIX_PATH` or `data/Hazard Matrix Group Review 9-19-23.xlsx`) for meaningful error metrics; the dev placeholder is layout-only. Rows with empty `computed_score` mean the matrix produced no category max for that bucket (often missing PubChem endpoints). Use `--iuclid-audit-dir path/to/dir` to dump `*_iuclid_normalized.csv` per CAS when dossiers exist (tuning IUCLID heuristics).
+    - See also [docs/P2OASYS_LOOKUP_SOURCES.md](docs/P2OASYS_LOOKUP_SOURCES.md) (section 7).
+
+13. **P2OASys CAS validation (offline expert, default for `run_full_validation`)**
+    - **`--source expert`** (recommended for CAS lists): deterministic, no browser. For each CAS, loads **`../sds examples/scripts/lookup_p2oasys_by_cas.py`** (`get_best_match`) to (1) find rows in **`allP2OASys_*`** `P2OASys_Database_Results*.csv`, (2) match product **Name** to a column in **`fastP2OASys/P2OASys_Category_Scores_Data_*.csv`**, (3) read expert **top-level category** scores and compare to the app’s `_category_max` per category.
+    - Environment variables (optional): **`P2OASYS_ARCHIVE_DIR`**, **`FAST_P2OASYS_DIR`**, **`P2OASYS_LOOKUP_SCRIPT`** (override path to `lookup_p2oasys_by_cas.py` if not under `GHhaz4/sds examples/scripts/`).
+    - **Orchestrator** (`scripts/run_full_validation.py`, **`--source expert` by default**):
+      ```bash
+      python scripts/run_full_validation.py --cas-file cas_list.txt \\
+        --archive-dir path/to/allP2OASys_120825 --fastp2oasys-dir path/to/fastP2OASys -o validation_report.csv
+      ```
+      **Check retrieval only** (no PubChem / matrix scoring): `python scripts/run_full_validation.py --check --cas-file cas_list.txt --archive-dir ... --fastp2oasys-dir ...` (optional `--strict`, `--json`). Same flags exist on `validate_p2oasys_vs_fast_reference.py` as `--check-retrieval` / `--dry-run`.
+      Optional: `--summary summary.txt` (full validation only). For Playwright-based reference instead, use **`--source scraped`** and see below.
+    - **Validator directly:**
+      ```bash
+      python scripts/validate_p2oasys_vs_fast_reference.py --source expert --cas 67-63-0 \\
+        --archive-dir path/to/allP2OASys_120825 --fastp2oasys-dir path/to/fastP2OASys \\
+        -o data/p2oasys_expert_validation_comparison.csv
+      ```
+    - **Expert mode output columns:** `CAS`, `category`, `computed_score`, `reference_score`, `absolute_error`, `source_of_lowest_value` (app pipeline + which expert column / matched name / archive evaluation), `matrix_kind`, `error`. CAS rows with no archive match or no expert column are skipped with a warning.
+
+    **Optional: `--source scraped`** (compare-raw-data Playwright CSV)
+    - The sibling **`../sds examples/scripts/fetch_p2oasys_category_scores.py`** builds a wide CSV: first column **`CAS`**, remaining columns = endpoint labels from the P2OASys web table. Respect [p2oasys.turi.org](https://p2oasys.turi.org) terms of use; install Playwright (`pip install playwright`, `python -m playwright install chromium`). Set **`P2OASYS_SCRAPER_SCRIPT`** if the script path differs.
+    - Example:
+      ```bash
+      python scripts/run_full_validation.py --source scraped --cas-file cas_list.txt --auto-fetch -o validation_report.csv
+      ```
+      Or validate only:
+      ```bash
+      python scripts/validate_p2oasys_vs_fast_reference.py --source scraped --cas-file cas_list.txt \\
+        --reference-csv data/p2oasys_category_scores.csv -o data/scraped_compare.csv
+      ```
+    - Edit **`SCRAPED_COLUMN_TO_COMPUTED_KEY`** in `scripts/validate_p2oasys_vs_fast_reference.py` so scraped headers map to matrix unit names or **`category:TopLevelCategoryName`**.
+
+---
+
+## Docker (Windows containers + OPERA)
+
+This project now includes a Windows-container Docker setup so local OPERA (`OPERA.exe`) can be mounted and used without bundling large binaries in the image.
+
+### Prerequisites
+
+- Docker Desktop on Windows
+- **Windows containers mode** enabled in Docker Desktop (required for `OPERA.exe`)
+- Optional: local OPERA install from [NIEHS/OPERA releases](https://github.com/NIEHS/OPERA/releases)
+
+### 1) Configure OPERA (automated helper)
+
+From the repo root:
+
+```bash
+python scripts/setup_opera.py
+```
+
+What it does:
+- checks common OPERA locations and existing `HAZQUERY_OPERA_EXE`
+- queries latest release from GitHub API
+- downloads host-appropriate artifact when possible
+- updates `.env` with `HAZQUERY_OPERA_EXE`
+
+Non-interactive mode:
+
+```bash
+python scripts/setup_opera.py --yes
+```
+
+If automation cannot perform a silent install (some `.exe`/`.msi` packages), install OPERA manually from [releases](https://github.com/NIEHS/OPERA/releases), then set:
+
+```env
+HAZQUERY_OPERA_EXE=C:\path\to\OPERA\application\OPERA.exe
+```
+
+### 2) Configure environment for Docker
+
+Copy:
+
+```bash
+copy .env.example .env
+```
+
+Edit `.env` values as needed for your local paths.
+
+### 3) Start the app with Docker Compose
+
+```bash
+docker compose up --build
+```
+
+Open [http://localhost:8501](http://localhost:8501).
+
+### Data volume strategy (40+ GB friendly)
+
+`docker-compose.yml` mounts local folders into the container:
+- `./data -> C:/app/data`
+- `./opera -> C:/app/opera`
+- `./DSS -> C:/app/DSS`
+
+This keeps large databases and OPERA assets on your host disk instead of image layers.
+
+### Linux/macOS note
+
+The provided container stack targets Windows containers because OPERA CLI in this workflow is a Windows executable.
+On Linux/macOS, run the app locally without OPERA, or set `HAZQUERY_OPERA_EXE` to a compatible native binary if available.
+
+---
+
+## Offline REACH / IUCLID (optional)
+
+The Streamlit app can read **offline REACH study-result dossiers** (`.i6z` inside a `.zip`) and decode IUCLID picklist codes when you install the **IUCLID format** phrase package.
+
+### Obtaining the REACH study results archive
+
+1. Open the official IUCLID download area: **[IUCLID 6 downloads (ECHA)](https://iuclid6.echa.europa.eu/downloads)**.
+2. Download a **REACH study results dossiers** archive (file name like `reach_study_results_dossiers_*.zip`). This ZIP contains many `.i6z` dossier files.
+3. On your machine, set the environment variable (or add to `.streamlit/secrets.toml` — see `.streamlit/secrets.example.toml`):
+
+   | Variable | Meaning |
+   |----------|---------|
+   | `OFFLINE_LOCAL_ARCHIVE` | Full path to the `reach_study_results_dossiers_*.zip` file **or** to a folder that already contains `.i6z` files. |
+
+The app extracts or scans that location and builds caches under `OFFLINE_CACHE_DIR` (default: `data/offline_cache/`).
+
+### Obtaining the IUCLID format package (phrase mapping)
+
+1. On the same **[IUCLID 6 downloads](https://iuclid6.echa.europa.eu/downloads)** page, download the **IUCLID 6 format** bundle (e.g. a ZIP named like `IUCLID6_6_format_9.0.0.zip`).
+2. Extract it to a folder on disk.
+3. Set:
+
+   | Variable | Meaning |
+   |----------|---------|
+   | `IUCLID_FORMAT_DIR` | Path to the **extracted** format folder (the directory that contains `dcr.xml`, `*.properties`, etc.). |
+
+If `IUCLID_FORMAT_DIR` is **not** set, the app still runs: numeric codes may show as raw values or with `(unmapped)` in the UI until you configure the format directory.
+
+### Phrase decoder test and snippet cache rebuild
+
+```bash
+python scripts/test_iuclid_decoder.py
+python scripts/rebuild_iuclid_cache_two_uuids.py --cas "71-43-2" --refresh
+```
+
+Replace the CAS as needed. Use `--refresh` to force re-parsing cached dossiers.
+
+---
+
+## Chemical database (DSSTox, ToxValDB)
+
+For **faster** DSSTox and ToxValDB access, build the local SQLite database:
+
+1. Add a CAS → DTXSID mapping file under `DSS/` (see `DSS/README.md` and [EPA Figshare DSSTox mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566)).
+2. Optionally add COMPTOX ToxValDB Excel exports under `COMPTOX_Public (Data Excel Files Folder)/Data Excel Files/`.
+3. Run:
+
+   ```bash
+   python scripts/setup_chemical_db.py
+   ```
+
+   This writes `data/chemical_db.sqlite`. The app **falls back** to CSV/XLSX in `DSS/` if SQLite is missing, but SQLite is **recommended** for speed.
+
+---
+
+## Environment variables (summary)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OFFLINE_LOCAL_ARCHIVE` | No | Path to REACH `reach_study_results_dossiers_*.zip` or folder of `.i6z` files. |
+| `OFFLINE_DOSSIER_INFO_XLSX` | No | Optional Excel index for dossier metadata (CAS ↔ UUID). |
+| `OFFLINE_CACHE_DIR` | No | Where offline snapshots and `offline_snippets_cache.db` live (default `data/offline_cache`). |
+| `IUCLID_FORMAT_DIR` | No | Extracted IUCLID format bundle for picklist / phrase decoding. |
+| `CHEMICAL_DB_PATH` | No | Override path to SQLite chemical DB (default `data/chemical_db.sqlite`). |
+| `P2OASYS_MATRIX_PATH` | No | P2OASys hazard matrix Excel (default under `data/`). If missing, a dev placeholder is auto-written unless `P2OASYS_DISABLE_AUTO_PLACEHOLDER=1`. |
+| `QSAR_TOOLBOX_PORT` | No | Local OECD QSAR Toolbox WebSuite port (Windows; optional). |
+| `USE_PUBCHEM_CAS_VALIDATION` | No | `1` / `0` — validate extracted CAS against PubChem (default on). |
+| `SHOW_ONLY_PUBCHEM_VERIFIED` | No | `1` hides SDS CAS not found in PubChem. |
+| `MIN_CAS_CONFIDENCE` | No | Minimum confidence (0–1) to show SDS extractions in UI. |
+| `HAZQUERY_DISABLE_DOCLING` | No | `1` to skip Docling on constrained hosts. |
+| `OLLAMA_HOST`, `OLLAMA_MODEL` | No | Local LLM for optional SDS flows (see `docs/OLLAMA_SETUP.md`). |
+
+Contributors can install dev tools (e.g. **vulture**) with `pip install -r requirements-dev.txt`.
 
 ---
 
@@ -96,7 +286,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 1. Push this app to a GitHub repo (e.g. under `quick_hazard_assessment`, in a branch like `feature/streamlit-app` or in a subfolder).
 2. Go to [share.streamlit.io](https://share.streamlit.io), sign in with GitHub, and deploy.
-3. Set **Main file path** to `app.py` and **Root directory** to the folder that contains `app.py` (e.g. repo root or `GHhaz2`).
+3. Set **Main file path** to `app.py` and **Root directory** to the folder that contains `app.py` (usually the repository root).
 4. If you use the DSSTox file: the repo is **Git LFS–ready** (see below). Add the file to `DSS/`, commit, and push; LFS will store it. Or omit it and run in PubChem-only mode.
 
 Update the badge URL in this README to your deployed app URL (e.g. `https://your-app-name.streamlit.app`).
@@ -165,7 +355,7 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 │   └── OLLAMA_SETUP.md    # How to install Ollama + Qwen/Gemma locally (models stay on your machine)
 ├── scripts/
 │   ├── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
-│   ├── run_sds_examples.py   # Batch run SDS extraction on PDFs in sds examples folder
+│   ├── run_sds_examples.py   # Batch run SDS extraction on PDFs in sds_examples/ (optional)
 │   ├── make_searchable_pdf.py # Add text layer to a PDF (ocrmypdf + Tesseract)
 │   └── test_sds_readers.py   # Test SDS extraction + OCR on example PDFs
 └── utils/
@@ -187,7 +377,7 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 If this tool contributes to your research, please cite:
 
 - **Zenodo:** [DOI 10.5281/zenodo.19056294](https://doi.org/10.5281/zenodo.19056294)
-- **Repository:** [quick-hazard-assessment-app](https://github.com/glsalierno/quick-hazard-assessment-app)
+- **Repository:** publish your own fork or tarball; do not rely on private paths in configuration.
 
 ---
 
