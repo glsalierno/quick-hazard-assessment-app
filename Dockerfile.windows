@@ -1,0 +1,17 @@
+FROM python:3.11-windowsservercore-ltsc2022
+
+WORKDIR C:/app
+
+COPY requirements.txt C:/app/requirements.txt
+RUN python -m pip install --upgrade pip && \
+    python -m pip install --no-cache-dir -r C:/app/requirements.txt
+
+COPY . C:/app
+
+# Runtime defaults can be overridden by .env / docker-compose environment.
+ENV OPERA_INSTALL_DIR=C:/app/opera
+ENV HAZQUERY_OPERA_EXE=C:/app/opera/application/OPERA.exe
+
+EXPOSE 8501
+
+CMD ["python", "-m", "streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]

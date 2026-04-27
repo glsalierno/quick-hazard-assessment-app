@@ -19,6 +19,19 @@ Thumbs.db
 
 # Streamlit
 .streamlit/secrets.toml
+.env
+
+# Auto-generated P2OASys dev matrix (install official TURI xlsx for calibrated scores)
+data/p2oasys_matrix_dev_placeholder.xlsx
+
+# Offline REACH / IUCLID caches and local DB artifacts
+data/offline_cache/
+**/offline_snippets_cache.db
+data/*.sqlite
+
+# Local verification logs (may contain absolute paths)
+verification_full.txt
+verification_output.txt
 
 # Local reports / outputs (optional)
 *.log
@@ -34,6 +47,8 @@ models/cas_bert/pytorch_model.bin
 models/cas_bert/*.bin
 # PDF extraction cache (MarkItDown / OCR artifacts)
 cache/
+# Local OPERA install/download staging
+opera/
 
 # Do NOT ignore DSS/ — the DSSTox mapping is tracked via Git LFS for publishing.
 

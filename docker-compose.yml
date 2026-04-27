@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  hazard-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.windows
+    container_name: quick-hazard-assessment
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    environment:
+      # Defaults are safe when .env does not define them.
+      HAZQUERY_OPERA_EXE: ${HAZQUERY_OPERA_EXE:-C:/app/opera/application/OPERA.exe}
+      OPERA_INSTALL_DIR: ${OPERA_INSTALL_DIR:-C:/app/opera}
+      CHEMICAL_DB_PATH: ${CHEMICAL_DB_PATH:-C:/app/data/chemical_db.sqlite}
+      P2OASYS_MATRIX_PATH: ${P2OASYS_MATRIX_PATH:-C:/app/data/Hazard Matrix Group Review 9-19-23.xlsx}
+    volumes:
+      # Keep large local databases outside image layers.
+      - ./data:C:/app/data
+      - ./opera:C:/app/opera
+      - ./DSS:C:/app/DSS
+    command:
+      [
+        "python",
+        "-m",
+        "streamlit",
+        "run",
+        "app.py",
+        "--server.port=8501",
+        "--server.address=0.0.0.0"
+      ]
