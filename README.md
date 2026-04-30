@@ -17,7 +17,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 - **Download:** Report as CSV
 - **Citation:** Zenodo DOI reminder for research use
 
-*Enhanced predictions with OPERA QSAR are available in the [command-line version](https://github.com/glsalierno/quick_hazard_assessment); OPERA is not included in this Streamlit deployment.*
+*Enhanced predictions with OPERA QSAR is available in the [local-v2.0 version]([https://github.com/glsalierno/quick_hazard_assessment/tree/v2.0](https://github.com/glsalierno/quick-hazard-assessment-app/tree/v2.0)); OPERA is not included in this Streamlit deployment.*
 
 ---
 
