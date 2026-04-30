@@ -1,6 +1,10 @@
 """
 Optional **GLiNER2** structured extraction on MarkItDown markdown (v1.5 experimental).
 
+Also exposes **regex-only** helpers: H-codes, P-codes, and coarse **physical / toxicity** fields
+(signal word, flash/boiling point, vapor pressure, LD50/LC50/EC50-style snippets) for the same
+markdown — merged into pipeline **diagnostics** without requiring the model.
+
 Install: ``pip install gliner2`` (see ``requirements-gliner2.txt``). If the package or model
 is missing, pipelines fall back to **regex-only** CAS / H-code extraction on the same markdown.
 
@@ -22,6 +26,28 @@ from utils import cas_validator
 logger = logging.getLogger(__name__)
 
 H_CODE_RE = re.compile(r"\bH\d{3}(?:\([^)]+\))?\b", re.I)
+P_CODE_RE = re.compile(r"\bP\d{3}(?:\([^)]+\))?\b", re.I)
+
+# Common SDS section phrasing (best-effort; values are first strong match only).
+_SIGNAL_WORD_RE = re.compile(r"(?i)signal\s*word\s*:?\s*(Danger|Warning)\b")
+_FLASH_POINT_RE = re.compile(
+    r"(?i)flash\s*point\s*:?\s*([<>≤≥]?\s*[\d.,]+\s*(?:°?\s*[CF]|°\s*[CF]|(?:deg\.?|degrees?)\s*[CF]|°C|°F))"
+)
+_BOILING_POINT_RE = re.compile(
+    r"(?i)boiling\s*point\s*:?\s*([<>≤≥]?\s*[\d.,]+\s*(?:°?\s*[CF]|°\s*[CF]|(?:deg\.?|degrees?)\s*[CF]|°C|°F))"
+)
+_VAPOR_PRESSURE_RE = re.compile(
+    r"(?i)vapor\s*pressure\s*:?\s*([\d.,]+\s*(?:Pa|kPa|hPa|mbar|mm\s*Hg|atm|bar|psi)\b[^.\n]{0,40})"
+)
+_LD50_ORAL_RAT_RE = re.compile(
+    r"(?i)LD\s*50[^.\n]{0,160}?(?:oral|orally)[^.\n]{0,80}?([\d.,]+\s*mg/kg)"
+)
+_LC50_INHAL_RE = re.compile(
+    r"(?i)LC\s*50[^.\n]{0,160}?(?:inhalation|inhal)[^.\n]{0,80}?([\d.,]+\s*(?:mg/m3|mg/m³|ppm)\b[^.\n]{0,20})"
+)
+_EC50_AQUATIC_RE = re.compile(
+    r"(?i)EC\s*50[^.\n]{0,120}?(?:fish|daphnid|algae|aquatic)[^.\n]{0,80}?([\d.,]+\s*mg/L)"
+)
 
 # Schema aligned with GLiNER2 ``extract_json`` examples (fastino/gliner2-base-v1).
 SDS_GLINER_SCHEMA: dict[str, Any] = {
@@ -30,9 +56,71 @@ SDS_GLINER_SCHEMA: dict[str, Any] = {
             "cas_number": "str::Chemical Abstracts Service (CAS) Registry Number like 50-00-0",
             "chemical_name": "str::Ingredient or substance name if stated",
             "ghs_h_code": "str::GHS hazard statement code such as H301 or H314",
+            "signal_word": "str::GHS signal word Danger or Warning if stated",
+            "flash_point": "str::Flash point with unit e.g. 12 °C",
+            "oral_ld50_rat": "str::Oral LD50 in rats including mg/kg if present in text",
         }
     ]
 }
+
+
+def extract_p_codes_regex(text: str) -> list[str]:
+    """GHS P-code tokens (whole-word P + three digits, optional parenthetical)."""
+    if not text or not str(text).strip():
+        return []
+    found = P_CODE_RE.findall(text)
+    out: list[str] = []
+    seen: set[str] = set()
+    for raw in found:
+        u = raw.upper()
+        if u not in seen:
+            seen.add(u)
+            out.append(u)
+    return out
+
+
+def extract_properties_regex(text: str) -> dict[str, Any]:
+    """
+    Lightweight property / toxicity hints from SDS markdown (regex only).
+
+    Returns a flat dict with optional keys: ``signal_word``, ``flash_point``, ``boiling_point``,
+    ``vapor_pressure``, ``ld50_oral_rat``, ``lc50_inhalation``, ``ec50_aquatic``.
+    Always includes ``_source``: ``regex``. First strong match wins per field.
+    """
+    out: dict[str, Any] = {"_source": "regex"}
+    if not text or not str(text).strip():
+        return out
+    t = text
+
+    m = _SIGNAL_WORD_RE.search(t)
+    if m:
+        out["signal_word"] = m.group(1).strip().capitalize()
+
+    m = _FLASH_POINT_RE.search(t)
+    if m:
+        out["flash_point"] = re.sub(r"\s+", " ", m.group(1).strip())[:120]
+
+    m = _BOILING_POINT_RE.search(t)
+    if m:
+        out["boiling_point"] = re.sub(r"\s+", " ", m.group(1).strip())[:120]
+
+    m = _VAPOR_PRESSURE_RE.search(t)
+    if m:
+        out["vapor_pressure"] = re.sub(r"\s+", " ", m.group(1).strip())[:120]
+
+    m = _LD50_ORAL_RAT_RE.search(t)
+    if m:
+        out["ld50_oral_rat"] = re.sub(r"\s+", " ", m.group(1).strip())[:80]
+
+    m = _LC50_INHAL_RE.search(t)
+    if m:
+        out["lc50_inhalation"] = re.sub(r"\s+", " ", m.group(1).strip())[:80]
+
+    m = _EC50_AQUATIC_RE.search(t)
+    if m:
+        out["ec50_aquatic"] = re.sub(r"\s+", " ", m.group(1).strip())[:80]
+
+    return out
 
 
 def extract_h_codes_regex(text: str) -> list[str]:
