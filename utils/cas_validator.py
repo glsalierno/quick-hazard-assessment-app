@@ -23,12 +23,19 @@ def is_valid_cas_format(cas: str) -> bool:
     return _CAS_PATTERN.match(cas.strip()) is not None
 
 
-def cas_checksum(digits: str) -> int:
-    """Compute CAS check digit. digits is the full numeric string (no hyphens)."""
-    n = len(digits)
+def cas_checksum(registration_digits: str) -> int:
+    """
+    Compute the CAS Registry check digit from the registration digits only (no check digit, no hyphens).
+
+    Weights 1, 2, 3, … are applied from the **rightmost** registration digit to the left; sum mod 10
+    equals the check digit. (The previous implementation incorrectly weighted the check digit itself,
+    which rejected valid CAS such as ``67-64-1``.)
+    """
+    if not registration_digits or not registration_digits.isdigit():
+        return -1
     total = 0
-    for i, d in enumerate(digits):
-        total += int(d) * (n - i)
+    for i, ch in enumerate(reversed(registration_digits)):
+        total += int(ch) * (i + 1)
     return total % 10
 
 
@@ -45,8 +52,8 @@ def validate_cas(cas: str) -> Tuple[bool, str]:
     if not m:
         return False, s
     first, second, check = m.group(1), m.group(2), m.group(3)
-    digits = first + second + check
-    expected_check = str(cas_checksum(digits))
+    body = first + second
+    expected_check = str(cas_checksum(body))
     if check != expected_check:
         return False, f"{first}-{second}-{check}"
     return True, f"{first}-{second}-{check}"
@@ -74,8 +81,8 @@ def validate_cas_relaxed(cas: str) -> tuple[str, bool]:
     if not m:
         return "", False
     first, second, check = m.group(1), m.group(2), m.group(3)
-    digits = first + second + check
-    expected_check = str(cas_checksum(digits))
+    body = first + second
+    expected_check = str(cas_checksum(body))
     normalized = f"{first}-{second}-{check}"
     if check == expected_check:
         return normalized, True
