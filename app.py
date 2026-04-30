@@ -75,6 +75,20 @@ def _reach_iuclid_panel_unconfigured_fallback(code: str) -> None:
                 "to your REACH study-results archive or a folder of extracted ``.i6z`` dossiers. "
                 "See README → **Offline REACH / IUCLID (optional)**."
             )
+            if on_cloud:
+                st.markdown(
+                    "**Streamlit Cloud:** open the app → **⋮ Manage app** → **Secrets**, and add a **top-level** "
+                    "TOML key (name must match exactly):"
+                )
+                st.code(
+                    "# Example — use a path that exists on the Cloud filesystem (e.g. small demo under the repo)\n"
+                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/your_reach_demo.zip"\n',
+                    language="toml",
+                )
+                st.caption(
+                    "Save Secrets, then **Reboot** the app. Full ECHA zips are too large for GitHub; for demos, "
+                    "commit only a small archive or folder of `.i6z` files and point the path at that location."
+                )
         elif code == "badpath":
             st.warning(
                 "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set but could not be read as a path "
@@ -490,7 +504,7 @@ if not _hide_examples:
             st.rerun()
     st.caption(
         "**Assessment scope:** one compound per run — each full lookup runs **PubChem + DSSTox + ToxValDB + CPDB** "
-        "(plus **OPERA** cache / **P2OASys** / ToxVal cross-checks when configured) for **a single resolved CAS** at a time. "
+        "(plus **OPERA** cache when configured) for **a single resolved CAS** at a time. "
         "Multi-ingredient SDS: extract CAS list, choose one, assess, then switch CAS and run again."
     )
 
