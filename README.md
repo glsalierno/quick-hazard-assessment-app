@@ -10,7 +10,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 Streamlit opens that deployment in the browser:
 
-- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app) **Streamlit App** — Opens the **main** hosted app (`quick-hazard-assessment-app.streamlit.app`): the default Quick Hazard Assessment flow (CAS/name input, PubChem + DSSTox + related tabs, SDS upload if enabled in that deployment).
+- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app) **Streamlit App** — Opens the **main** hosted app ([quick-hazard-assessment-app.streamlit.app](https://quick-hazard-assessment-app.streamlit.app)): the default Quick Hazard Assessment flow (CAS/name input, PubChem + DSSTox + related tabs, SDS upload if enabled in that deployment).
 - [![Streamlit App v2.0](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-v2.streamlit.app) **Streamlit App v2.0** — Opens the **v2.0** deployment ([quick-hazard-assessment-v2.streamlit.app](https://quick-hazard-assessment-v2.streamlit.app/)): same core assessment experience plus **v2.0** UI copy (e.g. top info banner), optional **REACH / IUCLID** offline panel when the repo’s demo archive and format paths are present, and **REACH demo** example CAS buttons when `data/reach_demo/reach_subset_examples.json` is shipped. Behavior can differ slightly from main while features are tested on branch `v2.0`.
 
 ---
