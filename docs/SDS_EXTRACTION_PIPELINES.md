@@ -78,7 +78,9 @@ These options existed in earlier builds or experiments. They are **no longer sel
 - **Install:** `pip install -r requirements-gliner2.txt` (adds `gliner2`; uses existing `torch` from the main stack when present).
 - **Model:** `HAZQUERY_GLINER2_MODEL` (default `fastino/gliner2-base-v1`). First run downloads weights.
 - **Disable inference:** `HAZQUERY_USE_GLINER2=0` or Streamlit sidebar **uncheck** “Run GLiNER2…”.
-- **UX:** After an SDS upload, open **“SDS extraction diagnostics”** to inspect regex vs GLiNER CAS counts, H-code regex list, GLiNER timing/errors, and a truncated raw JSON preview.
+- **Regex stage (no model):** On ``markdown_gliner_regex``, diagnostics also include **P-codes**, **``properties_regex``** (signal word, flash/boiling point, vapor pressure, LD50/LC50/EC50-style snippets — first match per field), and the existing **H-code** list.
+- **GLiNER schema:** CAS / name / H-code plus optional **signal_word**, **flash_point**, **oral_ld50_rat** strings when the model is enabled.
+- **UX:** After an SDS upload, open **“SDS extraction diagnostics”** to inspect regex vs GLiNER CAS counts, code lists, ``properties_regex``, GLiNER timing/errors, and a truncated raw JSON preview.
 
 ## Summary
 

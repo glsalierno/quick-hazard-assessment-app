@@ -277,9 +277,14 @@ def run_markdown_gliner_regex_pipeline(
     extra["markdown_chars"] = len(md)
     regex_cas = cas_text_extract.find_checksum_valid_cas_in_text(md)
     h_codes = sds_gliner_extract.extract_h_codes_regex(md)
+    p_codes = sds_gliner_extract.extract_p_codes_regex(md)
+    props = sds_gliner_extract.extract_properties_regex(md)
     extra["regex_cas"] = list(regex_cas)
     extra["h_codes_regex"] = h_codes[:100]
     extra["h_codes_regex_count"] = len(h_codes)
+    extra["p_codes_regex"] = p_codes[:100]
+    extra["p_codes_regex_count"] = len(p_codes)
+    extra["properties_regex"] = {k: v for k, v in props.items() if not str(k).startswith("_")}
     extra["regex_cas_count"] = len(regex_cas)
 
     sources: dict[str, str] = {c: "regex" for c in regex_cas}
