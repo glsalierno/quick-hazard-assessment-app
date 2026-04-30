@@ -1,6 +1,5 @@
 """
 Quick Hazard Assessment — Streamlit app.
-Chemical hazard assessment from PubChem + DSSTox local (no API key required).
 """
 
 from __future__ import annotations
@@ -146,9 +145,6 @@ dsstox_data: Optional[dict[str, Any]] = None
 
 # Title and description
 st.title(f"🧪 {config.APP_TITLE}")
-st.markdown(
-    "Chemical hazard assessment from **PubChem** + **DSSTox local** (no API key required)."
-)
 if not MARKITDOWN_OK:
     st.error(_MARKITDOWN_ERR or "MarkItDown is required for SDS PDF parsing.")
     st.caption("Typed CAS/name still works below. SDS upload is disabled until MarkItDown is installed.")
