@@ -1,4 +1,4 @@
-# <img src="hierarchy-banner.svg" alt="Hierarchy of Controls pyramid" width="34" style="vertical-align: -6px;" /> Quick Hazard Assessment - Streamlit App
+# <img src="hierarchy-banner.svg" alt="Hierarchy of Controls pyramid" width="26" style="vertical-align: -4px;" /> Quick Hazard Assessment - Streamlit App <img src="hierarchy-banner.svg" alt="Hierarchy of Controls pyramid" width="26" style="vertical-align: -4px;" />
 
 ﻿<p align="center">
  <a href="https://quick-hazard-assessment-v2.streamlit.app/">
