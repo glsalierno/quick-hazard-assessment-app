@@ -40,6 +40,18 @@ def _validate_checksum(cas: str) -> bool:
     return _canonical_cas_for_sds(cas) is not None
 
 
+def _canonical_cas_for_sds(cas: str) -> Optional[str]:
+    """Canonical checksum-valid dashed CAS (auto-corrects check digit when shape is CAS-like)."""
+    raw = (cas or "").strip()
+    if not raw:
+        return None
+    relaxed, _ = cas_validator.validate_cas_relaxed(raw)
+    if not relaxed:
+        return None
+    ok, canonical = cas_validator.validate_cas(relaxed)
+    return canonical if ok else None
+
+
 def _norm_cas_key(cas: str) -> str:
     """Normalize CAS for dict lookup (hyphens, spacing) so rows match scored cas_list."""
     s = (cas or "").strip()
@@ -285,6 +297,51 @@ def _score_cas_confidence(
     return out_cas, filtered
 
 
+SDS_MSG_NO_PUBCHEM_VALID = (
+    "SDS CAS extraction failed, please type it above manually to prompt assessment"
+)
+SDS_MSG_PUBCHEM_LOOKUP_FAILED = (
+    "Could not verify extracted CAS in PubChem (network or service error). "
+    "Type a CAS above manually or retry."
+)
+
+
+def _filter_sds_cas_pubchem_confirmed_only(
+    cas_list: List[str], rows: List[dict[str, Any]]
+) -> Tuple[List[str], List[dict[str, Any]], Optional[str]]:
+    import config as _cfg
+
+    use_pc = bool(getattr(_cfg, "USE_PUBCHEM_CAS_VALIDATION", True))
+    if not use_pc or not cas_list:
+        return list(cas_list), list(rows), None
+
+    row_by = _rows_by_norm_cas(rows)
+    statuses: list[Any] = []
+    for cas in cas_list:
+        r = row_by.get(_norm_cas_key(cas), {})
+        statuses.append(r.get("pubchem_verified"))
+
+    confirmed_cas: List[str] = []
+    confirmed_rows: List[dict[str, Any]] = []
+    for cas in cas_list:
+        r = row_by.get(_norm_cas_key(cas), {})
+        if r.get("pubchem_verified") is True:
+            confirmed_cas.append(cas)
+            confirmed_rows.append(dict(r))
+
+    if confirmed_cas:
+        return confirmed_cas, confirmed_rows, None
+
+    if not statuses:
+        return [], [], None
+
+    all_unknown = all(s is None for s in statuses)
+    if all_unknown:
+        return [], [], SDS_MSG_PUBCHEM_LOOKUP_FAILED
+
+    return [], [], SDS_MSG_NO_PUBCHEM_VALID
+
+
 @dataclass
 class ChemicalInput:
     """Result of parsing user input before database assessment."""
@@ -383,6 +440,9 @@ class UnifiedInputHandler:
         raw_count_before_gate = len(cas_list)
         raw_best = best[1]
         cas_list, rows = _score_cas_confidence(cas_list, rows)
+        post_score_n = len(cas_list)
+        pubchem_filter_msg: Optional[str] = None
+        cas_list, rows, pubchem_filter_msg = _filter_sds_cas_pubchem_confirmed_only(cas_list, rows)
         canon_best = _canonical_cas_for_sds(raw_best) if raw_best else None
         if canon_best and canon_best in cas_list:
             primary = canon_best
@@ -392,21 +452,29 @@ class UnifiedInputHandler:
         label = getattr(uploaded_file, "name", None) or "SDS.pdf"
         err = metrics.get("error")
         filtered_note: Optional[str] = None
-        if not err and raw_count_before_gate > 0 and not cas_list:
+        if not err and raw_count_before_gate > 0 and not cas_list and not pubchem_filter_msg:
             filtered_note = (
                 f"Extractor reported {raw_count_before_gate} CAS-like candidate(s), but none passed the "
                 "checksum gate after normalization (or all were removed by filters: "
                 "SHOW_ONLY_PUBCHEM_VERIFIED=1, MIN_CAS_CONFIDENCE, or composition vs low-trust rules). "
                 "Defaults: SHOW_ONLY_PUBCHEM_VERIFIED=0, MIN_CAS_CONFIDENCE=0."
             )
+        final_err: Optional[str] = str(err) if err else None
+        if not final_err and pubchem_filter_msg:
+            final_err = pubchem_filter_msg
+        if not final_err:
+            final_err = filtered_note
+        _mx = dict(metrics) if metrics else {}
+        _mx["sds_cas_count_after_score"] = post_score_n
+        _mx["sds_cas_count_pubchem_confirmed"] = len(cas_list)
         return ChemicalInput(
             input_type=in_type if cas_list else "sds_single",
             primary=primary,
             cas_numbers=cas_list,
             source_label=label,
             extraction_rows=rows,
-            extraction_error=str(err) if err else filtered_note,
-            extraction_metrics=dict(metrics) if metrics else None,
+            extraction_error=final_err,
+            extraction_metrics=_mx,
         )
 
 

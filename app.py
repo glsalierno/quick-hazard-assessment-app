@@ -47,6 +47,65 @@ def _is_assessment_result(obj: Any) -> bool:
     return obj is not None and hasattr(obj, "identity") and hasattr(obj, "pubchem_data")
 
 
+def _reach_iuclid_panel_unconfigured_fallback(code: str) -> None:
+    """
+    Same UX as ``render_reach_iuclid_panel_unconfigured`` when that helper is missing from an
+    older ``iuclid_integration`` (avoids ``ImportError: cannot import name ...`` on partial deploys).
+    """
+    with st.expander("REACH / IUCLID (offline dossier)", expanded=False):
+        try:
+            from services.config import ServiceConfig
+
+            on_cloud = ServiceConfig.is_streamlit_cloud()
+        except Exception:
+            on_cloud = False
+        cloud_note = (
+            "**Streamlit Cloud:** large REACH / IUCLID archives are not stored in GitHub. "
+            "Use a **local** install with ``OFFLINE_LOCAL_ARCHIVE`` pointing at your dossier ``.zip`` / ``.7z`` "
+            "or a folder of ``.i6z`` files, or host a small demo subset under the repo if you need Cloud demos.\n\n"
+        )
+        if code == "unset":
+            st.info(
+                (cloud_note if on_cloud else "")
+                + "🔒 **IUCLID offline lookup is not configured.** "
+                "Set **`OFFLINE_LOCAL_ARCHIVE`** in Streamlit **Secrets** (cloud) or your shell / ``.env`` (local). "
+                "See README → **Offline REACH / IUCLID (optional)**."
+            )
+            if on_cloud:
+                st.markdown(
+                    "**Streamlit Cloud:** open the app → **⋮ Manage app** → **Secrets**, and add a **top-level** "
+                    "TOML key (name must match exactly):"
+                )
+                st.code(
+                    "# Optional — phrase/picklist format tree; copy \"IUCLID 6 9.0.0_format\" into repo (no spaces)\n"
+                    'IUCLID_FORMAT_DIR = "/mount/src/quick-hazard-assessment-app/data/iuclid_format/IUCLID_6_9_0_0_format"\n'
+                    "\n"
+                    "# Dossier lookup — small demo zip/folder only inside clone (full REACH ~10+ GB cannot be on GitHub)\n"
+                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/reach_demo/reach_subset.zip"\n',
+                    language="toml",
+                )
+                st.caption(
+                    "Save Secrets, then **Reboot**. Read **`data/echa_cloud/README.txt`** for what to upload vs keep local."
+                )
+        elif code == "badpath":
+            st.warning(
+                "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set but could not be read as a path."
+            )
+        else:
+            st.warning(
+                (cloud_note if on_cloud else "")
+                + "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set, but that path **does not exist** "
+                "or is unreadable on this server."
+            )
+        st.caption(
+            "Secrets: top-level TOML key ``OFFLINE_LOCAL_ARCHIVE``. Optional: ``OFFLINE_DOSSIER_INFO_XLSX``, ``IUCLID_FORMAT_DIR``."
+        )
+        try:
+            st.page_link("pages/02_Offline_Loader_Test.py", label="Open **Offline ECHA loader** test page", icon="🧪")
+        except Exception:
+            st.caption("Sidebar → **Offline ECHA loader** to verify paths and snapshots.")
+
+
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
 
@@ -303,8 +362,10 @@ read ``utils.sds_strategy`` (not the primary SDS upload extractor).
         pass
 
 st.info(
-    "Enter a **CAS or name** above, or upload an **SDS PDF** below to auto-extract CAS. "
-    "All use **ChemicalAssessmentService** (PubChem + DSSTox + ToxValDB + CPDB)."
+    "**Quick Hazard Assessment v2.0** — Enter a CAS, name, or SMILES and click **Assess**, or upload an SDS PDF: **PubChem-valid** CAS only are listed; **one** valid CAS runs the assessment automatically; **several** show as buttons to click.\n\n"
+    "• Real-time lookup from PubChem, DSSTox, ToxValDB, CPDB\n"
+    "• **OPERA QSAR** predictions (batch pre-computed, cached)\n\n"
+    "Core pipeline: **ChemicalAssessmentService** (multi-source evidence)."
 )
 
 # Banner when CAS was chosen from SDS upload or unified parser (results render below this message)
@@ -331,14 +392,14 @@ with st.form("cas_input", clear_on_submit=False):
     if "cas_query_input" not in st.session_state:
         st.session_state["cas_query_input"] = default
     cas = st.text_input(
-        "CAS or chemical name",
+        "CAS, chemical name, or SMILES",
         key="cas_query_input",
-        placeholder="e.g., 67-64-1 or acetone",
-        help="Type directly or upload SDS below to auto-fill.",
+        placeholder="e.g., 67-64-1, acetone, or CC(=O)C",
+        help="Type directly or upload SDS below to auto-fill CAS.",
     )
     submitted = st.form_submit_button("Assess")
 
-# --- SDS PDF path (input_handler + alternative_extraction; does not run through assess() until user picks a CAS) ---
+# --- SDS PDF path (input_handler + alternative_extraction; PubChem filter + optional auto-assess) ---
 # SDS upload below CAS input (requires MarkItDown for v1.4 extraction)
 uf_shared = None
 if sds_pdf_utils and sds_regex_extractor and MARKITDOWN_OK:
@@ -346,7 +407,7 @@ if sds_pdf_utils and sds_regex_extractor and MARKITDOWN_OK:
         "Or upload SDS (PDF) to extract CAS",
         type=["pdf"],
         key="shared_sds_pdf_upload",
-        help="Parsing runs automatically. Single CAS fills the field above; multiple CAS: pick one below.",
+        help="Parsing runs automatically. Only CAS found in PubChem are listed; one valid CAS triggers assessment; several valid CAS use the buttons below.",
     )
     if uf_shared is not None:
         st.session_state["shared_sds_pdf_bytes"] = uf_shared.getvalue()
@@ -354,12 +415,18 @@ if sds_pdf_utils and sds_regex_extractor and MARKITDOWN_OK:
         if st.session_state.get("_last_sds_upload_name") != uf_shared.name:
             st.session_state["_last_sds_upload_name"] = uf_shared.name
             st.session_state["sds_staged_chemical_input"] = None
-            with st.spinner("Extracting CAS from SDS…"):
+            with st.spinner("Extracting CAS from SDS (PubChem validation)…"):
                 staged = get_input_handler().process_sds_pdf(uf_shared)
             st.session_state["sds_staged_chemical_input"] = staged
             st.session_state["_last_sds_upload_name"] = uf_shared.name
             if staged and staged.cas_numbers and len(staged.cas_numbers) == 1:
-                st.session_state["_pending_cas_query_input"] = staged.cas_numbers[0]
+                raw_pick = str(staged.cas_numbers[0]).strip()
+                clean_pick = cas_validator.normalize_cas_input(raw_pick) or raw_pick
+                apply_assessment_query(
+                    clean_pick,
+                    show_banner=True,
+                    banner_note=f"Assessing **`{clean_pick}`** from SDS (single PubChem-valid CAS).",
+                )
                 st.rerun()
     else:
         st.session_state["shared_sds_pdf_bytes"] = None
@@ -370,7 +437,9 @@ if sds_pdf_utils and sds_regex_extractor and MARKITDOWN_OK:
 staged_ci = st.session_state.get("sds_staged_chemical_input")
 if staged_ci is not None and staged_ci.cas_numbers:
     if len(staged_ci.cas_numbers) > 1:
-        st.caption(f"**{len(staged_ci.cas_numbers)} CAS** from SDS. Choose one and assess:")
+        st.caption(
+            f"**{len(staged_ci.cas_numbers)} PubChem-valid CAS** from this SDS. Click a CAS below to run the assessment."
+        )
         if staged_ci.extraction_rows:
             _df_sds = pd.DataFrame(staged_ci.extraction_rows)
             _show_cols = [
@@ -409,10 +478,15 @@ if staged_ci is not None and staged_ci.cas_numbers:
                 "**Confidence:** High (80–100%) = multiple validations; Medium (50–80%) = some checks. "
                 "Use manual correction below to override or add CAS."
             )
-        pick = st.selectbox("CAS for assessment", options=staged_ci.cas_numbers, key="top_sds_cas_pick")
-        if st.button("Assess selected CAS", type="primary", key="top_sds_run_assess_btn"):
-            apply_assessment_query(pick, show_banner=True, banner_note=f"Assessing **{pick}** from SDS.")
-            st.rerun()
+        _nc = len(staged_ci.cas_numbers)
+        _ncol = min(4, _nc)
+        _btn_cols = st.columns(_ncol)
+        for _i, _c in enumerate(staged_ci.cas_numbers):
+            with _btn_cols[_i % _ncol]:
+                if st.button(f"Assess {_c}", key=f"sds_pubchem_cas_btn_{_i}", use_container_width=True):
+                    _clean = cas_validator.normalize_cas_input(str(_c).strip()) or str(_c).strip()
+                    apply_assessment_query(_clean, show_banner=True, banner_note=f"Assessing **`{_clean}`** from SDS.")
+                    st.rerun()
 
         with st.expander("✏️ Manual correction"):
             st.markdown("If the extracted CAS is incorrect, you can:")
@@ -430,23 +504,16 @@ if staged_ci is not None and staged_ci.cas_numbers:
             with col2:
                 if st.button("Report issue", key="manual_cas_report_btn"):
                     st.info("Thank you! This helps improve the extractor.")
-    elif len(staged_ci.cas_numbers) == 1 and not cas:
-        st.caption("CAS extracted — click **Assess** above.")
-        with st.expander("✏️ Manual correction"):
-            correct_cas = st.text_input("Correct CAS if wrong:", key="manual_cas_single", placeholder="e.g., 67-64-1")
-            if st.button("Use this CAS", key="manual_cas_single_btn"):
-                if correct_cas and cas_validator.is_valid_cas_format(str(correct_cas).strip()):
-                    st.session_state["query"] = cas_validator.normalize_cas_input(correct_cas) or correct_cas.strip()
-                    st.session_state["result_for"] = None
-                    st.session_state["_pending_cas_query_input"] = correct_cas.strip()
-                    st.rerun()
-                elif correct_cas:
-                    st.warning("Enter a valid CAS format (e.g., 67-64-1).")
 elif staged_ci is not None and not staged_ci.cas_numbers:
     _ex_err = getattr(staged_ci, "extraction_error", None)
     if _ex_err:
-        st.error(f"**SDS extraction issue:** {_ex_err}")
-    st.warning("No CAS extracted from SDS. Type a CAS or name above.")
+        _e = str(_ex_err).strip()
+        if _e.startswith("SDS CAS extraction failed") or _e.startswith("Could not verify extracted CAS in PubChem"):
+            st.warning(_e)
+        else:
+            st.error(f"**SDS extraction issue:** {_e}")
+    else:
+        st.warning("No CAS extracted from SDS. Type a CAS or name above.")
 
 if staged_ci is not None and getattr(staged_ci, "extraction_metrics", None):
     _mx = staged_ci.extraction_metrics
@@ -475,8 +542,9 @@ if not _hide_examples:
             st.session_state["result_for"] = None  # force re-fetch
             st.rerun()
     st.caption(
-        "**Assessment scope:** one compound per run — each full lookup runs **PubChem + DSSTox + ToxValDB** (and related panels) for **a single CAS** at a time. "
-        "Multi-ingredient SDS: extract CAS list, choose one, assess, then switch CAS and run again."
+        "**Assessment scope:** one compound per run — each full lookup runs **PubChem + DSSTox + ToxValDB + CPDB** "
+        "(plus **OPERA** cache when configured) for **a single resolved CAS** at a time. "
+        "Multi-ingredient SDS: only PubChem-valid CAS are listed; click a CAS button to assess that component."
     )
 
 # When form is submitted, set query to what the user typed
@@ -532,7 +600,7 @@ if current_query:
     tab_haz, tab_p2o = st.tabs(["Hazard assessment", "P2OASys scoring"])
     with tab_haz:
         if not result or not result.get("pubchem"):
-            msg = "No hazard data yet. Enter a CAS or name above and click **Assess**, or upload an SDS and select a CAS."
+            msg = "No hazard data yet. Enter a CAS or name above and click **Assess**, or upload an SDS PDF (assessment runs when CAS is extracted)."
             if result and result.get("fetch_error"):
                 msg = f"**Could not fetch hazard data:** {result['fetch_error']}. Check network, PubChem connectivity, or try a different CAS."
             st.info(msg)
@@ -576,9 +644,28 @@ if current_query:
             st.markdown("---")
 
             try:
-                from unified_hazard_report.iuclid_integration import render_reach_iuclid_panel
+                import unified_hazard_report.iuclid_integration as _iu_mod
 
-                render_reach_iuclid_panel(str(clean_cas))
+                offline_reach_archive_status = _iu_mod.offline_reach_archive_status
+                render_reach_iuclid_panel = _iu_mod.render_reach_iuclid_panel
+                _iu_render_unconfigured = getattr(_iu_mod, "render_reach_iuclid_panel_unconfigured", None)
+
+                _iu_ok, _iu_code = offline_reach_archive_status()
+                if not _iu_ok:
+                    if _iu_render_unconfigured is not None:
+                        _iu_render_unconfigured(_iu_code)
+                    else:
+                        _reach_iuclid_panel_unconfigured_fallback(_iu_code)
+                else:
+                    render_reach_iuclid_panel(str(clean_cas))
+            except (ImportError, ModuleNotFoundError) as exc:
+                logging.getLogger(__name__).warning("REACH / IUCLID integration import failed: %s", exc)
+                with st.expander("REACH / IUCLID (offline dossier)", expanded=False):
+                    st.info(
+                        "🔒 **IUCLID offline integration is not available** in this deployment "
+                        f"({type(exc).__name__}: `{exc}`). "
+                        "Use a full checkout with offline ingest modules, or run locally with ``OFFLINE_LOCAL_ARCHIVE``."
+                    )
             except Exception as exc:
                 logging.getLogger(__name__).debug("REACH / IUCLID panel skipped: %s", exc, exc_info=True)
 
@@ -1203,7 +1290,7 @@ if current_query:
                 else:
                     st.info("No itemized scores for this compound with current data and matrix.")
         else:
-            st.info("Run a hazard assessment above (enter CAS or name and click Assess) to see P2OASys scores here.")
+            st.info("Run a hazard assessment above (CAS/name + **Assess**, or upload an SDS PDF) to see P2OASys scores here.")
 
 # Footer when no query yet
 if not current_query:
