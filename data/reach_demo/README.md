@@ -18,4 +18,12 @@ python scripts/prepare_iuclid_demo.py --format-src "PATH/TO/IUCLID 6 9.0.0_forma
 
 Increase `--limit` until you approach comfortable repo size. Then `git add data/reach_demo/reach_subset.zip` (and the format tree under `data/iuclid_format/` if needed).
 
+After replacing ``reach_subset.zip``, you can refresh a **manifest** (optional tooling / docs):
+
+```bash
+python scripts/refresh_reach_subset_examples.py
+```
+
+That writes ``reach_subset_examples.json`` (heuristic CAS scan). **Main-page REACH shortcut buttons** are the curated list in ``config.REACH_DEMO_CURATED_EXAMPLES`` — edit that when you want to change labels or CAS picks.
+
 The Streamlit **REACH / IUCLID** expander shows an on-screen reminder when this committed demo path is in use.

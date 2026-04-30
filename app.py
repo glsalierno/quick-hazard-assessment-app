@@ -517,6 +517,20 @@ if not _hide_examples:
             st.session_state["_pending_cas_query_input"] = example_cas
             st.session_state["result_for"] = None  # force re-fetch
             st.rerun()
+    reach_demo_ex = list(getattr(config, "REACH_DEMO_CURATED_EXAMPLES", ()) or ())
+    if reach_demo_ex:
+        st.markdown(
+            "**REACH demo dossiers:** shortcuts for substances included in the committed subset "
+            "``data/reach_demo/reach_subset.zip`` (not full REACH). After **Assess**, open "
+            "**REACH / IUCLID (offline dossier)** for dossier-linked rows when the archive is configured."
+        )
+        rcols = st.columns(len(reach_demo_ex))
+        for i, (example_cas, label) in enumerate(reach_demo_ex):
+            if rcols[i].button(label, key=f"reach_demo_ex_{i}"):
+                st.session_state["query"] = example_cas
+                st.session_state["_pending_cas_query_input"] = example_cas
+                st.session_state["result_for"] = None
+                st.rerun()
     st.caption(
         "**Assessment scope:** one compound per run — each full lookup runs **PubChem + DSSTox + ToxValDB + CPDB** "
         "(plus **OPERA** cache when configured) for **a single resolved CAS** at a time. "
