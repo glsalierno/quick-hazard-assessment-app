@@ -23,11 +23,7 @@ from utils import cas_validator
 
 def _canonical_cas_for_sds(cas: str) -> Optional[str]:
     """
-    Return checksum-valid dashed CAS for SDS gating.
-
-    ``validate_cas_relaxed`` returns ``(corrected, False)`` when the check digit was wrong
-    but the body is CAS-shaped (common OCR/MarkItDown noise). The old gate treated ``False``
-    as "invalid" and dropped the substance entirely.
+    Canonical checksum-valid dashed CAS (auto-corrects a wrong check digit when shape is CAS-like).
     """
     raw = (cas or "").strip()
     if not raw:
@@ -40,8 +36,20 @@ def _canonical_cas_for_sds(cas: str) -> Optional[str]:
 
 
 def _validate_checksum(cas: str) -> bool:
-    """True if CAS can be normalized to a checksum-valid registry CAS (includes auto-corrected check digit)."""
+    """True when the value can be normalized to a valid registry CAS."""
     return _canonical_cas_for_sds(cas) is not None
+
+
+def _canonical_cas_for_sds(cas: str) -> Optional[str]:
+    """Canonical checksum-valid dashed CAS (auto-corrects check digit when shape is CAS-like)."""
+    raw = (cas or "").strip()
+    if not raw:
+        return None
+    relaxed, _ = cas_validator.validate_cas_relaxed(raw)
+    if not relaxed:
+        return None
+    ok, canonical = cas_validator.validate_cas(relaxed)
+    return canonical if ok else None
 
 
 def _norm_cas_key(cas: str) -> str:
@@ -75,6 +83,7 @@ _METHOD_WEIGHTS: dict[str, float] = {
     "ocr_fallback": -0.1,
     "section1_anchor": 0.15,
     "markitdown_regex": 0.12,
+    "markitdown_gliner_regex": 0.14,
     "markitdown_bert": 0.14,
     "markitdown_hybrid_primary": 0.13,
     "ocr_tesseract_regex": 0.08,
@@ -132,7 +141,7 @@ _COMPOSITION_METHODS: frozenset[str] = frozenset({
     "section1_anchor", "composition_section3", "html_table_parsing", "pipe_table_parsing",
     "delimiter_table_parsing", "line_composition_parsing", "orphan_cas_line", "table_parsing",
     "docling", "docling_table", "docling_distilbert",
-    "markitdown_regex", "markitdown_bert", "markitdown_hybrid_primary",
+    "markitdown_regex", "markitdown_gliner_regex", "markitdown_bert", "markitdown_hybrid_primary",
     "ocr_tesseract_regex", "ocr_easyocr_regex", "ocr_hybrid_fallback",
 })
 # Methods that infer CAS from digit sequences / full-text scan - high false positive risk
@@ -202,7 +211,7 @@ def _score_cas_confidence(
         _deduped.append(k)
     cas_list = _deduped
 
-    # Hard filter: never show unrecoverable CAS; accept checksum-corrected canonical forms (OCR/MarkItDown).
+    # Hard filter: drop unrecoverable CAS; keep canonical checksum-valid forms.
     valid_cas_list: List[str] = []
     valid_rows: List[dict[str, Any]] = []
     full_row_by = _rows_by_norm_cas(rows)
@@ -315,10 +324,15 @@ def _filter_sds_cas_pubchem_confirmed_only(
     confirmed_cas: List[str] = []
     confirmed_rows: List[dict[str, Any]] = []
     for cas in cas_list:
-        r = row_by.get(_norm_cas_key(cas), {})
+        canon = _canonical_cas_for_sds(cas)
+        if not canon:
+            continue
+        r = row_by.get(_norm_cas_key(cas)) or row_by.get(_norm_cas_key(canon), {})
         if r.get("pubchem_verified") is True:
-            confirmed_cas.append(cas)
-            confirmed_rows.append(dict(r))
+            confirmed_cas.append(canon)
+            nr = dict(r)
+            nr["cas"] = canon
+            confirmed_rows.append(nr)
 
     if confirmed_cas:
         return confirmed_cas, confirmed_rows, None
@@ -344,6 +358,8 @@ class ChemicalInput:
     extraction_rows: list[dict[str, Any]] = field(default_factory=list)
     # Set when MarkItDown/hybrid pipeline raises (see metrics["error"] in alternative_extraction)
     extraction_error: Optional[str] = None
+    # Last SDS run diagnostics (e.g. GLiNER2 + regex stage-2 metrics) for Streamlit UX monitoring
+    extraction_metrics: Optional[dict[str, Any]] = None
 
     def has_multiple_cas(self) -> bool:
         return len(self.cas_numbers) > 1
@@ -364,10 +380,13 @@ class UnifiedInputHandler:
         if not norm:
             return None
         if cas_validator.is_valid_cas_format(norm):
+            ok, canon = cas_validator.validate_cas(norm)
+            if not ok:
+                return None
             return ChemicalInput(
                 input_type="cas",
-                primary=norm,
-                cas_numbers=[norm],
+                primary=canon,
+                cas_numbers=[canon],
                 source_label="typed",
             )
         return ChemicalInput(
@@ -453,6 +472,9 @@ class UnifiedInputHandler:
             final_err = pubchem_filter_msg
         if not final_err:
             final_err = filtered_note
+        _mx = dict(metrics) if metrics else {}
+        _mx["sds_cas_count_after_score"] = post_score_n
+        _mx["sds_cas_count_pubchem_confirmed"] = len(cas_list)
         return ChemicalInput(
             input_type=in_type if cas_list else "sds_single",
             primary=primary,
@@ -460,6 +482,7 @@ class UnifiedInputHandler:
             source_label=label,
             extraction_rows=rows,
             extraction_error=final_err,
+            extraction_metrics=_mx,
         )
 
 

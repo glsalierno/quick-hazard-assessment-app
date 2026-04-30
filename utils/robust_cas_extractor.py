@@ -20,7 +20,7 @@ import unicodedata
 from io import BytesIO
 from typing import Any, Optional
 
-from utils import cas_validator
+from utils import cas_text_extract, cas_validator
 from utils.cas_reconstructor import CASReconstructor
 from utils.sds_models import CASExtraction
 
@@ -91,9 +91,16 @@ _CAS_FLEXIBLE_RE = re.compile(
 _CAS_FRAGMENT_RE = re.compile(
     r"\b(\d{1,7})\s*[.\s\u2010-\u2015\-]\s*(\d{2})\s*[.\s\u2010-\u2015\-]\s*(\d)\b",
 )
-# After "CAS" label (same line) – strip prefix
+# After common SDS labels (same line) – strip prefix (reserved for future line cleanup)
 _CAS_PREFIX_RE = re.compile(
-    r"(?:CAS\s*(?:No\.?|Number|#|Registry\s*No\.?)?\s*[:\-]?\s*)",
+    r"(?:"
+    r"(?:C(?:\.|\s)?A(?:\.|\s)?S(?:\.|\s)?(?:-?\s*(?:No\.?|Number|#|Registry\s*No\.?))?|CAS-No\.?)"
+    r"\s*[:\-]?\s*"
+    r"|\bCAS\s+Number\s*[:\-]?\s*"
+    r"|\bRN\b\s*[:\-]?\s*"
+    r"|\bRegistry\s+Number\s*[:\-]?\s*"
+    r"|\bIndex\s+No\.?\s*[:\-]?\s*"
+    r")",
     re.IGNORECASE,
 )
 # Concentration: ranges like ">=30 - <60%", simple "30%"
@@ -232,7 +239,7 @@ def _extract_cas_from_text(text: str) -> list[CASExtraction]:
     if not text:
         return []
     _cas_debug_log("input_text", context=text[:2000] if text else "")
-    text_norm = _clean_text_for_cas(text)
+    text_norm = _clean_text_for_cas(cas_text_extract.normalize_cas_labels_for_extraction(text))
     results: list[CASExtraction] = []
     seen: set[str] = set()
 
