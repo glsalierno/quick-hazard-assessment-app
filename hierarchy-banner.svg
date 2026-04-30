@@ -1,0 +1,46 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="1000" height="500">
+  <defs>
+    <rect id="bg" width="1000" height="500" fill="#ffffff" rx="16" />
+    <linearGradient id="band1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff6b6b" />
+      <stop offset="100%" stop-color="#c92a2a" />
+    </linearGradient>
+    <linearGradient id="band2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffa94d" />
+      <stop offset="100%" stop-color="#e8590c" />
+    </linearGradient>
+    <linearGradient id="band3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4dabf7" />
+      <stop offset="100%" stop-color="#1864ab" />
+    </linearGradient>
+    <linearGradient id="band4" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#69db7e" />
+      <stop offset="100%" stop-color="#2b8a3e" />
+    </linearGradient>
+    <linearGradient id="band5" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b2f2bb" />
+      <stop offset="100%" stop-color="#51cf66" />
+    </linearGradient>
+    <clipPath id="triangleClip">
+      <polygon points="500,420 100,60 900,60" />
+    </clipPath>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.1" />
+    </filter>
+  </defs>
+  <rect width="1000" height="500" rx="16" fill="#ffffff" />
+  <g filter="url(#shadow)">
+    <g clip-path="url(#triangleClip)">
+      <rect x="0" y="280" width="1000" height="140" fill="url(#band1)" />
+      <rect x="0" y="210" width="1000" height="70" fill="url(#band2)" />
+      <rect x="0" y="150" width="1000" height="60" fill="url(#band3)" />
+      <rect x="0" y="100" width="1000" height="50" fill="url(#band4)" />
+      <rect x="0" y="60" width="1000" height="40" fill="url(#band5)" />
+    </g>
+    <polygon points="500,420 100,60 900,60" fill="none" stroke="#2c3e50" stroke-width="2.5" stroke-linejoin="round" />
+    <line x1="180" y1="280" x2="820" y2="280" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.4" />
+    <line x1="250" y1="210" x2="750" y2="210" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.4" />
+    <line x1="320" y1="150" x2="680" y2="150" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.4" />
+    <line x1="400" y1="100" x2="600" y2="100" stroke="#ffffff" stroke-width="1.5" stroke-opacity="0.4" />
+  </g>
+</svg>
