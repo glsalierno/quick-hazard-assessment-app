@@ -3,6 +3,7 @@ pandas>=1.5.0
 pyarrow>=14.0.0
 beautifulsoup4>=4.11.0
 requests>=2.28.0
+tqdm>=4.65.0
 pubchempy>=1.0.4
 openpyxl>=3.1.0
 rdkit>=2023.9.6
@@ -11,7 +12,7 @@ openai>=1.0.0
 pypdf>=4.0.0
 # --- REQUIRED: SDS PDF CAS upload (v1.4) uses MarkItDown → Markdown → regex; without it, extraction returns nothing ---
 # PyPI:   pip install 'markitdown[pdf]'
-# Fork:   https://github.com/glsalierno/markitdown — pip install "markitdown[pdf] @ git+https://github.com/glsalierno/markitdown.git#subdirectory=packages/markitdown"
+# Optional: install MarkItDown from PyPI or from a Git fork if you need unreleased fixes.
 markitdown[pdf]>=0.0.1
 # pdfplumber for robust CAS extraction (tables + text)
 pdfplumber>=0.10.0
@@ -33,5 +34,5 @@ transformers>=4.35.0
 # Optional: add text layer to PDFs (pip install ocrmypdf; needs Tesseract)
 # ocrmypdf>=16.0.0
 # Optional: OECD QSAR Toolbox + VEGA (Windows only; start WebSuite, set QSAR_TOOLBOX_PORT)
-# pip install git+https://github.com/glsalierno/PyQSARToolbox.git
+# pip install PyQSARToolbox  # or install from the upstream PyQSARToolbox repository if needed
 # Optional: Smart CAS extraction with local LLM (pip install -r requirements_hf.txt)

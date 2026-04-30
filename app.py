@@ -296,7 +296,8 @@ with st.sidebar:
                 st.json({k: v for k, v in st.session_state["sds_strategy_override"].items()})
             with st.expander("📋 Strategy env overrides (legacy unified parser)", expanded=False):
                 st.markdown("""
-**SDS PDF CAS upload** uses **v1.4 only** (MarkItDown + regex or Hybrid). See
+**SDS PDF CAS upload** uses **MarkItDown** plus the pipeline you choose in the sidebar
+(Hybrid, fast regex-only, or optional GLiNER2). See
 [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md).
 
 Presets below tweak **USE_DOCLING**, **USE_OCR**, etc. for any code paths that still
@@ -314,17 +315,19 @@ read ``utils.sds_strategy`` (not the primary SDS upload extractor).
         from utils.alternative_extraction import PIPELINE_LABELS, PIPELINE_SIDEBAR_ORDER
 
         _v14_expanded = bool(sds_pdf_utils and sds_regex_extractor)
-        with st.expander("📄 SDS CAS extraction (v1.4 — two pipelines only)", expanded=_v14_expanded):
+        with st.expander("📄 SDS CAS extraction (pipelines)", expanded=_v14_expanded):
             st.markdown(
-                "Only **Hybrid** and **MarkItDown + regex** are supported. "
-                "See [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md) for why other parsers were removed.\n\n"
+                "Choose **Hybrid** (recommended), **MarkItDown + regex only**, or **Parse-then-extract** "
+                "(regex CAS/H/P codes + optional **GLiNER2** — install `pip install -r requirements-gliner2.txt`). "
+                "CAS regexes recognize common SDS labels (C.A.S., CAS-No., RN, Registry Number, Index No., etc.). "
+                "See [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md).\n\n"
                 "**Hybrid:** MarkItDown first; **OCR** (under *Advanced OCR options*) runs only if no CAS is found. "
                 "Requires `pip install 'markitdown[pdf]'`; OCR fallback needs **Poppler** + **Tesseract** or **EasyOCR** on PATH "
                 "or `HAZQUERY_POPPLER_PATH`."
             )
             if not MARKITDOWN_OK:
                 st.warning(
-                    "MarkItDown not installed — v1.4 SDS pipelines cannot run. "
+                    "MarkItDown not installed — SDS PDF pipelines cannot run. "
                     "Run: `pip install 'markitdown[pdf]'`"
                 )
             opts = [k for k in PIPELINE_SIDEBAR_ORDER if k in PIPELINE_LABELS]

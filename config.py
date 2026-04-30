@@ -93,7 +93,8 @@ RECONSTRUCTOR_USE_CONTEXT_FILTER = os.environ.get("RECONSTRUCTOR_USE_CONTEXT_FIL
 )
 USE_OCR = os.environ.get("USE_OCR", "").strip().lower() in ("1", "true", "yes", "on")
 
-# SDS CAS upload (Streamlit): only ``markitdown_fast`` or ``hybrid_md_ocr`` (see docs/SDS_EXTRACTION_PIPELINES.md).
+# SDS CAS upload (Streamlit): ``markitdown_fast``, ``hybrid_md_ocr``, or ``markdown_gliner_regex``
+# (optional GLiNER2; see requirements-gliner2.txt). See docs/SDS_EXTRACTION_PIPELINES.md.
 # Legacy values (e.g. ``default``) are normalized to hybrid at runtime.
 DEFAULT_SDS_EXTRACTION_PIPELINE = (
     (os.environ.get("HAZQUERY_DEFAULT_SDS_PIPELINE") or "hybrid_md_ocr").strip() or "hybrid_md_ocr"
