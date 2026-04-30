@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 220" role="img" aria-labelledby="title desc">
+  <title id="title">Quick Hazard Assessment</title>
+  <desc id="desc">Streamlit app banner: chemical hazard assessment from PubChem and DSSTox</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d3b4a"/>
+      <stop offset="55%" style="stop-color:#145a6e"/>
+      <stop offset="100%" style="stop-color:#0f766e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#5eead4;stop-opacity:0.95"/>
+      <stop offset="100%" style="stop-color:#38bdf8;stop-opacity:0.9"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="220" rx="14" fill="url(#bg)"/>
+  <rect x="32" y="32" width="1136" height="8" rx="4" fill="url(#accent)" opacity="0.85"/>
+  <text x="60" y="118" fill="#f0fdfa" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="42" font-weight="700" letter-spacing="-0.02em">Quick Hazard Assessment</text>
+  <text x="60" y="168" fill="#ccfbf1" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="22" font-weight="400" opacity="0.95">Streamlit app · PubChem · DSSTox · SDS-aware hazard reports</text>
+  <text x="1140" y="188" fill="#99f6e4" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="15" font-weight="600" text-anchor="end">Try the live app ’</text>
+</svg>

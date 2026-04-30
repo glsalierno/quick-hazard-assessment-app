@@ -1,6 +1,8 @@
 """
-Quick Hazard Assessment — Streamlit app.
-Chemical hazard assessment from PubChem + DSSTox local (no API key required).
+Quick Hazard Assessment — Streamlit app (v2.0).
+
+Multi-source hazard assessment (PubChem, DSSTox, ToxValDB, CPDB), optional OPERA QSAR
+from a pre-computed cache, P2OASys matrix scoring, and ToxVal cross-checks where data exist.
 """
 
 from __future__ import annotations
@@ -138,9 +140,6 @@ dsstox_data: Optional[dict[str, Any]] = None
 
 # Title and description
 st.title(f"🧪 {config.APP_TITLE}")
-st.markdown(
-    "Chemical hazard assessment from **PubChem** + **DSSTox local** (no API key required)."
-)
 if not MARKITDOWN_OK:
     st.error(_MARKITDOWN_ERR or "MarkItDown is required for SDS PDF parsing.")
     st.caption("Typed CAS/name still works below. SDS upload is disabled until MarkItDown is installed.")
@@ -293,8 +292,12 @@ read ``utils.sds_strategy`` (not the primary SDS upload extractor).
         pass
 
 st.info(
-    "Enter a **CAS or name** above, or upload an **SDS PDF** below to auto-extract CAS. "
-    "All use **ChemicalAssessmentService** (PubChem + DSSTox + ToxValDB + CPDB)."
+    "**Quick Hazard Assessment v2.0** — Enter a CAS, name, or SMILES — or upload an SDS PDF.\n\n"
+    "• Real-time lookup from PubChem, DSSTox, ToxValDB, CPDB\n"
+    "• **OPERA QSAR** predictions (batch pre-computed, cached)\n"
+    "• **P2OASys** hazard scores (matrix-driven)\n"
+    "• Cross-validation against experimental ToxVal data\n\n"
+    "Core pipeline: **ChemicalAssessmentService** (multi-source evidence)."
 )
 
 # Banner when CAS was chosen from SDS upload or unified parser (results render below this message)
@@ -321,10 +324,10 @@ with st.form("cas_input", clear_on_submit=False):
     if "cas_query_input" not in st.session_state:
         st.session_state["cas_query_input"] = default
     cas = st.text_input(
-        "CAS or chemical name",
+        "CAS, chemical name, or SMILES",
         key="cas_query_input",
-        placeholder="e.g., 67-64-1 or acetone",
-        help="Type directly or upload SDS below to auto-fill.",
+        placeholder="e.g., 67-64-1, acetone, or CC(=O)C",
+        help="Type directly or upload SDS below to auto-fill CAS.",
     )
     submitted = st.form_submit_button("Assess")
 
@@ -441,7 +444,8 @@ if not _hide_examples:
             st.session_state["result_for"] = None  # force re-fetch
             st.rerun()
     st.caption(
-        "**Assessment scope:** one compound per run — each full lookup runs **PubChem + DSSTox + ToxValDB** (and related panels) for **a single CAS** at a time. "
+        "**Assessment scope:** one compound per run — each full lookup runs **PubChem + DSSTox + ToxValDB + CPDB** "
+        "(plus **OPERA** cache / **P2OASys** / ToxVal cross-checks when configured) for **a single resolved CAS** at a time. "
         "Multi-ingredient SDS: extract CAS list, choose one, assess, then switch CAS and run again."
     )
 
