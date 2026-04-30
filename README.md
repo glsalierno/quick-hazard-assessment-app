@@ -1,24 +1,24 @@
-<p align="center">
-  <a href="https://quick-hazard-assessment-app.streamlit.app" title="Open the Streamlit app">
-    <img src="readme-banner.svg" width="920" alt="Quick Hazard Assessment — chemical hazard reports from PubChem and DSSTox" />
+﻿<p align="center">
+  <a href="https://quick-hazard-assessment-v2.streamlit.app/">
+    <img src="hierarchy-banner.svg" width="800" alt="Hierarchy of Controls pyramid" />
   </a>
 </p>
 
-# Quick Hazard Assessment — Streamlit App
+# Quick Hazard Assessment â€” Streamlit App
 
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox** local data. Optional modules (offline REACH dossiers, local LLMs) are configured via environment variables.
 
 Streamlit opens that deployment in the browser:
 
-- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app) **Streamlit App** — Opens the **main** hosted app ([quick-hazard-assessment-app.streamlit.app](https://quick-hazard-assessment-app.streamlit.app)): the default Quick Hazard Assessment flow (CAS/name input, PubChem + DSSTox + related tabs, SDS upload if enabled in that deployment).
-- [![Streamlit App v2.0](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-v2.streamlit.app) **Streamlit App v2.0** — Opens the **v2.0** deployment ([quick-hazard-assessment-v2.streamlit.app](https://quick-hazard-assessment-v2.streamlit.app/)): same core assessment experience plus **v2.0** UI copy (e.g. top info banner), optional **REACH / IUCLID** offline panel when the repo’s demo archive and format paths are present, and **REACH demo** example CAS buttons when `data/reach_demo/reach_subset_examples.json` is shipped. Behavior can differ slightly from main while features are tested on branch `v2.0`.
+- [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app) **Streamlit App** â€” Opens the **main** hosted app ([quick-hazard-assessment-app.streamlit.app](https://quick-hazard-assessment-app.streamlit.app)): the default Quick Hazard Assessment flow (CAS/name input, PubChem + DSSTox + related tabs, SDS upload if enabled in that deployment).
+- [![Streamlit App v2.0](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-v2.streamlit.app) **Streamlit App v2.0** â€” Opens the **v2.0** deployment ([quick-hazard-assessment-v2.streamlit.app](https://quick-hazard-assessment-v2.streamlit.app/)): same core assessment experience plus **v2.0** UI copy (e.g. top info banner), optional **REACH / IUCLID** offline panel when the repoâ€™s demo archive and format paths are present, and **REACH demo** example CAS buttons when `data/reach_demo/reach_subset_examples.json` is shipped. Behavior can differ slightly from main while features are tested on branch `v2.0`.
 
 ---
 
 ## Features
 
 - **Input:** CAS number (e.g. `67-64-1`) or chemical name
-- **DSSTox local:** CAS → DTXSID lookup from a local mapping file (no EPA API key)
+- **DSSTox local:** CAS â†’ DTXSID lookup from a local mapping file (no EPA API key)
 - **PubChem:** Properties, GHS H/P codes with phrase legends, flash point, vapor pressure, IUPAC name, SMILES
 - **Molecular structure:** 2D rendering at the top of the report (client-side [smiles-drawer](https://github.com/reymond-group/smiles-drawer))
 - **Graceful fallback:** If the DSSTox file is missing, the app runs in **PubChem-only** mode
@@ -27,7 +27,7 @@ Streamlit opens that deployment in the browser:
 
 *Enhanced predictions with OPERA QSAR may be available in a separate command-line workflow; OPERA is not bundled with this Streamlit deployment.*
 
-**v1.4 SDS upload:** **MarkItDown + regex** and **Hybrid** (MarkItDown → OCR if no CAS) only — see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md). 
+**v1.4 SDS upload:** **MarkItDown + regex** and **Hybrid** (MarkItDown â†’ OCR if no CAS) only â€” see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md). 
 
 ---
 
@@ -48,7 +48,7 @@ Streamlit opens that deployment in the browser:
    ```
 
 3. **DSSTox mapping (optional but recommended)**
-   - Download the [EPA Figshare CAS–DTXSID mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566) (CSV).
+   - Download the [EPA Figshare CASâ€“DTXSID mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566) (CSV).
    - Place it in the **`DSS/`** folder (e.g. `DSS/cas_dtxsid_mapping.csv`).
    - See **`DSS/README.md`** for column names, Excel support, and update instructions.
    - If the file is missing, the app runs in PubChem-only mode.
@@ -61,7 +61,7 @@ Streamlit opens that deployment in the browser:
 
    **Tip:** Test the app locally before deploying to Streamlit Cloud. Each Cloud redeploy clones the repo and fetches Git LFS files, which consumes your LFS bandwidth quota. Running locally avoids LFS entirely.
 
-5. **Optional — Local LLM (Qwen / Gemma) for SDS extraction**
+5. **Optional â€” Local LLM (Qwen / Gemma) for SDS extraction**
    - Install [Ollama](https://ollama.com) on your machine.
    - In a terminal: `ollama pull qwen2:0.5b` and/or `ollama pull gemma2:2b`.
    - The app uses `OLLAMA_HOST` and `OLLAMA_MODEL` (see [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md)). Nothing is pushed to GitHub except instructions; models stay local.
@@ -83,9 +83,9 @@ Streamlit opens that deployment in the browser:
 8. **SDS CAS extraction (two pipelines only)**
    - Full rationale and list of **removed** parsers: **[docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md)**.
    - Install: `pip install "markitdown[pdf]"` (see `requirements.txt`). **Default:** **Hybrid** (`hybrid_md_ocr`). Valid values: `hybrid_md_ocr` | `markitdown_fast`. Legacy env values (e.g. `default`, `ocr_tesseract`) are **remapped** to a supported pipeline.
-   - Sidebar: **“SDS CAS extraction (v1.4 — two pipelines only)”** — **Hybrid** or **MarkItDown + regex**.
+   - Sidebar: **â€œSDS CAS extraction (v1.4 â€” two pipelines only)â€** â€” **Hybrid** or **MarkItDown + regex**.
    - Caching: `cache/{sha256}/` (see `utils/cache_manager.py`). Env: `HAZQUERY_EXTRACTION_PIPELINE`, `HAZQUERY_DEFAULT_SDS_PIPELINE`, `HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`, `HAZQUERY_OCR_ENGINE`, `HAZQUERY_TESSERACT_PSM`.
-   - Benchmark: `python tests/test_extraction_pipelines.py --folder "sds_examples" --limit 20` → `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
+   - Benchmark: `python tests/test_extraction_pipelines.py --folder "sds_examples" --limit 20` â†’ `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
 
 9. **Windows terminal PATH & pip script warnings**
    - If pip warns that scripts are installed outside `PATH`, open the integrated terminal **from this workspace** so `.vscode/settings.json` applies: it appends common **user** Python `Scripts` folders and sets `HF_HUB_DISABLE_SYMLINKS_WARNING=1` and `TF_ENABLE_ONEDNN_OPTS=0` to reduce Hugging Face / oneDNN noise.
@@ -98,10 +98,10 @@ Streamlit opens that deployment in the browser:
      ```
    - Optional: `--limit N` for a subset. Outputs `artifacts/sds_parsing_accuracy_report.md`, `.csv`, and `sds_parsing_accuracy_summary.json` (micro/macro F1, pooled TP/FP/FN).
 
-11. **IUCLID / offline REACH (optional)** — see [Offline REACH / IUCLID](#offline-reach--iuclid-optional) below.
+11. **IUCLID / offline REACH (optional)** â€” see [Offline REACH / IUCLID](#offline-reach--iuclid-optional) below.
 
 12. **P2OASys validation vs `fastP2OASys` reference CSVs (`--source fast`)**
-    - Compares **category-level** expert scores (columns = chemical **names**, not CAS) to scores from this app’s pipeline: `ChemicalAssessmentService` → `build_hazard_data` → `compute_p2oasys_scores`, with the same optional **IARC / ODP–GWP / IPCC** and **IUCLID** merges as the P2OASys tab (no QSAR Toolbox in the script).
+    - Compares **category-level** expert scores (columns = chemical **names**, not CAS) to scores from this appâ€™s pipeline: `ChemicalAssessmentService` â†’ `build_hazard_data` â†’ `compute_p2oasys_scores`, with the same optional **IARC / ODPâ€“GWP / IPCC** and **IUCLID** merges as the P2OASys tab (no QSAR Toolbox in the script).
     - Default reference folder: sibling `../fastP2OASys/` under `hazquery` (override with `--reference-dir`).
     - Run from the repo root:
       ```bash
@@ -112,7 +112,7 @@ Streamlit opens that deployment in the browser:
     - See also [docs/P2OASYS_LOOKUP_SOURCES.md](docs/P2OASYS_LOOKUP_SOURCES.md) (section 7).
 
 13. **P2OASys CAS validation (offline expert, default for `run_full_validation`)**
-    - **`--source expert`** (recommended for CAS lists): deterministic, no browser. For each CAS, loads **`../sds examples/scripts/lookup_p2oasys_by_cas.py`** (`get_best_match`) to (1) find rows in **`allP2OASys_*`** `P2OASys_Database_Results*.csv`, (2) match product **Name** to a column in **`fastP2OASys/P2OASys_Category_Scores_Data_*.csv`**, (3) read expert **top-level category** scores and compare to the app’s `_category_max` per category.
+    - **`--source expert`** (recommended for CAS lists): deterministic, no browser. For each CAS, loads **`../sds examples/scripts/lookup_p2oasys_by_cas.py`** (`get_best_match`) to (1) find rows in **`allP2OASys_*`** `P2OASys_Database_Results*.csv`, (2) match product **Name** to a column in **`fastP2OASys/P2OASys_Category_Scores_Data_*.csv`**, (3) read expert **top-level category** scores and compare to the appâ€™s `_category_max` per category.
     - Environment variables (optional): **`P2OASYS_ARCHIVE_DIR`**, **`FAST_P2OASYS_DIR`**, **`P2OASYS_LOOKUP_SCRIPT`** (override path to `lookup_p2oasys_by_cas.py` if not under `GHhaz4/sds examples/scripts/`).
     - **Orchestrator** (`scripts/run_full_validation.py`, **`--source expert` by default**):
       ```bash
@@ -220,16 +220,16 @@ On Linux/macOS, run the app locally without OPERA, or set `HAZQUERY_OPERA_EXE` t
 
 The Streamlit app can read **offline REACH study-result dossiers** (`.i6z` inside a `.zip`) and decode IUCLID picklist codes when you install the **IUCLID format** phrase package.
 
-> **Demo vs full database:** Anything committed under `data/reach_demo/` is a **demo subset** for GitHub / Streamlit Cloud size limits. It is **not** the official full REACH export. **Most substances have no dossier** in that zip; study text, endpoints, and GHS-style rows can be **missing or incomplete** even when a dossier exists. The app uses **heuristic** XML parsing, not a certified IUCLID engine. **Do not** use the demo bundle for regulatory submissions, registration completeness, or as a substitute for ECHA’s own tools and downloads — use a **local** full archive when you need authoritative coverage.
+> **Demo vs full database:** Anything committed under `data/reach_demo/` is a **demo subset** for GitHub / Streamlit Cloud size limits. It is **not** the official full REACH export. **Most substances have no dossier** in that zip; study text, endpoints, and GHS-style rows can be **missing or incomplete** even when a dossier exists. The app uses **heuristic** XML parsing, not a certified IUCLID engine. **Do not** use the demo bundle for regulatory submissions, registration completeness, or as a substitute for ECHAâ€™s own tools and downloads â€” use a **local** full archive when you need authoritative coverage.
 
 ### Downloading the full official IUCLID and REACH packages (ECHA)
 
-Use ECHA’s **[IUCLID 6 downloads](https://iuclid6.echa.europa.eu/downloads)** page in a browser. That page lists the current **IUCLID 6 format** bundle and the **REACH study results dossiers** bulk export (names and versions change over time; pick the latest entries that match those descriptions). Accept ECHA’s terms if the site asks you to.
+Use ECHAâ€™s **[IUCLID 6 downloads](https://iuclid6.echa.europa.eu/downloads)** page in a browser. That page lists the current **IUCLID 6 format** bundle and the **REACH study results dossiers** bulk export (names and versions change over time; pick the latest entries that match those descriptions). Accept ECHAâ€™s terms if the site asks you to.
 
-1. **IUCLID 6 format (phrase / picklist / XSD)** — Download the **IUCLID 6 format** ZIP (often named like `IUCLID6_6_format_*.zip`, on the order of ~100 MB). Extract it to a folder on your machine. Point **`IUCLID_FORMAT_DIR`** at the **extracted** folder (the directory that contains `dcr.xml` and the phrase / properties files). The same tree can be copied into this repo as `data/iuclid_format/IUCLID_6_9_0_0_format/` for demos only — it does **not** replace downloading from ECHA when you update or audit your local setup.
-2. **REACH study results dossiers (full bulk)** — Download the **REACH study results dossiers** archive (`reach_study_results_dossiers_*.zip`). That file is **very large** (~10+ GB or more, depending on release) and contains the per-substance **`.i6z`** dossiers. Point **`OFFLINE_LOCAL_ARCHIVE`** at that `.zip` **or** at a folder where you have extracted the `.i6z` files.
+1. **IUCLID 6 format (phrase / picklist / XSD)** â€” Download the **IUCLID 6 format** ZIP (often named like `IUCLID6_6_format_*.zip`, on the order of ~100 MB). Extract it to a folder on your machine. Point **`IUCLID_FORMAT_DIR`** at the **extracted** folder (the directory that contains `dcr.xml` and the phrase / properties files). The same tree can be copied into this repo as `data/iuclid_format/IUCLID_6_9_0_0_format/` for demos only â€” it does **not** replace downloading from ECHA when you update or audit your local setup.
+2. **REACH study results dossiers (full bulk)** â€” Download the **REACH study results dossiers** archive (`reach_study_results_dossiers_*.zip`). That file is **very large** (~10+ GB or more, depending on release) and contains the per-substance **`.i6z`** dossiers. Point **`OFFLINE_LOCAL_ARCHIVE`** at that `.zip` **or** at a folder where you have extracted the `.i6z` files.
 
-**This repository vs the official downloads:** This repo ships **only a demo portion** of the dossier bulk (`data/reach_demo/reach_subset.zip` — a small hand-picked or script-built subset for GitHub / Streamlit Cloud). It may also ship a **copy of the format tree** under `data/iuclid_format/` for hosted decoding. Neither replaces the **full** REACH dossier archive from ECHA; for complete substance coverage you **must** download the bulk `reach_study_results_dossiers_*.zip` (or equivalent) yourself from the link above and set `OFFLINE_LOCAL_ARCHIVE` locally.
+**This repository vs the official downloads:** This repo ships **only a demo portion** of the dossier bulk (`data/reach_demo/reach_subset.zip` â€” a small hand-picked or script-built subset for GitHub / Streamlit Cloud). It may also ship a **copy of the format tree** under `data/iuclid_format/` for hosted decoding. Neither replaces the **full** REACH dossier archive from ECHA; for complete substance coverage you **must** download the bulk `reach_study_results_dossiers_*.zip` (or equivalent) yourself from the link above and set `OFFLINE_LOCAL_ARCHIVE` locally.
 
 Configure paths via environment variables or `.streamlit/secrets.toml` (see `.streamlit/secrets.example.toml`):
 
@@ -242,12 +242,12 @@ The app extracts or scans the archive location and builds caches under `OFFLINE_
 
 ### IUCLID offline data for Streamlit Cloud
 
-The full REACH dossier bulk (~10+ GB) **must not** be committed to GitHub. For **Streamlit Community Cloud**, commit **as much as is practical** within GitHub / LFS limits: the format tree plus a zip of selected `.i6z` dossiers. That zip is still a **demo database** relative to full REACH — **most CAS numbers will have no dossier**, and fields may be **missing or incomplete** even when present.
+The full REACH dossier bulk (~10+ GB) **must not** be committed to GitHub. For **Streamlit Community Cloud**, commit **as much as is practical** within GitHub / LFS limits: the format tree plus a zip of selected `.i6z` dossiers. That zip is still a **demo database** relative to full REACH â€” **most CAS numbers will have no dossier**, and fields may be **missing or incomplete** even when present.
 
 | Path | Purpose |
 |------|---------|
 | `data/iuclid_format/IUCLID_6_9_0_0_format/` | Extracted **IUCLID 6 format** tree (phrase / picklist / XSD; ~100 MB). Copy from your local `IUCLID 6 9.0.0_format` folder; use a **name without spaces**. This is the **format** package (decoding), not the dossier bulk. |
-| `data/reach_demo/reach_subset.zip` | Zip of selected `.i6z` dossiers — **demo / UI / teaching** only. Increase count until file size limits bite; coverage stays **non-exhaustive**. See **`data/reach_demo/README.md`**. |
+| `data/reach_demo/reach_subset.zip` | Zip of selected `.i6z` dossiers â€” **demo / UI / teaching** only. Increase count until file size limits bite; coverage stays **non-exhaustive**. See **`data/reach_demo/README.md`**. |
 
 The REACH / IUCLID panel is **supplementary** and, when using these committed paths, **non-authoritative** (see the disclaimer blockquote above).
 
@@ -269,9 +269,9 @@ powershell -ExecutionPolicy Bypass -File scripts/run_streamlit_with_offline_reac
 ```
 (Use `pwsh` instead of `powershell` if you have PowerShell 7 installed.)
 
-Optional: `-Port 8502`. Then open **Hazard assessment** → expand **REACH / IUCLID (offline dossier)** after assessing a CAS.
+Optional: `-Port 8502`. Then open **Hazard assessment** â†’ expand **REACH / IUCLID (offline dossier)** after assessing a CAS.
 
-### IUCLID format package (phrase mapping) — recap
+### IUCLID format package (phrase mapping) â€” recap
 
 The **IUCLID 6 format** ZIP is obtained from the same **[IUCLID 6 downloads](https://iuclid6.echa.europa.eu/downloads)** page as in [Downloading the full official IUCLID and REACH packages (ECHA)](#downloading-the-full-official-iuclid-and-reach-packages-echa); set **`IUCLID_FORMAT_DIR`** to the extracted folder (the directory that contains `dcr.xml`, `*.properties`, etc.).
 
@@ -292,7 +292,7 @@ Replace the CAS as needed. Use `--refresh` to force re-parsing cached dossiers.
 
 For **faster** DSSTox and ToxValDB access, build the local SQLite database:
 
-1. Add a CAS → DTXSID mapping file under `DSS/` (see `DSS/README.md` and [EPA Figshare DSSTox mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566)).
+1. Add a CAS â†’ DTXSID mapping file under `DSS/` (see `DSS/README.md` and [EPA Figshare DSSTox mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566)).
 2. Optionally add COMPTOX ToxValDB Excel exports under `COMPTOX_Public (Data Excel Files Folder)/Data Excel Files/`.
 3. Run:
 
@@ -309,15 +309,15 @@ For **faster** DSSTox and ToxValDB access, build the local SQLite database:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `OFFLINE_LOCAL_ARCHIVE` | No | Path to REACH `reach_study_results_dossiers_*.zip` or folder of `.i6z` files. |
-| `OFFLINE_DOSSIER_INFO_XLSX` | No | Optional Excel index for dossier metadata (CAS ↔ UUID). |
+| `OFFLINE_DOSSIER_INFO_XLSX` | No | Optional Excel index for dossier metadata (CAS â†” UUID). |
 | `OFFLINE_CACHE_DIR` | No | Where offline snapshots and `offline_snippets_cache.db` live (default `data/offline_cache`). |
 | `IUCLID_FORMAT_DIR` | No | Extracted IUCLID format bundle for picklist / phrase decoding. |
 | `CHEMICAL_DB_PATH` | No | Override path to SQLite chemical DB (default `data/chemical_db.sqlite`). |
 | `P2OASYS_MATRIX_PATH` | No | P2OASys hazard matrix Excel (default under `data/`). If missing, a dev placeholder is auto-written unless `P2OASYS_DISABLE_AUTO_PLACEHOLDER=1`. |
 | `QSAR_TOOLBOX_PORT` | No | Local OECD QSAR Toolbox WebSuite port (Windows; optional). |
-| `USE_PUBCHEM_CAS_VALIDATION` | No | `1` / `0` — validate extracted CAS against PubChem (default on). |
+| `USE_PUBCHEM_CAS_VALIDATION` | No | `1` / `0` â€” validate extracted CAS against PubChem (default on). |
 | `SHOW_ONLY_PUBCHEM_VERIFIED` | No | `1` hides SDS CAS not found in PubChem. |
-| `MIN_CAS_CONFIDENCE` | No | Minimum confidence (0–1) to show SDS extractions in UI. |
+| `MIN_CAS_CONFIDENCE` | No | Minimum confidence (0â€“1) to show SDS extractions in UI. |
 | `HAZQUERY_DISABLE_DOCLING` | No | `1` to skip Docling on constrained hosts. |
 | `OLLAMA_HOST`, `OLLAMA_MODEL` | No | Local LLM for optional SDS flows (see `docs/OLLAMA_SETUP.md`). |
 
@@ -330,8 +330,8 @@ Contributors can install dev tools (e.g. **vulture**) with `pip install -r requi
 1. Push this app to a GitHub repo (e.g. under `quick_hazard_assessment`, in a branch like `feature/streamlit-app` or in a subfolder).
 2. Go to [share.streamlit.io](https://share.streamlit.io), sign in with GitHub, and deploy.
 3. Set **Main file path** to `app.py` and **Root directory** to the folder that contains `app.py` (usually the repository root).
-4. If you use the DSSTox file: the repo is **Git LFS–ready** (see below). Add the file to `DSS/`, commit, and push; LFS will store it. Or omit it and run in PubChem-only mode.
-5. **`packages.txt`:** Put **only** valid Debian package names, **one per line**. Do not use `#` comments — Streamlit Community Cloud does not ignore them; tokens from comment lines are passed to `apt-get` and the dependency step fails.
+4. If you use the DSSTox file: the repo is **Git LFSâ€“ready** (see below). Add the file to `DSS/`, commit, and push; LFS will store it. Or omit it and run in PubChem-only mode.
+5. **`packages.txt`:** Put **only** valid Debian package names, **one per line**. Do not use `#` comments â€” Streamlit Community Cloud does not ignore them; tokens from comment lines are passed to `apt-get` and the dependency step fails.
 
 Update the badge URL in this README to your deployed app URL (e.g. `https://your-app-name.streamlit.app`).
 
@@ -341,7 +341,7 @@ Update the badge URL in this README to your deployed app URL (e.g. `https://your
 
 The DSSTox mapping in **`DSS/`** can be large. The repo uses **Git LFS** so GitHub accepts it and clones stay fast.
 
-1. **Install Git LFS** (one-time): [git-lfs.com](https://git-lfs.com) → then run:
+1. **Install Git LFS** (one-time): [git-lfs.com](https://git-lfs.com) â†’ then run:
    ```bash
    git lfs install
    ```
@@ -365,7 +365,7 @@ See **`DSS/README.md`** for download links and update instructions.
 For **faster lookups**, you can build a single SQLite database that combines DSSTox identifiers and ToxValDB toxicity data.
 
 1. **One-time setup**
-   - Ensure **DSS** has a CAS–DTXSID CSV (e.g. `DSS/cas_dtxsid_mapping.csv`).
+   - Ensure **DSS** has a CASâ€“DTXSID CSV (e.g. `DSS/cas_dtxsid_mapping.csv`).
    - Optionally place the **COMPTOX ToxValDB Excel** files in  
      `COMPTOX_Public (Data Excel Files Folder)/Data Excel Files/` (each `.xlsx` will be read).
 2. **Build the database**
@@ -383,35 +383,35 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 ## Project layout
 
 ```
-├── app.py                 # Main Streamlit app
-├── config.py              # App and path settings
-├── requirements.txt
-├── .gitattributes         # Git LFS tracking for DSS/*.csv, DSS/*.xlsx
-├── DSS/                   # DSSTox local database (LFS-tracked)
-│   ├── README.md          # Source, LFS instructions, update steps
-│   └── cas_dtxsid_mapping.csv   # (user-downloaded; add to repo via LFS)
-├── COMPTOX_Public (Data Excel Files Folder)/   # ToxValDB Excel files (optional; LFS)
-│   └── Data Excel Files/*.xlsx
-├── COMPTOX_Public (Data MySQL Dump File Folder)/   # MySQL dump (optional)
-├── data/                  # Built SQLite DB (after setup_chemical_db.py)
-│   └── chemical_db.sqlite
-├── docs/
-│   └── OLLAMA_SETUP.md    # How to install Ollama + Qwen/Gemma locally (models stay on your machine)
-├── scripts/
-│   ├── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
-│   ├── run_sds_examples.py   # Batch run SDS extraction on PDFs in sds_examples/ (optional)
-│   ├── make_searchable_pdf.py # Add text layer to a PDF (ocrmypdf + Tesseract)
-│   └── test_sds_readers.py   # Test SDS extraction + OCR on example PDFs
-└── utils/
-    ├── chemical_db.py     # SQLite DSSTox + ToxValDB (fast lookups)
-    ├── dsstox_local.py    # DSSTox loader from DSS/ (CSV/Excel fallback)
-    ├── cas_validator.py   # CAS validation/normalization
-    ├── pubchem_client.py  # PubChem API wrapper
-    ├── ghs_formatter.py   # GHS H/P phrase formatting
-    ├── smiles_drawer.py   # 2D structure (smiles-drawer)
-    ├── sds_pdf_utils.py   # PDF text extraction for SDS uploads
-    ├── sds_regex_extractor.py  # SDS field extraction (regex, Phase 1)
-    └── sds_compare.py     # SDS vs PubChem comparison report
+â”œâ”€â”€ app.py                 # Main Streamlit app
+â”œâ”€â”€ config.py              # App and path settings
+â”œâ”€â”€ requirements.txt
+â”œâ”€â”€ .gitattributes         # Git LFS tracking for DSS/*.csv, DSS/*.xlsx
+â”œâ”€â”€ DSS/                   # DSSTox local database (LFS-tracked)
+â”‚   â”œâ”€â”€ README.md          # Source, LFS instructions, update steps
+â”‚   â””â”€â”€ cas_dtxsid_mapping.csv   # (user-downloaded; add to repo via LFS)
+â”œâ”€â”€ COMPTOX_Public (Data Excel Files Folder)/   # ToxValDB Excel files (optional; LFS)
+â”‚   â””â”€â”€ Data Excel Files/*.xlsx
+â”œâ”€â”€ COMPTOX_Public (Data MySQL Dump File Folder)/   # MySQL dump (optional)
+â”œâ”€â”€ data/                  # Built SQLite DB (after setup_chemical_db.py)
+â”‚   â””â”€â”€ chemical_db.sqlite
+â”œâ”€â”€ docs/
+â”‚   â””â”€â”€ OLLAMA_SETUP.md    # How to install Ollama + Qwen/Gemma locally (models stay on your machine)
+â”œâ”€â”€ scripts/
+â”‚   â”œâ”€â”€ setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
+â”‚   â”œâ”€â”€ run_sds_examples.py   # Batch run SDS extraction on PDFs in sds_examples/ (optional)
+â”‚   â”œâ”€â”€ make_searchable_pdf.py # Add text layer to a PDF (ocrmypdf + Tesseract)
+â”‚   â””â”€â”€ test_sds_readers.py   # Test SDS extraction + OCR on example PDFs
+â””â”€â”€ utils/
+    â”œâ”€â”€ chemical_db.py     # SQLite DSSTox + ToxValDB (fast lookups)
+    â”œâ”€â”€ dsstox_local.py    # DSSTox loader from DSS/ (CSV/Excel fallback)
+    â”œâ”€â”€ cas_validator.py   # CAS validation/normalization
+    â”œâ”€â”€ pubchem_client.py  # PubChem API wrapper
+    â”œâ”€â”€ ghs_formatter.py   # GHS H/P phrase formatting
+    â”œâ”€â”€ smiles_drawer.py   # 2D structure (smiles-drawer)
+    â”œâ”€â”€ sds_pdf_utils.py   # PDF text extraction for SDS uploads
+    â”œâ”€â”€ sds_regex_extractor.py  # SDS field extraction (regex, Phase 1)
+    â””â”€â”€ sds_compare.py     # SDS vs PubChem comparison report
 ```
 
 ---
@@ -428,3 +428,4 @@ If this tool contributes to your research, please cite:
 ## License
 
 MIT (see [LICENSE](LICENSE)).
+
