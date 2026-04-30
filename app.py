@@ -373,6 +373,7 @@ read ``utils.sds_strategy`` (not the primary SDS upload extractor).
 st.info(
     "**Quick Hazard Assessment v2.0** — Enter a CAS, name, or SMILES and click **Assess**, or upload an SDS PDF: **PubChem-valid** CAS only are listed; **one** valid CAS runs the assessment automatically; **several** show as buttons to click.\n\n"
     "• Real-time lookup from PubChem, DSSTox, ToxValDB, CPDB\n"
+    "• **REACH** / **IUCLID**\n"
     "• **OPERA QSAR** predictions (batch pre-computed, cached)\n\n"
     "Core pipeline: **ChemicalAssessmentService** (multi-source evidence)."
 )
