@@ -50,6 +50,53 @@ def _is_assessment_result(obj: Any) -> bool:
     return obj is not None and hasattr(obj, "identity") and hasattr(obj, "pubchem_data")
 
 
+def _reach_iuclid_panel_unconfigured_fallback(code: str) -> None:
+    """
+    Same UX as ``render_reach_iuclid_panel_unconfigured`` when that helper is missing from an
+    older ``iuclid_integration`` (avoids ``ImportError: cannot import name ...`` on partial deploys).
+    """
+    with st.expander("REACH / IUCLID (offline dossier)", expanded=False):
+        try:
+            from services.config import ServiceConfig
+
+            on_cloud = ServiceConfig.is_streamlit_cloud()
+        except Exception:
+            on_cloud = False
+        cloud_note = (
+            "**Streamlit Cloud:** large REACH / IUCLID archives are not stored in GitHub. "
+            "Use a **local** install with ``OFFLINE_LOCAL_ARCHIVE`` pointing at your dossier ``.zip`` / ``.7z`` "
+            "or a folder of ``.i6z`` files, or host a small demo subset under the repo if you need Cloud demos.\n\n"
+        )
+        if code == "unset":
+            st.info(
+                (cloud_note if on_cloud else "")
+                + "🔒 **IUCLID offline lookup is not configured.** "
+                "Set **`OFFLINE_LOCAL_ARCHIVE`** in Streamlit **Secrets** (cloud) or your shell / ``.env`` (local) "
+                "to your REACH study-results archive or a folder of extracted ``.i6z`` dossiers. "
+                "See README → **Offline REACH / IUCLID (optional)**."
+            )
+        elif code == "badpath":
+            st.warning(
+                "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set but could not be read as a path "
+                "on this host. Fix the value in Secrets or the environment."
+            )
+        else:
+            st.warning(
+                (cloud_note if on_cloud else "")
+                + "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set, but that path **does not exist** "
+                "or is unreadable on this server. Cloud paths differ from a laptop — use a path inside the deployed "
+                "repo, mount external storage, or run locally with an absolute path to your archive."
+            )
+        st.caption(
+            "Secrets: top-level TOML key ``OFFLINE_LOCAL_ARCHIVE`` (same spelling as the environment variable). "
+            "Optional: ``OFFLINE_DOSSIER_INFO_XLSX``, ``IUCLID_FORMAT_DIR``."
+        )
+        try:
+            st.page_link("pages/02_Offline_Loader_Test.py", label="Open **Offline ECHA loader** test page", icon="🧪")
+        except Exception:
+            st.caption("Sidebar → **Offline ECHA loader** to verify paths and snapshots.")
+
+
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
 
@@ -544,18 +591,21 @@ if current_query:
             st.markdown("---")
 
             try:
-                from unified_hazard_report.iuclid_integration import (
-                    offline_reach_archive_status,
-                    render_reach_iuclid_panel,
-                    render_reach_iuclid_panel_unconfigured,
-                )
+                import unified_hazard_report.iuclid_integration as _iu_mod
+
+                offline_reach_archive_status = _iu_mod.offline_reach_archive_status
+                render_reach_iuclid_panel = _iu_mod.render_reach_iuclid_panel
+                _iu_render_unconfigured = getattr(_iu_mod, "render_reach_iuclid_panel_unconfigured", None)
 
                 _iu_ok, _iu_code = offline_reach_archive_status()
                 if not _iu_ok:
-                    render_reach_iuclid_panel_unconfigured(_iu_code)
+                    if _iu_render_unconfigured is not None:
+                        _iu_render_unconfigured(_iu_code)
+                    else:
+                        _reach_iuclid_panel_unconfigured_fallback(_iu_code)
                 else:
                     render_reach_iuclid_panel(str(clean_cas))
-            except ModuleNotFoundError as exc:
+            except (ImportError, ModuleNotFoundError) as exc:
                 logging.getLogger(__name__).warning("REACH / IUCLID integration import failed: %s", exc)
                 with st.expander("REACH / IUCLID (offline dossier)", expanded=False):
                     st.info(
