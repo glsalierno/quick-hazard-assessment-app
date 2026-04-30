@@ -98,6 +98,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 2. Go to [share.streamlit.io](https://share.streamlit.io), sign in with GitHub, and deploy.
 3. Set **Main file path** to `app.py` and **Root directory** to the folder that contains `app.py` (e.g. repo root or `GHhaz2`).
 4. If you use the DSSTox file: the repo is **Git LFS–ready** (see below). Add the file to `DSS/`, commit, and push; LFS will store it. Or omit it and run in PubChem-only mode.
+5. **`packages.txt`:** Put **only** valid Debian package names, **one per line**. Do not use `#` comments — Streamlit Community Cloud does not ignore them; tokens from comment lines are passed to `apt-get` and the dependency step fails.
 
 Update the badge URL in this README to your deployed app URL (e.g. `https://your-app-name.streamlit.app`).
 
