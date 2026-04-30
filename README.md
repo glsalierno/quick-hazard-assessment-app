@@ -1,4 +1,9 @@
-﻿
+﻿<p align="center">
+  <a href="https://quick-hazard-assessment-v2.streamlit.app/">
+    <img src="hierarchy-banner.svg" width="800" alt="Hierarchy of Controls pyramid" />
+  </a>
+</p>
+
 # Quick Hazard Assessment â€” Streamlit App
 
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox local** (no API key required). Part of the [quick_hazard_assessment](https://github.com/glsalierno/quick_hazard_assessment) ecosystem.
@@ -145,4 +150,5 @@ If this tool contributes to your research, please cite:
 ## License
 
 MIT (see [LICENSE](LICENSE)).
+
 
