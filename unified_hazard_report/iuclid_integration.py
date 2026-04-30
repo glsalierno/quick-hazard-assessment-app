@@ -201,6 +201,57 @@ def get_offline_context(archive_fingerprint: str) -> Any:
         return None
 
 
+def render_reach_iuclid_panel_unconfigured(code: str) -> None:
+    """
+    Show a single REACH / IUCLID expander when no usable offline archive is configured.
+
+    Used on Streamlit Cloud (no multi-GB ECHA bundle in the repo) and local runs without
+    ``OFFLINE_LOCAL_ARCHIVE``. Avoids calling :func:`render_reach_iuclid_panel`, which would
+    duplicate messaging and may touch loader paths unnecessarily.
+    """
+    with st.expander("REACH / IUCLID (offline dossier)", expanded=False):
+        try:
+            from services.config import ServiceConfig
+
+            on_cloud = ServiceConfig.is_streamlit_cloud()
+        except Exception:
+            on_cloud = False
+
+        cloud_note = (
+            "**Streamlit Cloud:** large REACH / IUCLID archives are not stored in GitHub. "
+            "Use a **local** install with ``OFFLINE_LOCAL_ARCHIVE`` pointing at your dossier ``.zip`` / ``.7z`` "
+            "or a folder of ``.i6z`` files, or host a small demo subset under the repo if you need Cloud demos.\n\n"
+        )
+        if code == "unset":
+            st.info(
+                (cloud_note if on_cloud else "")
+                + "🔒 **IUCLID offline lookup is not configured.** "
+                "Set **`OFFLINE_LOCAL_ARCHIVE`** in Streamlit **Secrets** (cloud) or your shell / ``.env`` (local) "
+                "to your REACH study-results archive or a folder of extracted ``.i6z`` dossiers. "
+                "See README → **Offline REACH / IUCLID (optional)**."
+            )
+        elif code == "badpath":
+            st.warning(
+                "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set but could not be read as a path "
+                "on this host. Fix the value in Secrets or the environment."
+            )
+        else:
+            st.warning(
+                (cloud_note if on_cloud else "")
+                + "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set, but that path **does not exist** "
+                "or is unreadable on this server. Cloud paths differ from a laptop — use a path inside the deployed "
+                "repo, mount external storage, or run locally with an absolute path to your archive."
+            )
+        st.caption(
+            "Secrets: top-level TOML key ``OFFLINE_LOCAL_ARCHIVE`` (same spelling as the environment variable). "
+            "Optional: ``OFFLINE_DOSSIER_INFO_XLSX``, ``IUCLID_FORMAT_DIR``."
+        )
+        try:
+            st.page_link("pages/02_Offline_Loader_Test.py", label="Open **Offline ECHA loader** test page", icon="🧪")
+        except Exception:
+            st.caption("Sidebar → **Offline ECHA loader** to verify paths and snapshots.")
+
+
 def render_reach_iuclid_panel(clean_cas: str) -> None:
     """
     Option A: dossier index (name, EC, UUID, infocard URL).

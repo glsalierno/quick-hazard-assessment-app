@@ -546,24 +546,26 @@ if current_query:
             st.markdown("---")
 
             try:
-                from unified_hazard_report.iuclid_integration import offline_reach_archive_status, render_reach_iuclid_panel
+                from unified_hazard_report.iuclid_integration import (
+                    offline_reach_archive_status,
+                    render_reach_iuclid_panel,
+                    render_reach_iuclid_panel_unconfigured,
+                )
 
                 _iu_ok, _iu_code = offline_reach_archive_status()
                 if not _iu_ok:
-                    if _iu_code == "unset":
-                        st.info(
-                            "**IUCLID (offline REACH):** not configured on this host. "
-                            "Set **`OFFLINE_LOCAL_ARCHIVE`** in Streamlit **Secrets** (cloud) or your shell / `.env` (local) "
-                            "to the REACH dossiers `.zip` or a folder of `.i6z` files. "
-                            "Large ECHA archives are not bundled in the GitHub repo — see README → **Offline REACH / IUCLID (optional)**."
-                        )
-                    else:
-                        st.warning(
-                            "**IUCLID (offline REACH):** `OFFLINE_LOCAL_ARCHIVE` is set but that path is missing or unreadable "
-                            f"on this server (`{_iu_code}`). Cloud paths differ from a laptop — use a repo-relative path, "
-                            "a small committed subset, or host the archive externally."
-                        )
-                render_reach_iuclid_panel(str(clean_cas))
+                    render_reach_iuclid_panel_unconfigured(_iu_code)
+                else:
+                    render_reach_iuclid_panel(str(clean_cas))
+            except ModuleNotFoundError as exc:
+                logging.getLogger(__name__).warning("REACH / IUCLID integration import failed: %s", exc)
+                with st.expander("REACH / IUCLID (offline dossier)", expanded=False):
+                    st.info(
+                        "🔒 **IUCLID offline integration is not available** in this deployment "
+                        f"({type(exc).__name__}: `{exc}`). "
+                        "Run from a full repo checkout or install missing packages; REACH dossiers still require "
+                        "``OFFLINE_LOCAL_ARCHIVE`` locally."
+                    )
             except Exception as exc:
                 logging.getLogger(__name__).exception("REACH / IUCLID panel failed")
                 st.error(f"REACH / IUCLID panel error: **{type(exc).__name__}:** {exc}")
