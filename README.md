@@ -1,3 +1,8 @@
+<p align="center">
+  <a href="https://quick-hazard-assessment-app.streamlit.app" title="Open the Streamlit app">
+    <img src="readme-banner.svg" width="920" alt="Quick Hazard Assessment — chemical hazard reports from PubChem and DSSTox" />
+  </a>
+</p>
 
 # Quick Hazard Assessment — Streamlit App
 
@@ -138,9 +143,9 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 ---
 
-## Docker (Windows containers + OPERA)
+## Docker (Windows containers + OPERA + optional IUCLID)
 
-This project now includes a Windows-container Docker setup so local OPERA (`OPERA.exe`) can be mounted and used without bundling large binaries in the image.
+This project includes a **Windows-container** `docker-compose.yml` so **OPERA** (`OPERA.exe`) mounts from `./opera` with defaults in `Dockerfile.windows`. **Offline IUCLID / REACH** is not in the image: you supply dossiers and the optional IUCLID format bundle under **`./data`** and set **`OFFLINE_LOCAL_ARCHIVE`** / **`IUCLID_FORMAT_DIR`** in `.env` to **`C:/app/data/...`** paths (same pattern as `CHEMICAL_DB_PATH`). See **Offline REACH / IUCLID** below and `.env.example`.
 
 ### Prerequisites
 
@@ -201,6 +206,8 @@ Open [http://localhost:8501](http://localhost:8501).
 
 This keeps large databases and OPERA assets on your host disk instead of image layers.
 
+**IUCLID offline:** put the REACH dossier archive (`.zip` / `.7z`) or a folder of `.i6z` files and, if you use phrase decoding, the extracted **IUCLID 6 format** tree under `./data` on the host. In `.env` use container paths, for example `OFFLINE_LOCAL_ARCHIVE=C:/app/data/reach_study_results_dossiers_23-05-2023.zip` and `IUCLID_FORMAT_DIR=C:/app/data/IUCLID6_6_format_9.0.0`. Compose passes these through (see `environment:` in `docker-compose.yml`); caches default to `C:/app/data/offline` and `C:/app/data/offline_cache` unless overridden.
+
 ### Linux/macOS note
 
 The provided container stack targets Windows containers because OPERA CLI in this workflow is a Windows executable.
@@ -223,6 +230,18 @@ The Streamlit app can read **offline REACH study-result dossiers** (`.i6z` insid
    | `OFFLINE_LOCAL_ARCHIVE` | Full path to the `reach_study_results_dossiers_*.zip` file **or** to a folder that already contains `.i6z` files. |
 
 The app extracts or scans that location and builds caches under `OFFLINE_CACHE_DIR` (default: `data/offline_cache/`).
+
+### Run locally with offline REACH (Windows)
+
+After you download the ECHA **REACH study results** archive, you can start the app without editing `.env`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/run_streamlit_with_offline_reach.ps1 `
+  -ReachArchive "C:\path\to\reach_study_results_dossiers_23-05-2023.zip"
+```
+(Use `pwsh` instead of `powershell` if you have PowerShell 7 installed.)
+
+Optional: `-Port 8502`. Then open **Hazard assessment** → expand **REACH / IUCLID (offline dossier)** after assessing a CAS.
 
 ### Obtaining the IUCLID format package (phrase mapping)
 
