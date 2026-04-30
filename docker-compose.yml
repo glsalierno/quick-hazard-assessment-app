@@ -11,11 +11,17 @@ services:
     env_file:
       - .env
     environment:
-      # Defaults are safe when .env does not define them.
+      # --- OPERA (Windows CLI; see Dockerfile.windows + ./opera mount) ---
       HAZQUERY_OPERA_EXE: ${HAZQUERY_OPERA_EXE:-C:/app/opera/application/OPERA.exe}
       OPERA_INSTALL_DIR: ${OPERA_INSTALL_DIR:-C:/app/opera}
       CHEMICAL_DB_PATH: ${CHEMICAL_DB_PATH:-C:/app/data/chemical_db.sqlite}
       P2OASYS_MATRIX_PATH: ${P2OASYS_MATRIX_PATH:-C:/app/data/Hazard Matrix Group Review 9-19-23.xlsx}
+      # --- IUCLID / offline REACH (optional; paths are inside the container) ---
+      # Host: place archives under ./data then point these at C:/app/data/... (see .env.example and README "Offline REACH / IUCLID").
+      OFFLINE_LOCAL_ARCHIVE: ${OFFLINE_LOCAL_ARCHIVE:-}
+      IUCLID_FORMAT_DIR: ${IUCLID_FORMAT_DIR:-}
+      OFFLINE_DATA_DIR: ${OFFLINE_DATA_DIR:-C:/app/data/offline}
+      OFFLINE_CACHE_DIR: ${OFFLINE_CACHE_DIR:-C:/app/data/offline_cache}
     volumes:
       # Keep large local databases outside image layers.
       - ./data:C:/app/data
