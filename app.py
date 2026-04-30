@@ -116,6 +116,8 @@ else:
         pass
 if "pdf_cache_behavior" not in st.session_state:
     st.session_state["pdf_cache_behavior"] = "use"
+if "sds_run_gliner2" not in st.session_state:
+    st.session_state["sds_run_gliner2"] = True
 if "sds_ocr_engine" not in st.session_state:
     st.session_state["sds_ocr_engine"] = "tesseract"
 if "sds_tesseract_psm" not in st.session_state:
@@ -245,11 +247,13 @@ read ``utils.sds_strategy`` (not the primary SDS upload extractor).
         from utils.alternative_extraction import PIPELINE_LABELS, PIPELINE_SIDEBAR_ORDER
 
         _v14_expanded = bool(sds_pdf_utils and sds_regex_extractor)
-        with st.expander("📄 SDS CAS extraction (v1.4 — two pipelines only)", expanded=_v14_expanded):
+        with st.expander("📄 SDS CAS extraction (v1.5 — MarkItDown pipelines)", expanded=_v14_expanded):
             st.markdown(
-                "Only **Hybrid** and **MarkItDown + regex** are supported. "
-                "See [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md) for why other parsers were removed.\n\n"
+                "Supported: **Hybrid**, **MarkItDown + regex**, and **Parse-then-extract (regex + optional GLiNER2)**. "
+                "See [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md).\n\n"
                 "**Hybrid:** MarkItDown first; **OCR** (under *Advanced OCR options*) runs only if no CAS is found. "
+                "**GLiNER2 path:** same MarkItDown stage, then **regex CAS + H-codes** and an optional **local** GLiNER2 "
+                "JSON extract (`pip install -r requirements-gliner2.txt`). First model load can take a minute.\n\n"
                 "Requires `pip install 'markitdown[pdf]'`; OCR fallback needs **Poppler** + **Tesseract** or **EasyOCR** on PATH "
                 "or `HAZQUERY_POPPLER_PATH`."
             )
@@ -291,9 +295,13 @@ read ``utils.sds_strategy`` (not the primary SDS upload extractor).
                 st.number_input(
                     "Tesseract PSM (6=block, 11=sparse)", min_value=0, max_value=13, key="sds_tesseract_psm"
                 )
+            st.checkbox(
+                "Run GLiNER2 when using the parse-then-extract pipeline (uncheck = regex-only stage 2)",
+                key="sds_run_gliner2",
+            )
             st.caption(
                 "Env: `HAZQUERY_EXTRACTION_PIPELINE`, `HAZQUERY_DEFAULT_SDS_PIPELINE`, "
-                "`HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`."
+                "`HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`, `HAZQUERY_USE_GLINER2`, `HAZQUERY_GLINER2_MODEL`."
             )
     except ImportError:
         pass
@@ -369,12 +377,27 @@ if staged_ci is not None and staged_ci.cas_numbers:
         st.caption(f"**{len(staged_ci.cas_numbers)} CAS** from SDS. Choose one and assess:")
         if staged_ci.extraction_rows:
             _df_sds = pd.DataFrame(staged_ci.extraction_rows)
-            _show_cols = [c for c in ("cas", "chemical_name", "concentration", "confidence", "pubchem_verified", "name_validated", "method", "source") if c in _df_sds.columns]
+            _show_cols = [
+                c
+                for c in (
+                    "cas",
+                    "cas_source",
+                    "chemical_name",
+                    "concentration",
+                    "confidence",
+                    "pubchem_verified",
+                    "name_validated",
+                    "method",
+                    "source",
+                )
+                if c in _df_sds.columns
+            ]
             _disp = _df_sds[_show_cols].copy() if _show_cols else _df_sds
             if "confidence" in _disp.columns:
                 _disp["confidence"] = _disp["confidence"].apply(lambda x: f"{float(x):.0%}" if x is not None else "—")
             _col_config = {
                 "cas": st.column_config.TextColumn("CAS", width="small"),
+                "cas_source": st.column_config.TextColumn("CAS src", width="small", help="regex | gliner | both"),
                 "chemical_name": st.column_config.TextColumn("Chemical name", width="large"),
                 "concentration": st.column_config.TextColumn("Concentration", width="medium"),
                 "confidence": st.column_config.TextColumn("Confidence", width="small", help="Graduated score; high = validated"),
@@ -428,6 +451,15 @@ elif staged_ci is not None and not staged_ci.cas_numbers:
     if _ex_err:
         st.error(f"**SDS extraction issue:** {_ex_err}")
     st.warning("No CAS extracted from SDS. Type a CAS or name above.")
+
+if staged_ci is not None and getattr(staged_ci, "extraction_metrics", None):
+    _mx = staged_ci.extraction_metrics
+    with st.expander("🔬 SDS extraction diagnostics (pipeline / GLiNER2 / regex)", expanded=False):
+        st.caption(
+            "Use this to compare **regex vs GLiNER2** CAS counts, H-code regex hits, and timing when testing "
+            "the **parse-then-extract** pipeline on Streamlit Cloud or locally."
+        )
+        st.json(_mx)
 
 # Example shortcuts: hide once user has SDS, typed input, or an active assessment query
 _typed = (st.session_state.get("cas_query_input") or "").strip()

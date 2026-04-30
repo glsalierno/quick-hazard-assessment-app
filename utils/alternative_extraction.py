@@ -16,10 +16,13 @@ from utils import cas_text_extract
 # --- Supported pipeline IDs (sidebar / env) ---
 PIPELINE_MARKITDOWN_FAST = "markitdown_fast"
 PIPELINE_HYBRID_MD_OCR = "hybrid_md_ocr"
+# v1.5: MarkItDown → Markdown → **regex CAS / H-codes** + optional **GLiNER2** structured extract (local).
+PIPELINE_MARKDOWN_GLINER_REGEX = "markdown_gliner_regex"
 
 SUPPORTED_SDS_PIPELINES: frozenset[str] = frozenset({
     PIPELINE_MARKITDOWN_FAST,
     PIPELINE_HYBRID_MD_OCR,
+    PIPELINE_MARKDOWN_GLINER_REGEX,
 })
 
 # Legacy env/session/bookmark values → map onto a supported pipeline
@@ -30,16 +33,20 @@ _LEGACY_SDS_PIPELINE_MAP: dict[str, str] = {
     "ocr_easyocr": PIPELINE_HYBRID_MD_OCR,
     "docling_bert": PIPELINE_HYBRID_MD_OCR,
     "pdfplumber_regex": PIPELINE_HYBRID_MD_OCR,
+    "gliner2": PIPELINE_MARKDOWN_GLINER_REGEX,
+    "markdown_gliner": PIPELINE_MARKDOWN_GLINER_REGEX,
 }
 
 PIPELINE_LABELS: dict[str, str] = {
     PIPELINE_HYBRID_MD_OCR: "Hybrid (recommended): MarkItDown + regex → OCR if no CAS",
     PIPELINE_MARKITDOWN_FAST: "MarkItDown + regex only (fast; best on text/table PDFs)",
+    PIPELINE_MARKDOWN_GLINER_REGEX: "Parse-then-extract: MarkItDown → regex + optional GLiNER2 (v1.5 UX test)",
 }
 
 PIPELINE_SIDEBAR_ORDER: list[str] = [
     PIPELINE_HYBRID_MD_OCR,
     PIPELINE_MARKITDOWN_FAST,
+    PIPELINE_MARKDOWN_GLINER_REGEX,
 ]
 
 
@@ -240,6 +247,84 @@ def run_ocr_pipeline(
     return cas_list, method
 
 
+def run_markdown_gliner_regex_pipeline(
+    pdf_bytes: bytes,
+    *,
+    cache: ExtractionCacheManager,
+    force_cache: bool,
+) -> tuple[list[str], str, dict[str, Any]]:
+    """
+    Stage 1: MarkItDown → Markdown. Stage 2: regex CAS + H-codes on markdown; optional GLiNER2
+    ``extract_json`` merge for CAS (and diagnostics). No OCR in this pipeline.
+    """
+    from utils import sds_gliner_extract
+
+    extra: dict[str, Any] = {
+        "stage2": PIPELINE_MARKDOWN_GLINER_REGEX,
+        "gliner2_installed": sds_gliner_extract.gliner2_is_installed(),
+        "gliner2_runtime_enabled": sds_gliner_extract.gliner2_runtime_enabled(),
+        "gliner2_used": False,
+        "regex_cas": [],
+        "gliner_cas": [],
+        "gliner_wall_time_sec": None,
+        "gliner_error": None,
+        "gliner_raw_preview": None,
+    }
+    _, _, md = run_markitdown_pipeline(
+        pdf_bytes, use_bert=False, cache=cache, force_cache=force_cache
+    )
+    md = md or ""
+    extra["markdown_chars"] = len(md)
+    regex_cas = cas_text_extract.find_checksum_valid_cas_in_text(md)
+    h_codes = sds_gliner_extract.extract_h_codes_regex(md)
+    extra["regex_cas"] = list(regex_cas)
+    extra["h_codes_regex"] = h_codes[:100]
+    extra["h_codes_regex_count"] = len(h_codes)
+    extra["regex_cas_count"] = len(regex_cas)
+
+    sources: dict[str, str] = {c: "regex" for c in regex_cas}
+    gliner_cas: list[str] = []
+
+    if sds_gliner_extract.gliner2_is_installed() and sds_gliner_extract.gliner2_runtime_enabled():
+        try:
+            gout = sds_gliner_extract.extract_sds_fields_gliner2(md)
+            extra["gliner_wall_time_sec"] = gout.get("wall_time_sec")
+            extra["gliner_error"] = gout.get("error")
+            raw = gout.get("raw")
+            if raw is not None:
+                try:
+                    import json
+
+                    raw_s = json.dumps(raw, ensure_ascii=False, default=str)
+                    extra["gliner_raw_preview"] = raw_s[:4000] + ("…" if len(raw_s) > 4000 else "")
+                except Exception:
+                    extra["gliner_raw_preview"] = str(type(raw).__name__)
+            gliner_cas = list(gout.get("cas_numbers") or [])
+            extra["gliner2_used"] = True
+        except Exception as exc:
+            extra["gliner_error"] = str(exc)
+            extra["gliner2_used"] = False
+    extra["gliner_cas"] = list(gliner_cas)
+    extra["gliner_cas_count"] = len(gliner_cas)
+
+    merged: list[str] = []
+    seen: set[str] = set()
+    for c in regex_cas:
+        if c not in seen:
+            seen.add(c)
+            merged.append(c)
+    for c in gliner_cas:
+        if c not in seen:
+            sources[c] = "gliner"
+            seen.add(c)
+            merged.append(c)
+        else:
+            sources[c] = "both"
+    extra["merged_cas_count"] = len(merged)
+    extra["cas_source_by_cas"] = {k: sources.get(k, "?") for k in merged}
+    return merged, "markitdown_gliner_regex", extra
+
+
 def run_hybrid_pipeline(
     pdf_bytes: bytes,
     *,
@@ -301,6 +386,11 @@ def run_pipeline_with_metrics(
             )
             method = "markitdown_regex"
             metrics["markdown_chars"] = len(md or "")
+        elif pipeline == PIPELINE_MARKDOWN_GLINER_REGEX:
+            cas_list, method, gmetrics = run_markdown_gliner_regex_pipeline(
+                pdf_bytes, cache=cache, force_cache=force
+            )
+            metrics.update(gmetrics)
         elif pipeline == PIPELINE_HYBRID_MD_OCR:
             cas_list, method = run_hybrid_pipeline(
                 pdf_bytes,
@@ -328,7 +418,27 @@ def run_pipeline_with_metrics(
     metrics["raw_cas_like_count"] = len(cas_list)
     metrics["wall_time_sec"] = time.perf_counter() - t0
 
-    rows = extraction_rows_from_cas_list(cas_list, method=method)
+    if pipeline == PIPELINE_MARKDOWN_GLINER_REGEX and cas_list:
+        src_map = metrics.get("cas_source_by_cas") or {}
+        rows = []
+        for cas in cas_list:
+            rows.append(
+                {
+                    "cas": cas,
+                    "chemical_name": "",
+                    "concentration": "",
+                    "section": None,
+                    "sections": [],
+                    "method": method,
+                    "confidence": 0.85 if src_map.get(cas) in ("both", "regex") else 0.78,
+                    "validated": True,
+                    "context": "",
+                    "warnings": "",
+                    "cas_source": src_map.get(cas, ""),
+                }
+            )
+    else:
+        rows = extraction_rows_from_cas_list(cas_list, method=method)
     try:
         fp = pdf_fingerprint(pdf_bytes)
         cache.save_json(
