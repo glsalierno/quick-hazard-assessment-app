@@ -150,6 +150,89 @@ def offline_archive_fingerprint() -> str:
     return (os.getenv("OFFLINE_LOCAL_ARCHIVE") or "").strip()
 
 
+def offline_reach_archive_status() -> tuple[bool, str]:
+    """
+    Whether ``OFFLINE_LOCAL_ARCHIVE`` can be used on this machine.
+
+    Returns ``(True, "ok")`` if the env var is set and ``Path(...).exists()``; otherwise
+    ``(False, "unset" | "missing" | "badpath")``.
+    """
+    sync_offline_secrets_from_st_secrets()
+    fp = offline_archive_fingerprint()
+    if not fp:
+        return False, "unset"
+    try:
+        if not Path(fp).expanduser().exists():
+            return False, "missing"
+    except OSError:
+        return False, "badpath"
+    return True, "ok"
+
+
+def render_reach_iuclid_panel_unconfigured(code: str) -> None:
+    """
+    Show a single REACH / IUCLID expander when no usable offline archive is configured.
+
+    Used on Streamlit Cloud and local runs without ``OFFLINE_LOCAL_ARCHIVE``.
+    """
+    with st.expander("REACH / IUCLID (offline dossier)", expanded=False):
+        try:
+            from services.config import ServiceConfig
+
+            on_cloud = ServiceConfig.is_streamlit_cloud()
+        except Exception:
+            on_cloud = False
+
+        cloud_note = (
+            "**Streamlit Cloud:** large REACH / IUCLID archives are not stored in GitHub. "
+            "Use a **local** install with ``OFFLINE_LOCAL_ARCHIVE`` pointing at your dossier ``.zip`` / ``.7z`` "
+            "or a folder of ``.i6z`` files, or host a small demo subset under the repo if you need Cloud demos.\n\n"
+        )
+        if code == "unset":
+            st.info(
+                (cloud_note if on_cloud else "")
+                + "🔒 **IUCLID offline lookup is not configured.** "
+                "Set **`OFFLINE_LOCAL_ARCHIVE`** in Streamlit **Secrets** (cloud) or your shell / ``.env`` (local). "
+                "See README → **Offline REACH / IUCLID (optional)**."
+            )
+            if on_cloud:
+                st.markdown(
+                    "**Streamlit Cloud:** open the app → **⋮ Manage app** → **Secrets**, and add a **top-level** "
+                    "TOML key (name must match exactly):"
+                )
+                st.code(
+                    "# Optional — IUCLID phrase/picklist format tree (~100 MB); copy from your "
+                    "# \"IUCLID 6 9.0.0_format\" folder into the repo (no spaces in path recommended)\n"
+                    'IUCLID_FORMAT_DIR = "/mount/src/quick-hazard-assessment-app/data/iuclid_format/IUCLID_6_9_0_0_format"\n'
+                    "\n"
+                    "# Required for dossier / .i6z lookup — must be a path INSIDE the Cloud clone.\n"
+                    "# Full REACH bulk (~10+ GB) cannot live on GitHub; use a small committed demo zip/folder only.\n"
+                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/reach_demo/reach_subset.zip"\n',
+                    language="toml",
+                )
+                st.caption(
+                    "Save Secrets, then **Reboot**. See **`data/echa_cloud/README.txt`** in the repo for what to copy "
+                    "from your local `ECHA IUCLID database` folder vs what must stay local or be shrunk for demos."
+                )
+        elif code == "badpath":
+            st.warning(
+                "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set but could not be read as a path."
+            )
+        else:
+            st.warning(
+                (cloud_note if on_cloud else "")
+                + "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set, but that path **does not exist** "
+                "or is unreadable on this server."
+            )
+        st.caption(
+            "Secrets: top-level TOML key ``OFFLINE_LOCAL_ARCHIVE``. Optional: ``OFFLINE_DOSSIER_INFO_XLSX``, ``IUCLID_FORMAT_DIR``."
+        )
+        try:
+            st.page_link("pages/02_Offline_Loader_Test.py", label="Open **Offline ECHA loader** test page", icon="🧪")
+        except Exception:
+            st.caption("Sidebar → **Offline ECHA loader** to verify paths and snapshots.")
+
+
 @st.cache_resource(show_spinner="Loading offline REACH index…")
 def get_offline_context(archive_fingerprint: str) -> Any:
     """

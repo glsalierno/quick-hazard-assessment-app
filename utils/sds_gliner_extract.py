@@ -7,6 +7,8 @@ markdown — merged into pipeline **diagnostics** without requiring the model.
 
 Install: ``pip install gliner2`` (see ``requirements-gliner2.txt``). If the package or model
 is missing, pipelines fall back to **regex-only** CAS / H-code extraction on the same markdown.
+Plain-text CAS from markdown uses ``utils.cas_text_extract`` (SDS label variants such as
+``C.A.S.``, ``CAS-No.``, ``RN``, ``Registry Number``, ``Index No.``).
 
 Env:
 

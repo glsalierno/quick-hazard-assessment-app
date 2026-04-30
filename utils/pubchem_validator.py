@@ -7,7 +7,73 @@ Filters out invalid/fake CAS that pass checksum but don't exist.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
+
+
+def _cid_synonyms_include_cas(cid: int, canonical_cas: str) -> bool:
+    """
+    Confirm the resolved PubChem record lists this CAS (xref alone can be ambiguous).
+    """
+    from utils import cas_validator
+
+    canon = (cas_validator.normalize_cas_input(canonical_cas) or canonical_cas).strip()
+    if not canon:
+        return False
+    canon_digits = "".join(c for c in canon if c.isdigit())
+    try:
+        import pubchempy as pcp
+
+        comp = pcp.Compound.from_cid(int(cid))
+    except Exception:
+        return False
+    for syn in getattr(comp, "synonyms", None) or []:
+        if not isinstance(syn, str):
+            continue
+        s = syn.strip()
+        if not s:
+            continue
+        n = cas_validator.normalize_cas_input(s)
+        if n and n == canon:
+            return True
+        sd = "".join(c for c in s if c.isdigit())
+        if len(sd) >= 5 and sd == canon_digits:
+            return True
+    return False
+
+
+def gate_strict_cas_for_assessment(raw: str) -> Tuple[Optional[str], Optional[str]]:
+    """
+    Typed / manual CAS entry: require checksum-valid CAS, then PubChem confirmation when enabled.
+
+    Returns:
+        (canonical_cas, None) on success.
+        (None, error_code) on failure — codes: ``checksum``, ``pubchem_not_found``.
+        (None, ``not_cas_pattern``) if the string does not look like N-N-N (caller may treat as name).
+    """
+    from utils import cas_validator
+
+    import config as _cfg
+
+    if not raw or not str(raw).strip():
+        return None, None
+    clean = cas_validator.normalize_cas_input(raw)
+    if not clean:
+        return None, None
+    if not cas_validator.is_valid_cas_format(clean):
+        return None, "not_cas_pattern"
+    ok, canon = cas_validator.validate_cas(clean)
+    if not ok:
+        return None, "checksum"
+    if not getattr(_cfg, "USE_PUBCHEM_CAS_VALIDATION", True):
+        return canon, None
+    v = get_pubchem_validator().validate(canon)
+    ex = v.get("exists")
+    if ex is False:
+        return None, "pubchem_not_found"
+    if ex is None:
+        # Network / service failure: still allow assessment attempt; caller may warn.
+        return canon, "pubchem_unknown"
+    return canon, None
 
 
 class PubChemValidator:
@@ -39,18 +105,22 @@ class PubChemValidator:
         if not cas or not str(cas).strip():
             return {"exists": False, "cid": None, "name": None, "confidence_boost": 0.0}
 
-        cas = str(cas).strip()
+        from utils import cas_validator
 
-        if cas in self.cache:
-            return self.cache[cas]
+        canonical = cas_validator.normalize_cas_input(str(cas).strip()) or str(cas).strip()
+
+        if canonical in self.cache:
+            return self.cache[canonical]
 
         self.validation_stats["total_checked"] += 1
 
         try:
             from utils import pubchem_client
 
-            data = pubchem_client.get_compound_data(cas, input_type="cas")
+            data = pubchem_client.get_compound_data(canonical, input_type="cas")
             exists = data is not None and data.get("cid") is not None
+            if exists and not _cid_synonyms_include_cas(int(data["cid"]), canonical):
+                exists = False
 
             result: Dict[str, Any] = {
                 "exists": exists,
@@ -64,7 +134,7 @@ class PubChemValidator:
             else:
                 self.validation_stats["not_found"] += 1
 
-            self.cache[cas] = result
+            self.cache[canonical] = result
             return result
 
         except Exception as e:

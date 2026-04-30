@@ -54,9 +54,18 @@ class ParsedSDSResult(TypedDict, total=False):
 _CAS_HYPHEN_RE = re.compile(r"\b(\d{1,9})-(\d{2})-(\d)\b")
 # Same with en-dash U+2013 or em-dash U+2014
 _CAS_DASH_RE = re.compile(r"\b(\d{1,9})[\u2010-\u2015\-](\d{2})[\u2010-\u2015\-](\d)\b")
-# After "CAS" label (same line): CAS No. 67-64-1 or CAS Number: 67-64-1 or CAS# 67-64-1
+# After common SDS labels (same line): CAS / C.A.S. / CAS-No. / CAS # / RN / Registry Number / Index No.
 _CAS_AFTER_LABEL_RE = re.compile(
-    r"(?:CAS\s*(?:No\.?|Number|#|Registry\s*No\.?)?\s*[:\-]?\s*)(\d{1,9})[\-.\s\u2010-\u2015]+(\d{2})[\-.\s\u2010-\u2015]+(\d)\b",
+    r"(?:"
+    r"(?:C(?:\.|\s)?A(?:\.|\s)?S(?:\.|\s)?(?:-?\s*(?:No\.?|Number|#|Registry\s*No\.?|Nr\.?|N°))?|CAS-No\.?)"
+    r"\s*[:\-]?\s*"
+    r"|\bCAS\s+Number\s*[:\-]?\s*"
+    r"|\bRN\b\s*[:\-]?\s*"
+    r"|\bRegistry\s+Number\s*[:\-]?\s*"
+    r"|\bCAS\s+Registry(?:\s+Number)?\s*[:\-]?\s*"
+    r"|\bIndex\s+No\.?\s*[:\-]?\s*"
+    r"|\bINDEX\s+NO\.?\s*[:\-]?\s*"
+    r")(\d{1,9})[\-.\s\u2010-\u2015]+(\d{2})[\-.\s\u2010-\u2015]+(\d)\b",
     re.IGNORECASE,
 )
 # Registry No. / EC No. / EC-CAS (same line) — allow single-digit first part
