@@ -1,8 +1,8 @@
 """
 Quick Hazard Assessment — Streamlit app (v2.0).
 
-Multi-source hazard assessment (PubChem, DSSTox, ToxValDB, CPDB), optional OPERA QSAR
-from a pre-computed cache, P2OASys matrix scoring, and ToxVal cross-checks where data exist.
+Multi-source hazard assessment (PubChem, DSSTox, ToxValDB, CPDB) with optional OPERA QSAR
+from a pre-computed cache.
 """
 
 from __future__ import annotations
@@ -294,9 +294,7 @@ read ``utils.sds_strategy`` (not the primary SDS upload extractor).
 st.info(
     "**Quick Hazard Assessment v2.0** — Enter a CAS, name, or SMILES — or upload an SDS PDF.\n\n"
     "• Real-time lookup from PubChem, DSSTox, ToxValDB, CPDB\n"
-    "• **OPERA QSAR** predictions (batch pre-computed, cached)\n"
-    "• **P2OASys** hazard scores (matrix-driven)\n"
-    "• Cross-validation against experimental ToxVal data\n\n"
+    "• **OPERA QSAR** predictions (batch pre-computed, cached)\n\n"
     "Core pipeline: **ChemicalAssessmentService** (multi-source evidence)."
 )
 
