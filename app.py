@@ -1,6 +1,5 @@
 """
 Quick Hazard Assessment — Streamlit app.
-Chemical hazard assessment from PubChem + DSSTox local (no API key required).
 """
 
 from __future__ import annotations
@@ -49,9 +48,6 @@ dsstox_data = None if use_sqlite_dsstox else dsstox_local.load_dsstox_enhanced()
 
 # Title and description
 st.title(f"🧪 {config.APP_TITLE}")
-st.markdown(
-    "Chemical hazard assessment from **PubChem** + **DSSTox local** (no API key required)."
-)
 
 # Sidebar: database stats (SQLite or CSV)
 with st.sidebar:
