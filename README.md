@@ -219,17 +219,44 @@ On Linux/macOS, run the app locally without OPERA, or set `HAZQUERY_OPERA_EXE` t
 
 The Streamlit app can read **offline REACH study-result dossiers** (`.i6z` inside a `.zip`) and decode IUCLID picklist codes when you install the **IUCLID format** phrase package.
 
-### Obtaining the REACH study results archive
+> **Demo vs full database:** Anything committed under `data/reach_demo/` is a **demo subset** for GitHub / Streamlit Cloud size limits. It is **not** the official full REACH export. **Most substances have no dossier** in that zip; study text, endpoints, and GHS-style rows can be **missing or incomplete** even when a dossier exists. The app uses **heuristic** XML parsing, not a certified IUCLID engine. **Do not** use the demo bundle for regulatory submissions, registration completeness, or as a substitute for ECHA’s own tools and downloads — use a **local** full archive when you need authoritative coverage.
 
-1. Open the official IUCLID download area: **[IUCLID 6 downloads (ECHA)](https://iuclid6.echa.europa.eu/downloads)**.
-2. Download a **REACH study results dossiers** archive (file name like `reach_study_results_dossiers_*.zip`). This ZIP contains many `.i6z` dossier files.
-3. On your machine, set the environment variable (or add to `.streamlit/secrets.toml` — see `.streamlit/secrets.example.toml`):
+### Downloading the full official IUCLID and REACH packages (ECHA)
 
-   | Variable | Meaning |
-   |----------|---------|
-   | `OFFLINE_LOCAL_ARCHIVE` | Full path to the `reach_study_results_dossiers_*.zip` file **or** to a folder that already contains `.i6z` files. |
+Use ECHA’s **[IUCLID 6 downloads](https://iuclid6.echa.europa.eu/downloads)** page in a browser. That page lists the current **IUCLID 6 format** bundle and the **REACH study results dossiers** bulk export (names and versions change over time; pick the latest entries that match those descriptions). Accept ECHA’s terms if the site asks you to.
 
-The app extracts or scans that location and builds caches under `OFFLINE_CACHE_DIR` (default: `data/offline_cache/`).
+1. **IUCLID 6 format (phrase / picklist / XSD)** — Download the **IUCLID 6 format** ZIP (often named like `IUCLID6_6_format_*.zip`, on the order of ~100 MB). Extract it to a folder on your machine. Point **`IUCLID_FORMAT_DIR`** at the **extracted** folder (the directory that contains `dcr.xml` and the phrase / properties files). The same tree can be copied into this repo as `data/iuclid_format/IUCLID_6_9_0_0_format/` for demos only — it does **not** replace downloading from ECHA when you update or audit your local setup.
+2. **REACH study results dossiers (full bulk)** — Download the **REACH study results dossiers** archive (`reach_study_results_dossiers_*.zip`). That file is **very large** (~10+ GB or more, depending on release) and contains the per-substance **`.i6z`** dossiers. Point **`OFFLINE_LOCAL_ARCHIVE`** at that `.zip` **or** at a folder where you have extracted the `.i6z` files.
+
+**This repository vs the official downloads:** This repo ships **only a demo portion** of the dossier bulk (`data/reach_demo/reach_subset.zip` — a small hand-picked or script-built subset for GitHub / Streamlit Cloud). It may also ship a **copy of the format tree** under `data/iuclid_format/` for hosted decoding. Neither replaces the **full** REACH dossier archive from ECHA; for complete substance coverage you **must** download the bulk `reach_study_results_dossiers_*.zip` (or equivalent) yourself from the link above and set `OFFLINE_LOCAL_ARCHIVE` locally.
+
+Configure paths via environment variables or `.streamlit/secrets.toml` (see `.streamlit/secrets.example.toml`):
+
+| Variable | Meaning |
+|----------|---------|
+| `OFFLINE_LOCAL_ARCHIVE` | Full path to the official `reach_study_results_dossiers_*.zip` **or** to a folder that already contains `.i6z` files. |
+| `IUCLID_FORMAT_DIR` | Full path to the **extracted** IUCLID 6 format folder from step 1. |
+
+The app extracts or scans the archive location and builds caches under `OFFLINE_CACHE_DIR` (default: `data/offline_cache/`).
+
+### IUCLID offline data for Streamlit Cloud
+
+The full REACH dossier bulk (~10+ GB) **must not** be committed to GitHub. For **Streamlit Community Cloud**, commit **as much as is practical** within GitHub / LFS limits: the format tree plus a zip of selected `.i6z` dossiers. That zip is still a **demo database** relative to full REACH — **most CAS numbers will have no dossier**, and fields may be **missing or incomplete** even when present.
+
+| Path | Purpose |
+|------|---------|
+| `data/iuclid_format/IUCLID_6_9_0_0_format/` | Extracted **IUCLID 6 format** tree (phrase / picklist / XSD; ~100 MB). Copy from your local `IUCLID 6 9.0.0_format` folder; use a **name without spaces**. This is the **format** package (decoding), not the dossier bulk. |
+| `data/reach_demo/reach_subset.zip` | Zip of selected `.i6z` dossiers — **demo / UI / teaching** only. Increase count until file size limits bite; coverage stays **non-exhaustive**. See **`data/reach_demo/README.md`**. |
+
+The REACH / IUCLID panel is **supplementary** and, when using these committed paths, **non-authoritative** (see the disclaimer blockquote above).
+
+After those exist on `v2.0`, the app **defaults** `OFFLINE_LOCAL_ARCHIVE` and `IUCLID_FORMAT_DIR` on Cloud when Secrets leave them unset (overridable; set `HAZQUERY_DISABLE_REPO_IUCLID_DEFAULTS=1` to turn off). Prepare assets locally with:
+
+```bash
+python scripts/prepare_iuclid_demo.py --format-src "PATH/TO/IUCLID 6 9.0.0_format" --i6z-dir "PATH/TO/FOLDER_WITH_I6Z" --limit 20
+```
+
+More detail: **`data/echa_cloud/README.txt`** and **`.streamlit/secrets.example.toml`**.
 
 ### Run locally with offline REACH (Windows)
 
@@ -243,15 +270,9 @@ powershell -ExecutionPolicy Bypass -File scripts/run_streamlit_with_offline_reac
 
 Optional: `-Port 8502`. Then open **Hazard assessment** → expand **REACH / IUCLID (offline dossier)** after assessing a CAS.
 
-### Obtaining the IUCLID format package (phrase mapping)
+### IUCLID format package (phrase mapping) — recap
 
-1. On the same **[IUCLID 6 downloads](https://iuclid6.echa.europa.eu/downloads)** page, download the **IUCLID 6 format** bundle (e.g. a ZIP named like `IUCLID6_6_format_9.0.0.zip`).
-2. Extract it to a folder on disk.
-3. Set:
-
-   | Variable | Meaning |
-   |----------|---------|
-   | `IUCLID_FORMAT_DIR` | Path to the **extracted** format folder (the directory that contains `dcr.xml`, `*.properties`, etc.). |
+The **IUCLID 6 format** ZIP is obtained from the same **[IUCLID 6 downloads](https://iuclid6.echa.europa.eu/downloads)** page as in [Downloading the full official IUCLID and REACH packages (ECHA)](#downloading-the-full-official-iuclid-and-reach-packages-echa); set **`IUCLID_FORMAT_DIR`** to the extracted folder (the directory that contains `dcr.xml`, `*.properties`, etc.).
 
 If `IUCLID_FORMAT_DIR` is **not** set, the app still runs: numeric codes may show as raw values or with `(unmapped)` in the UI until you configure the format directory.
 

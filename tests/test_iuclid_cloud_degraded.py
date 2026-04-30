@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -68,3 +69,64 @@ def test_render_reach_iuclid_panel_unconfigured_missing_no_crash() -> None:
         iu.render_reach_iuclid_panel_unconfigured("missing")
 
     mock_st.warning.assert_called_once()
+
+
+def test_apply_repo_iuclid_defaults_sets_env_on_cloud(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import unified_hazard_report.iuclid_integration as iu
+
+    monkeypatch.delenv("OFFLINE_LOCAL_ARCHIVE", raising=False)
+    monkeypatch.delenv("IUCLID_FORMAT_DIR", raising=False)
+    monkeypatch.delenv("HAZQUERY_DISABLE_REPO_IUCLID_DEFAULTS", raising=False)
+
+    (tmp_path / "data" / "reach_demo").mkdir(parents=True)
+    (tmp_path / "data" / "reach_demo" / "reach_subset.zip").write_bytes(b"PK\x05\x06" + b"\x00" * 18)
+    fmt = tmp_path / "data" / "iuclid_format" / "IUCLID_6_9_0_0_format"
+    fmt.mkdir(parents=True)
+    (fmt / "marker.txt").write_text("ok", encoding="utf-8")
+
+    monkeypatch.setattr(iu, "_APP_ROOT", tmp_path)
+
+    with patch("services.config.ServiceConfig.is_streamlit_cloud", return_value=True):
+        iu.apply_repo_iuclid_defaults_for_streamlit_cloud()
+
+    assert os.environ.get("OFFLINE_LOCAL_ARCHIVE") == str((tmp_path / "data" / "reach_demo" / "reach_subset.zip").resolve())
+    assert os.environ.get("IUCLID_FORMAT_DIR") == str(fmt.resolve())
+
+
+def test_apply_repo_iuclid_defaults_skips_when_not_cloud(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import unified_hazard_report.iuclid_integration as iu
+
+    monkeypatch.delenv("OFFLINE_LOCAL_ARCHIVE", raising=False)
+    monkeypatch.delenv("IUCLID_FORMAT_DIR", raising=False)
+    (tmp_path / "data" / "reach_demo" / "reach_subset.zip").parent.mkdir(parents=True)
+    (tmp_path / "data" / "reach_demo" / "reach_subset.zip").write_bytes(b"x")
+    monkeypatch.setattr(iu, "_APP_ROOT", tmp_path)
+
+    with patch("services.config.ServiceConfig.is_streamlit_cloud", return_value=False):
+        iu.apply_repo_iuclid_defaults_for_streamlit_cloud()
+
+    assert os.environ.get("OFFLINE_LOCAL_ARCHIVE") in (None, "")
+
+
+def test_using_committed_reach_demo_archive_true(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import unified_hazard_report.iuclid_integration as iu
+
+    z = tmp_path / "data" / "reach_demo" / "reach_subset.zip"
+    z.parent.mkdir(parents=True)
+    z.write_bytes(b"x")
+    monkeypatch.setattr(iu, "_APP_ROOT", tmp_path)
+    monkeypatch.setenv("OFFLINE_LOCAL_ARCHIVE", str(z.resolve()))
+
+    assert iu.using_committed_reach_demo_archive() is True
+    assert iu.committed_reach_demo_zip_path() == z.resolve()
+
+
+def test_using_committed_reach_demo_archive_false(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    import unified_hazard_report.iuclid_integration as iu
+
+    monkeypatch.setattr(iu, "_APP_ROOT", tmp_path)
+    other = tmp_path / "other.zip"
+    other.write_bytes(b"y")
+    monkeypatch.setenv("OFFLINE_LOCAL_ARCHIVE", str(other))
+
+    assert iu.using_committed_reach_demo_archive() is False
