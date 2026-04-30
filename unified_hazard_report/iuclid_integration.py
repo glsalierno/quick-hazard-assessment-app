@@ -236,13 +236,14 @@ def render_reach_iuclid_panel_unconfigured(code: str) -> None:
                     "TOML key (name must match exactly):"
                 )
                 st.code(
-                    "# Example — path must exist on the Cloud container (e.g. small demo committed under the repo)\n"
-                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/your_reach_demo.zip"\n',
+                    "# Cloud uses Linux paths under the Git clone — NOT your Windows C:\\... path.\n"
+                    "# Set this to whatever you actually committed (e.g. data/echa_iuclid/ or a .zip there).\n"
+                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/echa_iuclid_subset.zip"\n',
                     language="toml",
                 )
                 st.caption(
-                    "Save Secrets, then **Reboot** the app. Full ECHA drops are too large for GitHub; use a small "
-                    "`.zip` / `.7z` or a folder of `.i6z` files under the repo for demos only."
+                    "Replace `echa_iuclid_subset.zip` with your real filename or folder name under `data/`. "
+                    "Save Secrets, then **Reboot**. Your OneDrive / laptop path only works locally, not on Cloud."
                 )
         elif code == "badpath":
             st.warning(
