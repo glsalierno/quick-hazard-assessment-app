@@ -324,10 +324,15 @@ def _filter_sds_cas_pubchem_confirmed_only(
     confirmed_cas: List[str] = []
     confirmed_rows: List[dict[str, Any]] = []
     for cas in cas_list:
-        r = row_by.get(_norm_cas_key(cas), {})
+        canon = _canonical_cas_for_sds(cas)
+        if not canon:
+            continue
+        r = row_by.get(_norm_cas_key(cas)) or row_by.get(_norm_cas_key(canon), {})
         if r.get("pubchem_verified") is True:
-            confirmed_cas.append(cas)
-            confirmed_rows.append(dict(r))
+            confirmed_cas.append(canon)
+            nr = dict(r)
+            nr["cas"] = canon
+            confirmed_rows.append(nr)
 
     if confirmed_cas:
         return confirmed_cas, confirmed_rows, None
@@ -375,10 +380,13 @@ class UnifiedInputHandler:
         if not norm:
             return None
         if cas_validator.is_valid_cas_format(norm):
+            ok, canon = cas_validator.validate_cas(norm)
+            if not ok:
+                return None
             return ChemicalInput(
                 input_type="cas",
-                primary=norm,
-                cas_numbers=[norm],
+                primary=canon,
+                cas_numbers=[canon],
                 source_label="typed",
             )
         return ChemicalInput(

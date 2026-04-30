@@ -1,3 +1,8 @@
+<p align="center">
+  <a href="https://quick-hazard-assessment-app.streamlit.app" title="Open the Streamlit app">
+    <img src="readme-banner.svg" width="920" alt="Quick Hazard Assessment — chemical hazard reports from PubChem and DSSTox" />
+  </a>
+</p>
 
 # Quick Hazard Assessment — Streamlit App
 

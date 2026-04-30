@@ -20,6 +20,7 @@ from utils import atmo_gwp, hazard_for_p2oasys, hazard_report_utils, iarc_lookup
 from utils import summary_utils
 from utils.input_handler import get_input_handler
 from utils.markitdown_check import is_markitdown_available
+from utils.pubchem_validator import gate_strict_cas_for_assessment
 from utils.sds_integration import apply_assessment_query
 
 try:
@@ -386,6 +387,9 @@ st.markdown("### Chemical input")
 _pending_cas = st.session_state.pop("_pending_cas_query_input", None)
 if _pending_cas is not None:
     st.session_state["cas_query_input"] = _pending_cas
+_gate_msg = st.session_state.pop("_typed_cas_gate_message", None)
+if _gate_msg:
+    st.warning(_gate_msg)
 
 with st.form("cas_input", clear_on_submit=False):
     default = st.session_state.get("query") or st.session_state.get("cas_query_input") or ""
@@ -494,13 +498,25 @@ if staged_ci is not None and staged_ci.cas_numbers:
             with col1:
                 correct_cas = st.text_input("Correct CAS number:", key="manual_cas_override", placeholder="e.g., 67-64-1")
                 if st.button("Use this CAS", key="manual_cas_use_btn"):
-                    if correct_cas and cas_validator.is_valid_cas_format(str(correct_cas).strip()):
-                        st.session_state["query"] = cas_validator.normalize_cas_input(correct_cas) or correct_cas.strip()
-                        st.session_state["result_for"] = None
-                        st.session_state["_pending_cas_query_input"] = correct_cas.strip()
-                        st.rerun()
-                    elif correct_cas:
-                        st.warning("Enter a valid CAS format (e.g., 67-64-1).")
+                    if not correct_cas:
+                        pass
+                    else:
+                        ok_c, err = gate_strict_cas_for_assessment(str(correct_cas).strip())
+                        if err == "checksum":
+                            st.warning("Invalid CAS check digit. Correct the number or use a chemical name.")
+                        elif err == "pubchem_not_found":
+                            st.warning("That CAS is not found in PubChem.")
+                        elif err == "not_cas_pattern":
+                            st.warning("Use CAS format like **67-64-1** (digits-hyphens-digits).")
+                        elif ok_c:
+                            st.session_state["query"] = ok_c
+                            st.session_state["result_for"] = None
+                            st.session_state["_pending_cas_query_input"] = ok_c
+                            if err == "pubchem_unknown":
+                                st.session_state["_typed_cas_gate_message"] = (
+                                    "PubChem could not confirm this CAS (network). Assessment will still run."
+                                )
+                            st.rerun()
             with col2:
                 if st.button("Report issue", key="manual_cas_report_btn"):
                     st.info("Thank you! This helps improve the extractor.")
@@ -547,13 +563,33 @@ if not _hide_examples:
         "Multi-ingredient SDS: only PubChem-valid CAS are listed; click a CAS button to assess that component."
     )
 
-# When form is submitted, set query to what the user typed
+# When form is submitted: CAS-shaped input must pass checksum + PubChem (when enabled)
 if submitted and cas:
-    clean_cas = cas_validator.normalize_cas_input(cas)
-    if clean_cas:
-        st.session_state["query"] = clean_cas
-        st.session_state["_pending_cas_query_input"] = clean_cas
+    raw = str(cas).strip()
+    if not raw:
+        st.rerun()
+    ok_c, err = gate_strict_cas_for_assessment(raw)
+    if err == "not_cas_pattern":
+        st.session_state["query"] = raw
+        st.session_state["_pending_cas_query_input"] = raw
         st.session_state["result_for"] = None
+    elif err == "checksum":
+        st.session_state["_typed_cas_gate_message"] = (
+            "Invalid CAS **check digit**. Fix the number, or enter a **chemical name** / SMILES instead."
+        )
+    elif err == "pubchem_not_found":
+        clean = cas_validator.normalize_cas_input(raw) or raw
+        st.session_state["_typed_cas_gate_message"] = (
+            f"CAS **{clean}** is not listed in PubChem. Correct the number or use a name / SMILES."
+        )
+    elif ok_c:
+        st.session_state["query"] = ok_c
+        st.session_state["_pending_cas_query_input"] = ok_c
+        st.session_state["result_for"] = None
+        if err == "pubchem_unknown":
+            st.session_state["_typed_cas_gate_message"] = (
+                "PubChem could not verify this CAS (network). Assessment will still run."
+            )
     st.rerun()
 
 # --- Typed CAS / name assessment (ChemicalAssessmentService only; independent of SDS PDF pipeline) ---
