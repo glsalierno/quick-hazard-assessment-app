@@ -8,7 +8,7 @@
 
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox** local data (no API key required for core lookups). Optional modules (offline REACH dossiers, local LLMs) are configured via environment variables.
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)]([https://quick-hazard-assessment-app-v1-5.streamlit.app](https://quick-hazard-assessment-app-v1-5.streamlit.app/))
 
 ---
 
