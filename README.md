@@ -1,10 +1,10 @@
-<p align="center">
-  <a href="https://quick-hazard-assessment-app-v1-5.streamlit.app/" title="Open the Streamlit app">
-    <img src="readme-banner.svg" width="920" alt="Quick Hazard Assessment — chemical hazard reports from PubChem and DSSTox" />
+﻿<p align="center">
+  <a href="https://quick-hazard-assessment-v2.streamlit.app/">
+    <img src="hierarchy-banner.svg" width="800" alt="Hierarchy of Controls pyramid" />
   </a>
 </p>
 
-# Quick Hazard Assessment — Streamlit App
+# Quick Hazard Assessment â€” Streamlit App
 
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox** local data (no API key required for core lookups). Optional modules (offline REACH dossiers, local LLMs) are configured via environment variables.
 
@@ -21,8 +21,8 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
    .venv\Scripts\activate
    pip install -r requirements.txt
    ```
-2. **Optional — offline REACH / IUCLID:** download the REACH dossier ZIP and IUCLID format bundle from [IUCLID 6 downloads (ECHA)](https://iuclid6.echa.europa.eu/downloads), then set `OFFLINE_LOCAL_ARCHIVE` and `IUCLID_FORMAT_DIR` (see [Offline REACH / IUCLID](#offline-reach--iuclid-optional) below). If `IUCLID_FORMAT_DIR` is omitted, the app still runs; picklist codes may appear as raw values or with an `(unmapped)` label until you add the format folder.
-3. **Optional — DSSTox / ToxValDB SQLite:** place the CAS–DTXSID CSV in `DSS/` and run `python scripts/setup_chemical_db.py` for faster lookups (see [Chemical database](#chemical-database-dsstox-toxvaldb)).
+2. **Optional â€” offline REACH / IUCLID:** download the REACH dossier ZIP and IUCLID format bundle from [IUCLID 6 downloads (ECHA)](https://iuclid6.echa.europa.eu/downloads), then set `OFFLINE_LOCAL_ARCHIVE` and `IUCLID_FORMAT_DIR` (see [Offline REACH / IUCLID](#offline-reach--iuclid-optional) below). If `IUCLID_FORMAT_DIR` is omitted, the app still runs; picklist codes may appear as raw values or with an `(unmapped)` label until you add the format folder.
+3. **Optional â€” DSSTox / ToxValDB SQLite:** place the CASâ€“DTXSID CSV in `DSS/` and run `python scripts/setup_chemical_db.py` for faster lookups (see [Chemical database](#chemical-database-dsstox-toxvaldb)).
 4. **Launch:**
    ```bash
    streamlit run app.py
@@ -40,7 +40,7 @@ $env:IUCLID_FORMAT_DIR = "D:\data\IUCLID6_6_format_9.0.0"
 streamlit run app.py
 ```
 
-Alternatively, copy those files under a folder such as `local_data/` inside the repo and set the variables to the resolved full paths. This build matches the main app’s behavior except the REACH panel does **not** offer a reliability filter (see endpoint tables there).
+Alternatively, copy those files under a folder such as `local_data/` inside the repo and set the variables to the resolved full paths. This build matches the main appâ€™s behavior except the REACH panel does **not** offer a reliability filter (see endpoint tables there).
 
 More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)**.
 
@@ -49,7 +49,7 @@ More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)*
 ## Features
 
 - **Input:** CAS number (e.g. `67-64-1`) or chemical name
-- **DSSTox local:** CAS → DTXSID lookup from a local mapping file (no EPA API key)
+- **DSSTox local:** CAS â†’ DTXSID lookup from a local mapping file (no EPA API key)
 - **PubChem:** Properties, GHS H/P codes with phrase legends, flash point, vapor pressure, IUPAC name, SMILES
 - **Molecular structure:** 2D rendering at the top of the report (client-side [smiles-drawer](https://github.com/reymond-group/smiles-drawer))
 - **Graceful fallback:** If the DSSTox file is missing, the app runs in **PubChem-only** mode
@@ -58,7 +58,7 @@ More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)*
 
 *Enhanced predictions with OPERA QSAR may be available in a separate command-line workflow; OPERA is not bundled with this Streamlit deployment.*
 
-**SDS upload (v1.5):** **Hybrid**, **MarkItDown + regex**, and optional **parse-then-extract** (`markdown_gliner_regex`: regex + local **GLiNER2** on Markdown) — see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md) and `requirements-gliner2.txt`. Optional **local LLM** (Ollama) for other flows: [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
+**SDS upload (v1.5):** **Hybrid**, **MarkItDown + regex**, and optional **parse-then-extract** (`markdown_gliner_regex`: regex + local **GLiNER2** on Markdown) â€” see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md) and `requirements-gliner2.txt`. Optional **local LLM** (Ollama) for other flows: [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
 
 ---
 
@@ -79,7 +79,7 @@ More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)*
    ```
 
 3. **DSSTox mapping (optional but recommended)**
-   - Download the [EPA Figshare CAS–DTXSID mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566) (CSV).
+   - Download the [EPA Figshare CASâ€“DTXSID mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566) (CSV).
    - Place it in the **`DSS/`** folder (e.g. `DSS/cas_dtxsid_mapping.csv`).
    - See **`DSS/README.md`** for column names, Excel support, and update instructions.
    - If the file is missing, the app runs in PubChem-only mode.
@@ -92,7 +92,7 @@ More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)*
 
    **Tip:** Test the app locally before deploying to Streamlit Cloud. Each Cloud redeploy clones the repo and fetches Git LFS files, which consumes your LFS bandwidth quota. Running locally avoids LFS entirely.
 
-5. **Optional — Local LLM (Qwen / Gemma) for SDS extraction**
+5. **Optional â€” Local LLM (Qwen / Gemma) for SDS extraction**
    - Install [Ollama](https://ollama.com) on your machine.
    - In a terminal: `ollama pull qwen2:0.5b` and/or `ollama pull gemma2:2b`.
    - The app uses `OLLAMA_HOST` and `OLLAMA_MODEL` (see [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md)). Nothing is pushed to GitHub except instructions; models stay local.
@@ -115,9 +115,9 @@ More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)*
    - Full rationale and list of **removed** parsers: **[docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md)**.
    - Install: `pip install "markitdown[pdf]"` (see `requirements.txt`). **Default:** **Hybrid** (`hybrid_md_ocr`). Valid values: `hybrid_md_ocr` | `markitdown_fast` | `markdown_gliner_regex`. Legacy env values (e.g. `default`, `ocr_tesseract`) are **remapped** to a supported pipeline.
    - Optional GLiNER2: `pip install -r requirements-gliner2.txt`. Env: `HAZQUERY_USE_GLINER2`, `HAZQUERY_GLINER2_MODEL`, `HAZQUERY_GLINER2_MAX_CHARS`.
-   - Sidebar: **“SDS CAS extraction (v1.5 — MarkItDown pipelines)”** — pick a strategy; use **SDS extraction diagnostics** after upload to monitor regex vs GLiNER2.
+   - Sidebar: **â€œSDS CAS extraction (v1.5 â€” MarkItDown pipelines)â€** â€” pick a strategy; use **SDS extraction diagnostics** after upload to monitor regex vs GLiNER2.
    - Caching: `cache/{sha256}/` (see `utils/cache_manager.py`). Env: `HAZQUERY_EXTRACTION_PIPELINE`, `HAZQUERY_DEFAULT_SDS_PIPELINE`, `HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`, `HAZQUERY_OCR_ENGINE`, `HAZQUERY_TESSERACT_PSM`.
-   - Benchmark: `python tests/test_extraction_pipelines.py --folder "sds_examples" --limit 20` → `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
+   - Benchmark: `python tests/test_extraction_pipelines.py --folder "sds_examples" --limit 20` â†’ `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
 
 9. **Windows terminal PATH & pip script warnings**
    - If pip warns that scripts are installed outside `PATH`, open the integrated terminal **from this workspace** so `.vscode/settings.json` applies: it appends common **user** Python `Scripts` folders and sets `HF_HUB_DISABLE_SYMLINKS_WARNING=1` and `TF_ENABLE_ONEDNN_OPTS=0` to reduce Hugging Face / oneDNN noise.
@@ -130,7 +130,7 @@ More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)*
      ```
    - Optional: `--limit N` for a subset. Outputs `artifacts/sds_parsing_accuracy_report.md`, `.csv`, and `sds_parsing_accuracy_summary.json` (micro/macro F1, pooled TP/FP/FN).
 
-11. **IUCLID / offline REACH (optional)** — see [Offline REACH / IUCLID](#offline-reach--iuclid-optional) below.
+11. **IUCLID / offline REACH (optional)** â€” see [Offline REACH / IUCLID](#offline-reach--iuclid-optional) below.
 
 ---
 
@@ -142,7 +142,7 @@ The Streamlit app can read **offline REACH study-result dossiers** (`.i6z` insid
 
 1. Open the official IUCLID download area: **[IUCLID 6 downloads (ECHA)](https://iuclid6.echa.europa.eu/downloads)**.
 2. Download a **REACH study results dossiers** archive (file name like `reach_study_results_dossiers_*.zip`). This ZIP contains many `.i6z` dossier files.
-3. On your machine, set the environment variable (or add to `.streamlit/secrets.toml` — see `.streamlit/secrets.example.toml`):
+3. On your machine, set the environment variable (or add to `.streamlit/secrets.toml` â€” see `.streamlit/secrets.example.toml`):
 
    | Variable | Meaning |
    |----------|---------|
@@ -177,7 +177,7 @@ Replace the CAS as needed. Use `--refresh` to force re-parsing cached dossiers.
 
 For **faster** DSSTox and ToxValDB access, build the local SQLite database:
 
-1. Add a CAS → DTXSID mapping file under `DSS/` (see `DSS/README.md` and [EPA Figshare DSSTox mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566)).
+1. Add a CAS â†’ DTXSID mapping file under `DSS/` (see `DSS/README.md` and [EPA Figshare DSSTox mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566)).
 2. Optionally add COMPTOX ToxValDB Excel exports under `COMPTOX_Public (Data Excel Files Folder)/Data Excel Files/`.
 3. Run:
 
@@ -194,15 +194,15 @@ For **faster** DSSTox and ToxValDB access, build the local SQLite database:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `OFFLINE_LOCAL_ARCHIVE` | No | Path to REACH `reach_study_results_dossiers_*.zip` or folder of `.i6z` files. |
-| `OFFLINE_DOSSIER_INFO_XLSX` | No | Optional Excel index for dossier metadata (CAS ↔ UUID). |
+| `OFFLINE_DOSSIER_INFO_XLSX` | No | Optional Excel index for dossier metadata (CAS â†” UUID). |
 | `OFFLINE_CACHE_DIR` | No | Where offline snapshots and `offline_snippets_cache.db` live (default `data/offline_cache`). |
 | `IUCLID_FORMAT_DIR` | No | Extracted IUCLID format bundle for picklist / phrase decoding. |
 | `CHEMICAL_DB_PATH` | No | Override path to SQLite chemical DB (default `data/chemical_db.sqlite`). |
 | `P2OASYS_MATRIX_PATH` | No | P2OASys hazard matrix Excel (default under `data/`). |
 | `QSAR_TOOLBOX_PORT` | No | Local OECD QSAR Toolbox WebSuite port (Windows; optional). |
-| `USE_PUBCHEM_CAS_VALIDATION` | No | `1` / `0` — validate extracted CAS against PubChem (default on). |
+| `USE_PUBCHEM_CAS_VALIDATION` | No | `1` / `0` â€” validate extracted CAS against PubChem (default on). |
 | `SHOW_ONLY_PUBCHEM_VERIFIED` | No | `1` hides SDS CAS not found in PubChem. |
-| `MIN_CAS_CONFIDENCE` | No | Minimum confidence (0–1) to show SDS extractions in UI. |
+| `MIN_CAS_CONFIDENCE` | No | Minimum confidence (0â€“1) to show SDS extractions in UI. |
 | `HAZQUERY_DISABLE_DOCLING` | No | `1` to skip Docling on constrained hosts. |
 | `OLLAMA_HOST`, `OLLAMA_MODEL` | No | Local LLM for optional SDS flows (see `docs/OLLAMA_SETUP.md`). |
 
@@ -215,7 +215,7 @@ Contributors can install dev tools (e.g. **vulture**) with `pip install -r requi
 1. Push this app to a GitHub repo (e.g. under `quick_hazard_assessment`, in a branch like `feature/streamlit-app` or in a subfolder).
 2. Go to [share.streamlit.io](https://share.streamlit.io), sign in with GitHub, and deploy.
 3. Set **Main file path** to `app.py` and **Root directory** to the folder that contains `app.py` (usually the repository root).
-4. If you use the DSSTox file: the repo is **Git LFS–ready** (see below). Add the file to `DSS/`, commit, and push; LFS will store it. Or omit it and run in PubChem-only mode.
+4. If you use the DSSTox file: the repo is **Git LFSâ€“ready** (see below). Add the file to `DSS/`, commit, and push; LFS will store it. Or omit it and run in PubChem-only mode.
 
 Update the badge URL in this README to your deployed app URL (e.g. `https://your-app-name.streamlit.app`).
 
@@ -225,7 +225,7 @@ Update the badge URL in this README to your deployed app URL (e.g. `https://your
 
 The DSSTox mapping in **`DSS/`** can be large. The repo uses **Git LFS** so GitHub accepts it and clones stay fast.
 
-1. **Install Git LFS** (one-time): [git-lfs.com](https://git-lfs.com) → then run:
+1. **Install Git LFS** (one-time): [git-lfs.com](https://git-lfs.com) â†’ then run:
    ```bash
    git lfs install
    ```
@@ -249,7 +249,7 @@ See **`DSS/README.md`** for download links and update instructions.
 For **faster lookups**, you can build a single SQLite database that combines DSSTox identifiers and ToxValDB toxicity data.
 
 1. **One-time setup**
-   - Ensure **DSS** has a CAS–DTXSID CSV (e.g. `DSS/cas_dtxsid_mapping.csv`).
+   - Ensure **DSS** has a CASâ€“DTXSID CSV (e.g. `DSS/cas_dtxsid_mapping.csv`).
    - Optionally place the **COMPTOX ToxValDB Excel** files in  
      `COMPTOX_Public (Data Excel Files Folder)/Data Excel Files/` (each `.xlsx` will be read).
 2. **Build the database**
@@ -267,35 +267,35 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 ## Project layout
 
 ```
-├── app.py                 # Main Streamlit app
-├── config.py              # App and path settings
-├── requirements.txt
-├── .gitattributes         # Git LFS tracking for DSS/*.csv, DSS/*.xlsx
-├── DSS/                   # DSSTox local database (LFS-tracked)
-│   ├── README.md          # Source, LFS instructions, update steps
-│   └── cas_dtxsid_mapping.csv   # (user-downloaded; add to repo via LFS)
-├── COMPTOX_Public (Data Excel Files Folder)/   # ToxValDB Excel files (optional; LFS)
-│   └── Data Excel Files/*.xlsx
-├── COMPTOX_Public (Data MySQL Dump File Folder)/   # MySQL dump (optional)
-├── data/                  # Built SQLite DB (after setup_chemical_db.py)
-│   └── chemical_db.sqlite
-├── docs/
-│   └── OLLAMA_SETUP.md    # How to install Ollama + Qwen/Gemma locally (models stay on your machine)
-├── scripts/
-│   ├── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
-│   ├── run_sds_examples.py   # Batch run SDS extraction on PDFs in sds_examples/ (optional)
-│   ├── make_searchable_pdf.py # Add text layer to a PDF (ocrmypdf + Tesseract)
-│   └── test_sds_readers.py   # Test SDS extraction + OCR on example PDFs
-└── utils/
-    ├── chemical_db.py     # SQLite DSSTox + ToxValDB (fast lookups)
-    ├── dsstox_local.py    # DSSTox loader from DSS/ (CSV/Excel fallback)
-    ├── cas_validator.py   # CAS validation/normalization
-    ├── pubchem_client.py  # PubChem API wrapper
-    ├── ghs_formatter.py   # GHS H/P phrase formatting
-    ├── smiles_drawer.py   # 2D structure (smiles-drawer)
-    ├── sds_pdf_utils.py   # PDF text extraction for SDS uploads
-    ├── sds_regex_extractor.py  # SDS field extraction (regex, Phase 1)
-    └── sds_compare.py     # SDS vs PubChem comparison report
+â”œâ”€â”€ app.py                 # Main Streamlit app
+â”œâ”€â”€ config.py              # App and path settings
+â”œâ”€â”€ requirements.txt
+â”œâ”€â”€ .gitattributes         # Git LFS tracking for DSS/*.csv, DSS/*.xlsx
+â”œâ”€â”€ DSS/                   # DSSTox local database (LFS-tracked)
+â”‚   â”œâ”€â”€ README.md          # Source, LFS instructions, update steps
+â”‚   â””â”€â”€ cas_dtxsid_mapping.csv   # (user-downloaded; add to repo via LFS)
+â”œâ”€â”€ COMPTOX_Public (Data Excel Files Folder)/   # ToxValDB Excel files (optional; LFS)
+â”‚   â””â”€â”€ Data Excel Files/*.xlsx
+â”œâ”€â”€ COMPTOX_Public (Data MySQL Dump File Folder)/   # MySQL dump (optional)
+â”œâ”€â”€ data/                  # Built SQLite DB (after setup_chemical_db.py)
+â”‚   â””â”€â”€ chemical_db.sqlite
+â”œâ”€â”€ docs/
+â”‚   â””â”€â”€ OLLAMA_SETUP.md    # How to install Ollama + Qwen/Gemma locally (models stay on your machine)
+â”œâ”€â”€ scripts/
+â”‚   â”œâ”€â”€ setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
+â”‚   â”œâ”€â”€ run_sds_examples.py   # Batch run SDS extraction on PDFs in sds_examples/ (optional)
+â”‚   â”œâ”€â”€ make_searchable_pdf.py # Add text layer to a PDF (ocrmypdf + Tesseract)
+â”‚   â””â”€â”€ test_sds_readers.py   # Test SDS extraction + OCR on example PDFs
+â””â”€â”€ utils/
+    â”œâ”€â”€ chemical_db.py     # SQLite DSSTox + ToxValDB (fast lookups)
+    â”œâ”€â”€ dsstox_local.py    # DSSTox loader from DSS/ (CSV/Excel fallback)
+    â”œâ”€â”€ cas_validator.py   # CAS validation/normalization
+    â”œâ”€â”€ pubchem_client.py  # PubChem API wrapper
+    â”œâ”€â”€ ghs_formatter.py   # GHS H/P phrase formatting
+    â”œâ”€â”€ smiles_drawer.py   # 2D structure (smiles-drawer)
+    â”œâ”€â”€ sds_pdf_utils.py   # PDF text extraction for SDS uploads
+    â”œâ”€â”€ sds_regex_extractor.py  # SDS field extraction (regex, Phase 1)
+    â””â”€â”€ sds_compare.py     # SDS vs PubChem comparison report
 ```
 
 ---
@@ -312,3 +312,4 @@ If this tool contributes to your research, please cite:
 ## License
 
 MIT (see [LICENSE](LICENSE)).
+
