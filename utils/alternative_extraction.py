@@ -62,7 +62,7 @@ def get_extraction_pipeline_mode() -> str:
     """
     Active SDS pipeline: env ``HAZQUERY_EXTRACTION_PIPELINE``, then Streamlit session,
     then ``HAZQUERY_DEFAULT_SDS_PIPELINE`` / ``config.DEFAULT_SDS_EXTRACTION_PIPELINE``.
-    Always returns a supported id (``markitdown_fast`` or ``hybrid_md_ocr``).
+    Always returns a supported id (``markitdown_fast``, ``hybrid_md_ocr``, or ``markdown_gliner_regex``).
     """
     raw = ""
     env = (os.environ.get("HAZQUERY_EXTRACTION_PIPELINE") or "").strip()
