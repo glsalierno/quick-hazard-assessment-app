@@ -49,9 +49,12 @@ import requests
 from tqdm import tqdm
 
 from ingest.crosswalk import normalize_cas
-from ingest.echa_loader import ECHA_REGISTERED_URL
 
 logger = logging.getLogger(__name__)
+
+# Public ECHA bulk download (same as ``ingest.echa_loader``); inlined so offline loader does not
+# depend on the full online ingestion module tree on minimal deployments (e.g. Streamlit Cloud).
+ECHA_REGISTERED_URL = "https://echa.europa.eu/documents/10162/13634/registered_substances.csv"
 
 OFFLINE_DATA_DIR = Path(os.getenv("OFFLINE_DATA_DIR", "data/offline"))
 OFFLINE_CACHE_DIR = Path(os.getenv("OFFLINE_CACHE_DIR", "data/offline_cache"))
