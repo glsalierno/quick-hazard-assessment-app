@@ -4,6 +4,8 @@
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox** local data (no API key required for core lookups). Optional modules (offline REACH dossiers, local LLMs) are configured via environment variables.
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app)
+[![Streamlit App v1.3](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://YOUR_V1.3_APP_URL.streamlit.app)
+[![Streamlit App v2.0](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://YOUR_V2.0_APP_URL.streamlit.app)
 
 ---
 
@@ -288,6 +290,7 @@ Contributors can install dev tools (e.g. **vulture**) with `pip install -r requi
 2. Go to [share.streamlit.io](https://share.streamlit.io), sign in with GitHub, and deploy.
 3. Set **Main file path** to `app.py` and **Root directory** to the folder that contains `app.py` (usually the repository root).
 4. If you use the DSSTox file: the repo is **Git LFS–ready** (see below). Add the file to `DSS/`, commit, and push; LFS will store it. Or omit it and run in PubChem-only mode.
+5. **`packages.txt`:** Put **only** valid Debian package names, **one per line**. Do not use `#` comments — Streamlit Community Cloud does not ignore them; tokens from comment lines are passed to `apt-get` and the dependency step fails.
 
 Update the badge URL in this README to your deployed app URL (e.g. `https://your-app-name.streamlit.app`).
 
