@@ -81,13 +81,14 @@ def _reach_iuclid_panel_unconfigured_fallback(code: str) -> None:
                     "TOML key (name must match exactly):"
                 )
                 st.code(
-                    "# Example — use a path that exists on the Cloud filesystem (e.g. small demo under the repo)\n"
-                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/your_reach_demo.zip"\n',
+                    "# Cloud uses Linux paths under the Git clone — NOT your Windows C:\\... path.\n"
+                    "# Set this to whatever you actually committed (e.g. data/echa_iuclid/ or a .zip there).\n"
+                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/echa_iuclid_subset.zip"\n',
                     language="toml",
                 )
                 st.caption(
-                    "Save Secrets, then **Reboot** the app. Full ECHA zips are too large for GitHub; for demos, "
-                    "commit only a small archive or folder of `.i6z` files and point the path at that location."
+                    "Replace `echa_iuclid_subset.zip` with your real filename or folder name under `data/`. "
+                    "Save Secrets, then **Reboot**. Your OneDrive / laptop path only works locally, not on Cloud."
                 )
         elif code == "badpath":
             st.warning(
