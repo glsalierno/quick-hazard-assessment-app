@@ -230,6 +230,20 @@ def render_reach_iuclid_panel_unconfigured(code: str) -> None:
                 "to your REACH study-results archive or a folder of extracted ``.i6z`` dossiers. "
                 "See README → **Offline REACH / IUCLID (optional)**."
             )
+            if on_cloud:
+                st.markdown(
+                    "**Streamlit Cloud:** open the app → **⋮ Manage app** → **Secrets**, and add a **top-level** "
+                    "TOML key (name must match exactly):"
+                )
+                st.code(
+                    "# Example — path must exist on the Cloud container (e.g. small demo committed under the repo)\n"
+                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/your_reach_demo.zip"\n',
+                    language="toml",
+                )
+                st.caption(
+                    "Save Secrets, then **Reboot** the app. Full ECHA drops are too large for GitHub; use a small "
+                    "`.zip` / `.7z` or a folder of `.i6z` files under the repo for demos only."
+                )
         elif code == "badpath":
             st.warning(
                 "**IUCLID (offline REACH):** ``OFFLINE_LOCAL_ARCHIVE`` is set but could not be read as a path "
