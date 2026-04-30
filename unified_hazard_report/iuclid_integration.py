@@ -236,14 +236,18 @@ def render_reach_iuclid_panel_unconfigured(code: str) -> None:
                     "TOML key (name must match exactly):"
                 )
                 st.code(
-                    "# Cloud uses Linux paths under the Git clone — NOT your Windows C:\\... path.\n"
-                    "# Set this to whatever you actually committed (e.g. data/echa_iuclid/ or a .zip there).\n"
-                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/echa_iuclid_subset.zip"\n',
+                    "# Optional — IUCLID phrase/picklist format tree (~100 MB); copy from your "
+                    "# \"IUCLID 6 9.0.0_format\" folder into the repo (no spaces in path recommended)\n"
+                    'IUCLID_FORMAT_DIR = "/mount/src/quick-hazard-assessment-app/data/iuclid_format/IUCLID_6_9_0_0_format"\n'
+                    "\n"
+                    "# Required for dossier / .i6z lookup — must be a path INSIDE the Cloud clone.\n"
+                    "# Full REACH bulk (~10+ GB) cannot live on GitHub; use a small committed demo zip/folder only.\n"
+                    'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/reach_demo/reach_subset.zip"\n',
                     language="toml",
                 )
                 st.caption(
-                    "Replace `echa_iuclid_subset.zip` with your real filename or folder name under `data/`. "
-                    "Save Secrets, then **Reboot**. Your OneDrive / laptop path only works locally, not on Cloud."
+                    "Save Secrets, then **Reboot**. See **`data/echa_cloud/README.txt`** in the repo for what to copy "
+                    "from your local `ECHA IUCLID database` folder vs what must stay local or be shrunk for demos."
                 )
         elif code == "badpath":
             st.warning(
