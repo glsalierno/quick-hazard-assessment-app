@@ -1,11 +1,12 @@
-# SDS CAS extraction pipelines (v1.4)
+# SDS CAS extraction pipelines (v1.4+)
 
-The Streamlit app’s **SDS PDF upload** path uses **two supported extractors** only:
+The Streamlit app’s **SDS PDF upload** path uses these supported extractors:
 
 | ID | Behavior |
 |----|----------|
 | `hybrid_md_ocr` | **Hybrid (default):** PDF → **MarkItDown** → Markdown + **regex** for checksum-valid CAS. If **zero** CAS, fall back to **OCR** (Tesseract or EasyOCR, per sidebar) + regex. |
 | `markitdown_fast` | **MarkItDown + regex only:** same first stage as hybrid, **no** OCR fallback (faster when you know the PDF has extractable text). |
+| `markdown_gliner_regex` | **v1.5 parse-then-extract:** MarkItDown → Markdown → **regex CAS + H-codes**, merged with optional **GLiNER2** `extract_json` (local; install `requirements-gliner2.txt`). No OCR. Sidebar checkbox / `HAZQUERY_USE_GLINER2` can force regex-only stage 2. |
 
 Install: `pip install "markitdown[pdf]"`. Hybrid OCR fallback also needs **Poppler** (for rasterizing PDF pages) and **Tesseract** or **EasyOCR** on `PATH`, or set `HAZQUERY_POPPLER_PATH` where applicable.
 
@@ -72,8 +73,15 @@ These options existed in earlier builds or experiments. They are **no longer sel
 
 ---
 
+## GLiNER2 (optional, v1.5)
+
+- **Install:** `pip install -r requirements-gliner2.txt` (adds `gliner2`; uses existing `torch` from the main stack when present).
+- **Model:** `HAZQUERY_GLINER2_MODEL` (default `fastino/gliner2-base-v1`). First run downloads weights.
+- **Disable inference:** `HAZQUERY_USE_GLINER2=0` or Streamlit sidebar **uncheck** “Run GLiNER2…”.
+- **UX:** After an SDS upload, open **“SDS extraction diagnostics”** to inspect regex vs GLiNER CAS counts, H-code regex list, GLiNER timing/errors, and a truncated raw JSON preview.
+
 ## Summary
 
-- **Ship:** `hybrid_md_ocr` (default) and `markitdown_fast`.
+- **Ship:** `hybrid_md_ocr` (default), `markitdown_fast`, and **`markdown_gliner_regex`** (experimental / UX monitoring).
 - **Discard (UI + upload path):** classic unified, OCR-only, MarkItDown+BERT, Docling+BERT-only, pdfplumber-only mode, dual parser — for the reasons above.
 - **Backward compatibility:** unknown or legacy pipeline IDs normalize to **hybrid** or **markitdown_fast** via `utils.alternative_extraction.normalize_sds_pipeline_mode`.

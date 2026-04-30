@@ -1,0 +1,4 @@
+# Optional: GLiNER2 for SDS "parse-then-extract" pipeline (markdown_gliner_regex).
+# Install on top of the main app: pip install -r requirements-gliner2.txt
+# Streamlit Cloud: expect long cold-starts and possible memory limits; prefer local for model UX tests.
+gliner2>=0.1.0

@@ -53,7 +53,7 @@ More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)*
 
 *Enhanced predictions with OPERA QSAR may be available in a separate command-line workflow; OPERA is not bundled with this Streamlit deployment.*
 
-**v1.4 SDS upload:** **MarkItDown + regex** and **Hybrid** (MarkItDown → OCR if no CAS) only — see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md). Optional **local LLM** (Ollama) for other flows: [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
+**SDS upload (v1.5):** **Hybrid**, **MarkItDown + regex**, and optional **parse-then-extract** (`markdown_gliner_regex`: regex + local **GLiNER2** on Markdown) — see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md) and `requirements-gliner2.txt`. Optional **local LLM** (Ollama) for other flows: [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
 
 ---
 
@@ -106,10 +106,11 @@ More detail: **[docs/PUBLIC_RELEASE_TESTING.md](docs/PUBLIC_RELEASE_TESTING.md)*
    - Install **Tesseract** and **Poppler** on your system and ensure both are on `PATH`, then `pip install pdf2image pytesseract easyocr`. See [docs/OCR_SETUP.md](docs/OCR_SETUP.md). Without Poppler, `pdf2image` cannot rasterize PDF pages (`Unable to get page count`).
    - Optional: **ocrmypdf** to produce searchable PDFs: `pip install ocrmypdf`, then `python scripts/make_searchable_pdf.py input.pdf [output.pdf]`.
 
-8. **SDS CAS extraction (two pipelines only)**
+8. **SDS CAS extraction (MarkItDown pipelines)**
    - Full rationale and list of **removed** parsers: **[docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md)**.
-   - Install: `pip install "markitdown[pdf]"` (see `requirements.txt`). **Default:** **Hybrid** (`hybrid_md_ocr`). Valid values: `hybrid_md_ocr` | `markitdown_fast`. Legacy env values (e.g. `default`, `ocr_tesseract`) are **remapped** to a supported pipeline.
-   - Sidebar: **“SDS CAS extraction (v1.4 — two pipelines only)”** — **Hybrid** or **MarkItDown + regex**.
+   - Install: `pip install "markitdown[pdf]"` (see `requirements.txt`). **Default:** **Hybrid** (`hybrid_md_ocr`). Valid values: `hybrid_md_ocr` | `markitdown_fast` | `markdown_gliner_regex`. Legacy env values (e.g. `default`, `ocr_tesseract`) are **remapped** to a supported pipeline.
+   - Optional GLiNER2: `pip install -r requirements-gliner2.txt`. Env: `HAZQUERY_USE_GLINER2`, `HAZQUERY_GLINER2_MODEL`, `HAZQUERY_GLINER2_MAX_CHARS`.
+   - Sidebar: **“SDS CAS extraction (v1.5 — MarkItDown pipelines)”** — pick a strategy; use **SDS extraction diagnostics** after upload to monitor regex vs GLiNER2.
    - Caching: `cache/{sha256}/` (see `utils/cache_manager.py`). Env: `HAZQUERY_EXTRACTION_PIPELINE`, `HAZQUERY_DEFAULT_SDS_PIPELINE`, `HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`, `HAZQUERY_OCR_ENGINE`, `HAZQUERY_TESSERACT_PSM`.
    - Benchmark: `python tests/test_extraction_pipelines.py --folder "sds_examples" --limit 20` → `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
 

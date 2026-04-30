@@ -26,11 +26,14 @@ def find_checksum_valid_cas_in_text(text: str) -> list[str]:
     for m in _CAS_LINE_RE.finditer(text):
         raw = m.group(1)
         norm = cas_validator.normalize_cas_input(raw) or raw
-        ok, _ = cas_validator.validate_cas_relaxed(norm)
-        if not ok or norm in seen:
+        relaxed, _ = cas_validator.validate_cas_relaxed(norm)
+        if not relaxed:
             continue
-        seen.add(norm)
-        out.append(norm)
+        ok, canonical = cas_validator.validate_cas(relaxed)
+        if not ok or canonical in seen:
+            continue
+        seen.add(canonical)
+        out.append(canonical)
     return out
 
 

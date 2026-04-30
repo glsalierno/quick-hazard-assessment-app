@@ -21,12 +21,23 @@ import streamlit as st
 from utils import cas_validator
 
 
+def _canonical_cas_for_sds(cas: str) -> Optional[str]:
+    """
+    Canonical checksum-valid dashed CAS (auto-corrects a wrong check digit when shape is CAS-like).
+    """
+    raw = (cas or "").strip()
+    if not raw:
+        return None
+    relaxed, _ = cas_validator.validate_cas_relaxed(raw)
+    if not relaxed:
+        return None
+    ok, canonical = cas_validator.validate_cas(relaxed)
+    return canonical if ok else None
+
+
 def _validate_checksum(cas: str) -> bool:
-    """Return True if CAS passes checksum validation."""
-    if not cas or not str(cas).strip():
-        return False
-    _, check_ok = cas_validator.validate_cas_relaxed(str(cas).strip())
-    return check_ok
+    """True when the value can be normalized to a valid registry CAS."""
+    return _canonical_cas_for_sds(cas) is not None
 
 
 def _norm_cas_key(cas: str) -> str:
@@ -60,6 +71,7 @@ _METHOD_WEIGHTS: dict[str, float] = {
     "ocr_fallback": -0.1,
     "section1_anchor": 0.15,
     "markitdown_regex": 0.12,
+    "markitdown_gliner_regex": 0.14,
     "markitdown_bert": 0.14,
     "markitdown_hybrid_primary": 0.13,
     "ocr_tesseract_regex": 0.08,
@@ -117,7 +129,7 @@ _COMPOSITION_METHODS: frozenset[str] = frozenset({
     "section1_anchor", "composition_section3", "html_table_parsing", "pipe_table_parsing",
     "delimiter_table_parsing", "line_composition_parsing", "orphan_cas_line", "table_parsing",
     "docling", "docling_table", "docling_distilbert",
-    "markitdown_regex", "markitdown_bert", "markitdown_hybrid_primary",
+    "markitdown_regex", "markitdown_gliner_regex", "markitdown_bert", "markitdown_hybrid_primary",
     "ocr_tesseract_regex", "ocr_easyocr_regex", "ocr_hybrid_fallback",
 })
 # Methods that infer CAS from digit sequences / full-text scan - high false positive risk
@@ -187,16 +199,25 @@ def _score_cas_confidence(
         _deduped.append(k)
     cas_list = _deduped
 
-    # Hard filter: NEVER show CAS that fails checksum — avoid invalid/made-up CAS
+    # Hard filter: drop unrecoverable CAS; keep canonical checksum-valid forms.
     valid_cas_list: List[str] = []
     valid_rows: List[dict[str, Any]] = []
-    row_by_cas = _rows_by_norm_cas(rows)
+    full_row_by = _rows_by_norm_cas(rows)
+    _seen_canon: set[str] = set()
     for cas in cas_list:
-        if not _validate_checksum(cas):
+        canon = _canonical_cas_for_sds(cas)
+        if not canon:
             continue
-        valid_cas_list.append(cas)
-        if cas in row_by_cas:
-            valid_rows.append(dict(row_by_cas[cas]))
+        ck = _norm_cas_key(canon)
+        if not ck or ck in _seen_canon:
+            continue
+        _seen_canon.add(ck)
+        valid_cas_list.append(canon)
+        r_src = full_row_by.get(_norm_cas_key(cas)) or full_row_by.get(ck)
+        if r_src:
+            nr = dict(r_src)
+            nr["cas"] = canon
+            valid_rows.append(nr)
 
     validator = get_pubchem_validator()
     row_by_cas = _rows_by_norm_cas(valid_rows)
@@ -207,7 +228,7 @@ def _score_cas_confidence(
 
     enriched: List[dict[str, Any]] = []
     for cas in valid_cas_list:
-        r = dict(row_by_cas.get(cas, {}))
+        r = dict(row_by_cas.get(_norm_cas_key(cas), {}))
         r["cas"] = cas
         if not (r.get("method") or "").strip() and _batch_method:
             r["method"] = _batch_method
@@ -275,6 +296,8 @@ class ChemicalInput:
     extraction_rows: list[dict[str, Any]] = field(default_factory=list)
     # Set when MarkItDown/hybrid pipeline raises (see metrics["error"] in alternative_extraction)
     extraction_error: Optional[str] = None
+    # Last SDS run diagnostics (e.g. GLiNER2 + regex stage-2 metrics) for Streamlit UX monitoring
+    extraction_metrics: Optional[dict[str, Any]] = None
 
     def has_multiple_cas(self) -> bool:
         return len(self.cas_numbers) > 1
@@ -358,16 +381,22 @@ class UnifiedInputHandler:
                 best = (conf, c)
 
         raw_count_before_gate = len(cas_list)
+        raw_best = best[1]
         cas_list, rows = _score_cas_confidence(cas_list, rows)
-        primary = best[1] if best[1] and best[1] in cas_list else (cas_list[0] if cas_list else "")
+        canon_best = _canonical_cas_for_sds(raw_best) if raw_best else None
+        if canon_best and canon_best in cas_list:
+            primary = canon_best
+        else:
+            primary = cas_list[0] if cas_list else ""
         in_type = "sds_multi" if len(cas_list) > 1 else "sds_single"
         label = getattr(uploaded_file, "name", None) or "SDS.pdf"
         err = metrics.get("error")
         filtered_note: Optional[str] = None
         if not err and raw_count_before_gate > 0 and not cas_list:
             filtered_note = (
-                f"Extractor found {raw_count_before_gate} checksum-valid CAS, but all were removed by "
-                "filters (PubChem gate if SHOW_ONLY_PUBCHEM_VERIFIED=1, or MIN_CAS_CONFIDENCE too high). "
+                f"Extractor reported {raw_count_before_gate} CAS-like candidate(s), but none passed the "
+                "checksum gate after normalization (or all were removed by filters: "
+                "SHOW_ONLY_PUBCHEM_VERIFIED=1, MIN_CAS_CONFIDENCE, or composition vs low-trust rules). "
                 "Defaults: SHOW_ONLY_PUBCHEM_VERIFIED=0, MIN_CAS_CONFIDENCE=0."
             )
         return ChemicalInput(
@@ -377,6 +406,7 @@ class UnifiedInputHandler:
             source_label=label,
             extraction_rows=rows,
             extraction_error=str(err) if err else filtered_note,
+            extraction_metrics=dict(metrics) if metrics else None,
         )
 
 
