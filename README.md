@@ -1,13 +1,5 @@
 # <img src="hierarchy-banner.svg" alt="Hierarchy of Controls pyramid" width="52" style="vertical-align: -4px;" /> Quick Hazard Assessment - Streamlit App <img src="hierarchy-banner.svg" alt="Hierarchy of Controls pyramid" width="52" style="vertical-align: -4px;" />
 
-﻿<p align="center">
- <a href="https://quick-hazard-assessment-v2.streamlit.app/">
- <img src="hierarchy-banner.svg" width="800" alt="Hierarchy of Controls pyramid" />
- </a>
-</p>
-
-# Quick Hazard Assessment - Streamlit App
-
 Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox** local data (no API key required for core lookups). Optional modules (offline REACH dossiers, local LLMs) are configured via environment variables.
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app)
