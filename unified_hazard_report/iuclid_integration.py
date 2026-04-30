@@ -152,10 +152,71 @@ def sync_offline_secrets_from_st_secrets() -> None:
             len(la),
             len(_candidate_secrets_toml_paths()),
         )
+    apply_repo_iuclid_defaults_for_streamlit_cloud()
+
+
+def apply_repo_iuclid_defaults_for_streamlit_cloud() -> None:
+    """
+    On Streamlit Cloud, if ``OFFLINE_LOCAL_ARCHIVE`` / ``IUCLID_FORMAT_DIR`` are still unset,
+    default to committed demo paths under the repo when those files exist.
+
+    User-set Secrets / env always win. Set ``HAZQUERY_DISABLE_REPO_IUCLID_DEFAULTS=1`` to skip.
+    """
+    if os.getenv("HAZQUERY_DISABLE_REPO_IUCLID_DEFAULTS", "").strip().lower() in ("1", "true", "yes", "on"):
+        return
+    try:
+        from services.config import ServiceConfig
+
+        on_cloud = ServiceConfig.is_streamlit_cloud()
+    except Exception:
+        on_cloud = bool(
+            os.getenv("STREAMLIT_CLOUD") == "1"
+            or os.getenv("IS_STREAMLIT_CLOUD") == "1"
+            or str(os.getenv("HOSTNAME", "")).endswith(".streamlit.app")
+        )
+    if not on_cloud:
+        return
+
+    root = _APP_ROOT
+    demo_zip = root / "data" / "reach_demo" / "reach_subset.zip"
+    format_dir = root / "data" / "iuclid_format" / "IUCLID_6_9_0_0_format"
+
+    if not (os.getenv("OFFLINE_LOCAL_ARCHIVE") or "").strip() and demo_zip.is_file():
+        os.environ["OFFLINE_LOCAL_ARCHIVE"] = str(demo_zip.resolve())
+        logger.info(
+            "Streamlit Cloud: default OFFLINE_LOCAL_ARCHIVE=%s (committed demo subset; not full REACH)",
+            os.environ["OFFLINE_LOCAL_ARCHIVE"],
+        )
+    if not (os.getenv("IUCLID_FORMAT_DIR") or "").strip() and format_dir.is_dir():
+        os.environ["IUCLID_FORMAT_DIR"] = str(format_dir.resolve())
+        logger.info(
+            "Streamlit Cloud: default IUCLID_FORMAT_DIR=%s (committed format bundle)",
+            os.environ["IUCLID_FORMAT_DIR"],
+        )
 
 
 def offline_archive_fingerprint() -> str:
     return (os.getenv("OFFLINE_LOCAL_ARCHIVE") or "").strip()
+
+
+def committed_reach_demo_zip_path() -> Path:
+    """Absolute path to the small committed demo archive (may or may not exist on disk)."""
+    return (_APP_ROOT / "data" / "reach_demo" / "reach_subset.zip").resolve()
+
+
+def using_committed_reach_demo_archive() -> bool:
+    """
+    True when ``OFFLINE_LOCAL_ARCHIVE`` points at the repo's committed demo zip.
+
+    Used to show that REACH coverage is intentionally partial and parsed fields may be incomplete.
+    """
+    fp = (os.getenv("OFFLINE_LOCAL_ARCHIVE") or "").strip()
+    if not fp:
+        return False
+    try:
+        return Path(fp).expanduser().resolve() == committed_reach_demo_zip_path()
+    except OSError:
+        return False
 
 
 def offline_reach_archive_status() -> tuple[bool, str]:
@@ -218,9 +279,11 @@ def render_reach_iuclid_panel_unconfigured(code: str) -> None:
             on_cloud = False
 
         cloud_note = (
-            "**Streamlit Cloud:** large REACH / IUCLID archives are not stored in GitHub. "
-            "Use a **local** install with ``OFFLINE_LOCAL_ARCHIVE`` pointing at your dossier ``.zip`` / ``.7z`` "
-            "or a folder of ``.i6z`` files, or host a small demo subset under the repo if you need Cloud demos.\n\n"
+            "**Streamlit Cloud:** the full ECHA REACH export is too large for GitHub. "
+            "This app may use a **small committed demo** (`data/reach_demo/reach_subset.zip`) — "
+            "most substances are **not** included, dossier content can be **missing or partial**, and parsing is **heuristic**. "
+            "For full coverage, run **locally** with ``OFFLINE_LOCAL_ARCHIVE`` pointing at your official dossier "
+            "``.zip`` / ``.7z`` or a folder of ``.i6z`` files.\n\n"
         )
         if code == "unset":
             st.info(
@@ -324,6 +387,16 @@ def render_reach_iuclid_panel(clean_cas: str) -> None:
                 st.caption("Use the sidebar multipage entry **Offline ECHA loader** to verify paths and load snapshots.")
             return
 
+        if using_committed_reach_demo_archive():
+            st.info(
+                "**Demo IUCLID / REACH database:** you are using the committed archive "
+                "`data/reach_demo/reach_subset.zip`. It is only a **small subset** of REACH dossiers for demos "
+                "and Cloud file limits — **not** the official full export. Most CAS numbers will have **no** dossier; "
+                "study snippets and classifications may be **missing, truncated, or incomplete**. "
+                "Parsing uses **heuristics**, not a full IUCLID engine — **not** for regulatory, registration, "
+                "or completeness claims. Use ECHA’s downloads and a local full archive when you need authoritative data."
+            )
+
         c1, c2 = st.columns([1, 2])
         ctx = get_offline_context(fp)
         cas_target_uuids = ctx.uuids_for_cas(cas_norm) if ctx is not None else []
@@ -386,9 +459,15 @@ def render_reach_iuclid_panel(clean_cas: str) -> None:
         uuids = data.get("iuclid_uuids") or []
         if not uuids:
             st.info(f"No REACH dossier index row matches **{cas_norm}** in the offline substances snapshot.")
-            st.caption(
+            cap = (
                 "If you expect a hit, confirm CAS formatting, merge **OFFLINE_DOSSIER_INFO_XLSX**, or rebuild snapshots."
             )
+            if using_committed_reach_demo_archive():
+                cap += (
+                    " With the **repo demo zip**, absent dossiers are **expected** for almost all substances — "
+                    "expand the subset or point **OFFLINE_LOCAL_ARCHIVE** at a full local archive."
+                )
+            st.caption(cap)
             return
 
         st.caption(f"{len(uuids)} matching dossier UUID(s) in the offline index.")

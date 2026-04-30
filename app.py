@@ -63,9 +63,10 @@ def _reach_iuclid_panel_unconfigured_fallback(code: str) -> None:
         except Exception:
             on_cloud = False
         cloud_note = (
-            "**Streamlit Cloud:** large REACH / IUCLID archives are not stored in GitHub. "
-            "Use a **local** install with ``OFFLINE_LOCAL_ARCHIVE`` pointing at your dossier ``.zip`` / ``.7z`` "
-            "or a folder of ``.i6z`` files, or host a small demo subset under the repo if you need Cloud demos.\n\n"
+            "**Streamlit Cloud:** the full ECHA REACH export is too large for GitHub. "
+            "A **committed demo** (`data/reach_demo/reach_subset.zip`) covers only a **tiny subset** — "
+            "most CAS have no dossier; data may be **missing or partial**; parsing is **heuristic**. "
+            "For full coverage, run **locally** with ``OFFLINE_LOCAL_ARCHIVE`` to your official archive.\n\n"
         )
         if code == "unset":
             st.info(
@@ -84,7 +85,7 @@ def _reach_iuclid_panel_unconfigured_fallback(code: str) -> None:
                     "# Optional — phrase/picklist format tree; copy \"IUCLID 6 9.0.0_format\" into repo (no spaces)\n"
                     'IUCLID_FORMAT_DIR = "/mount/src/quick-hazard-assessment-app/data/iuclid_format/IUCLID_6_9_0_0_format"\n'
                     "\n"
-                    "# Dossier lookup — small demo zip/folder only inside clone (full REACH ~10+ GB cannot be on GitHub)\n"
+                    "# Dossier lookup — demo zip only (NOT full REACH; incomplete by design)\n"
                     'OFFLINE_LOCAL_ARCHIVE = "/mount/src/quick-hazard-assessment-app/data/reach_demo/reach_subset.zip"\n',
                     language="toml",
                 )
@@ -119,12 +120,17 @@ st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sideb
 MARKITDOWN_OK, _MARKITDOWN_ERR = is_markitdown_available()
 
 # Offline REACH / IUCLID: mirror secrets into os.environ before any ingest reads env (optional package).
+_IUCLID_SYNC_FAILED: str | None = None
 try:
     from unified_hazard_report.iuclid_integration import sync_offline_secrets_from_st_secrets
 
     sync_offline_secrets_from_st_secrets()
-except Exception:
-    pass
+except ModuleNotFoundError as exc:
+    _IUCLID_SYNC_FAILED = str(exc)
+    logging.getLogger(__name__).warning("IUCLID integration module not found: %s", exc)
+except Exception as exc:
+    _IUCLID_SYNC_FAILED = f"{type(exc).__name__}: {exc}"
+    logging.getLogger(__name__).warning("IUCLID secrets sync skipped: %s", exc)
 
 # Session state: persist query and result to avoid re-fetching on every rerun
 if "query" not in st.session_state:
@@ -133,6 +139,13 @@ if "result_for" not in st.session_state:
     st.session_state["result_for"] = None
 if "result_data" not in st.session_state:
     st.session_state["result_data"] = None  # { "pubchem": ..., "dsstox_info": ..., "clean_cas": ... }
+
+if _IUCLID_SYNC_FAILED and not st.session_state.get("_iuclid_sync_banner_shown"):
+    st.session_state["_iuclid_sync_banner_shown"] = True
+    st.info(
+        "**IUCLID offline hooks did not load** (optional). The rest of the app runs; REACH / IUCLID expander may be limited. "
+        f"Reason: `{_IUCLID_SYNC_FAILED}`"
+    )
 
 # GHS display preferences (persist during session)
 if "show_h_phrases" not in st.session_state:
