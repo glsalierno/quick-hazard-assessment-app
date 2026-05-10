@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Quick Hazard Assessment",
+    "slug": "quick-hazard-assessment-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.quickhazard.assessment"
+    },
+    "android": {
+      "package": "com.quickhazard.assessment",
+      "adaptiveIcon": {
+        "backgroundColor": "#0f766e"
+      }
+    },
+    "extra": {
+      "zenodoDoi": "10.5281/zenodo.19056294"
+    }
+  }
+}
