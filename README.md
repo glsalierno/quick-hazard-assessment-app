@@ -50,6 +50,20 @@
 
 ---
 
+## Mobile app (Expo / React Native)
+
+A native Expo mobile implementation is available in **`mobile/`**. It ports the Streamlit assessment flow to native screens with TypeScript models, PubChem hazard parsing, and on-device history.
+
+```bash
+cd mobile
+npm install
+npm run start
+```
+
+See **`MOBILE_MIGRATION.md`** for the repo analysis, React Native recommendation, phased migration plan, MCP notes, and implementation details.
+
+---
+
 ## Deploy on Streamlit Community Cloud
 
 1. Push this app to a GitHub repo (e.g. under `quick_hazard_assessment`, in a branch like `feature/streamlit-app` or in a subfolder).
