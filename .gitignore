@@ -11,6 +11,11 @@ __pycache__/
 dist/
 build/
 
+# Node / Expo mobile app
+node_modules/
+mobile/.expo/
+mobile/.expo-shared/
+
 # IDE / OS
 .idea/
 .vscode/
