@@ -67,6 +67,19 @@ export type ExposureBands = {
   inhalation?: ExposureBand;
 };
 
+export type HazardSummaryHighlight = {
+  label: string;
+  value: string;
+  tone: 'info' | 'warning' | 'danger';
+};
+
+export type HazardSummary = {
+  headline: string;
+  paragraphs: string[];
+  highlights: HazardSummaryHighlight[];
+  concernLevel: 'high' | 'moderate' | 'low' | 'unknown';
+};
+
 export type ChemicalReport = {
   id: string;
   queriedAt: string;
@@ -90,6 +103,7 @@ export type ChemicalReport = {
   prioritizedToxicity: PrioritizedToxicityItem[];
   ecotoxicity: EcotoxicitySummary;
   exposureBands: ExposureBands;
+  hazardSummary?: HazardSummary;
 };
 
 export type PubChemPropertyRow = {

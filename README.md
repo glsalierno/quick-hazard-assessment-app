@@ -11,6 +11,7 @@
 - **Input:** CAS number (e.g. `67-64-1`) or chemical name
 - **DSSTox local:** CAS to DTXSID lookup from a local mapping file (no EPA API key)
 - **PubChem:** Properties, GHS H/P codes with phrase legends, flash point, vapor pressure, IUPAC name, SMILES
+- **Hazard summary:** Short narrative from GHS codes, flash point, and toxicity screening bands (try **1,3-dioxolane**, CAS `646-06-0`)
 - **Molecular structure:** 2D rendering at the top of the report (client-side [smiles-drawer](https://github.com/reymond-group/smiles-drawer))
 - **Graceful fallback:** If the DSSTox file is missing, the app runs in **PubChem-only** mode
 - **Download:** Report as CSV

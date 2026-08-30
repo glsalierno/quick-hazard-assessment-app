@@ -8,6 +8,7 @@ import {
   extractToxicities,
   prioritizeToxicityData,
 } from '../domain/hazardLogic';
+import { summarizeReport } from '../domain/hazardSummary';
 import { ChemicalReport, PubChemPropertyRow } from '../domain/types';
 
 const pubChemBase = 'https://pubchem.ncbi.nlm.nih.gov/rest/pug';
@@ -80,8 +81,10 @@ export async function assessCompound(rawQuery: string): Promise<ChemicalReport> 
   const toxicities = pugView ? extractToxicities(pugView) : [];
   const ecotoxicity = extractEcotoxicity(ghs, toxicities);
   const smiles = properties.IsomericSMILES ?? properties.CanonicalSMILES;
+  const exposureBands = computeExposureBands(toxicities);
+  const dsstox = inputType === 'cas' ? getBundledDsstoxRecord(normalizedQuery) : undefined;
 
-  return {
+  const report = {
     id: reportId(normalizedQuery, cid),
     queriedAt: new Date().toISOString(),
     query: rawQuery,
@@ -98,7 +101,7 @@ export async function assessCompound(rawQuery: string): Promise<ChemicalReport> 
           : String(properties.MolecularWeight),
     smiles,
     structureImageUrl: `${pubChemBase}/compound/cid/${cid}/PNG?image_size=large`,
-    dsstox: inputType === 'cas' ? getBundledDsstoxRecord(normalizedQuery) : undefined,
+    dsstox,
     ghs,
     flashPoint: metrics.flashPoint,
     vaporPressure: metrics.vaporPressure,
@@ -108,6 +111,11 @@ export async function assessCompound(rawQuery: string): Promise<ChemicalReport> 
     toxicities,
     prioritizedToxicity: prioritizeToxicityData(toxicities),
     ecotoxicity,
-    exposureBands: computeExposureBands(toxicities),
+    exposureBands,
+  };
+
+  return {
+    ...report,
+    hazardSummary: summarizeReport(report),
   };
 }
