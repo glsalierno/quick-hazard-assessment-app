@@ -61,6 +61,7 @@ export function HistoryScreen({ navigation }: Props) {
                 <Text style={styles.itemTitle}>{item.dsstox?.preferredName ?? item.iupacName ?? item.normalizedQuery}</Text>
                 {item.hazardSummary?.headline ? <Text style={styles.itemSummary}>{item.hazardSummary.headline}</Text> : null}
                 <Text style={styles.itemMeta}>
+                  {item.isExample ? 'Example report · ' : ''}
                   {item.normalizedQuery} · CID {item.cid}
                 </Text>
                 <Text style={styles.itemDate}>{new Date(item.queriedAt).toLocaleString()}</Text>

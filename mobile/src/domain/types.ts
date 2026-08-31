@@ -104,6 +104,7 @@ export type ChemicalReport = {
   ecotoxicity: EcotoxicitySummary;
   exposureBands: ExposureBands;
   hazardSummary?: HazardSummary;
+  isExample?: boolean;
 };
 
 export type PubChemPropertyRow = {

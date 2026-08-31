@@ -54,9 +54,14 @@ export function ResultsScreen({ route }: Props) {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.kicker}>{report.inputType === 'cas' ? 'CAS assessment' : 'Name assessment'}</Text>
+          <Text style={styles.kicker}>
+            {report.isExample ? 'Example report' : report.inputType === 'cas' ? 'CAS assessment' : 'Name assessment'}
+          </Text>
           <Text style={styles.title}>{report.dsstox?.preferredName ?? report.iupacName ?? report.normalizedQuery}</Text>
-          <Text style={styles.subtitle}>PubChem CID {report.cid} · saved {new Date(report.queriedAt).toLocaleString()}</Text>
+          <Text style={styles.subtitle}>
+            PubChem CID {report.cid}
+            {report.isExample ? ' · bundled snapshot' : ` · saved ${new Date(report.queriedAt).toLocaleString()}`}
+          </Text>
         </View>
 
         <Card>

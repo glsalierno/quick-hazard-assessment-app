@@ -34,6 +34,7 @@ Scan the QR code with Expo Go, then search for `67-64-1` or `acetone`.
 - AsyncStorage local history for offline review of previously fetched reports.
 - Bundled DSSTox identifiers for the example chemicals from the Streamlit app, including 1,3-dioxolane.
 - Generated narrative hazard summary from GHS codes, flash point, and toxicity screening bands.
+- Bundled **1,3-dioxolane** example report that opens immediately without a live PubChem fetch.
 
 The original Streamlit app does not contain a questionnaire, scoring table, or decision tree. Its "assessment" is a lookup, extraction, prioritization, and report-display workflow.
 
