@@ -5,6 +5,7 @@ const bundledDsstoxExamples: Record<string, DsstoxRecord> = {
   '64-17-5': { cas: '64-17-5', dtxsid: 'DTXSID9020584', preferredName: 'Ethanol' },
   '71-43-2': { cas: '71-43-2', dtxsid: 'DTXSID3039242', preferredName: 'Benzene' },
   '50-00-0': { cas: '50-00-0', dtxsid: 'DTXSID7020637', preferredName: 'Formaldehyde' },
+  '646-06-0': { cas: '646-06-0', dtxsid: 'DTXSID4027284', preferredName: '1,3-Dioxolane' },
 };
 
 export function getBundledDsstoxRecord(cas: string): DsstoxRecord | undefined {

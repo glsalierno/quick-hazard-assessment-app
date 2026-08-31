@@ -12,7 +12,7 @@ import pandas as pd
 import streamlit as st
 
 import config
-from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
+from utils import cas_validator, chemical_db, data_formatter, dsstox_local, example_reports, ghs_formatter, hazard_summary, pubchem_client, smiles_drawer
 from utils import toxvaldb_client
 
 # Page config
@@ -77,11 +77,27 @@ with st.form("cas_input"):
     with col1:
         submitted = st.form_submit_button("Assess")
 
+# Bundled example report — open without a live PubChem fetch
+st.markdown("**Example report**")
+example_left, example_right = st.columns([3, 2])
+with example_left:
+    st.write("**1,3-Dioxolane** · CAS 646-06-0")
+    st.caption("Danger — highly flammable liquid; reproductive toxicity. Bundled PubChem snapshot with a generated hazard summary.")
+with example_right:
+    if st.button("Open example report", type="primary", key="open_dioxolane_example"):
+        st.session_state["query"] = "646-06-0"
+        payload = example_reports.load_dioxolane_example()
+        st.session_state["result_for"] = payload["clean_cas"]
+        st.session_state["result_data"] = payload
+        st.rerun()
+
 # Example buttons (outside form — use session state to set query and rerun)
-st.markdown("**Examples:**")
-example_cols = st.columns(4)
+st.markdown("**Live examples:**")
+example_cols_per_row = 3
 for i, (example_cas, label) in enumerate(config.EXAMPLE_CHEMICALS):
-    if example_cols[i].button(label, key=f"ex_{i}"):
+    if i % example_cols_per_row == 0:
+        example_cols = st.columns(example_cols_per_row)
+    if example_cols[i % example_cols_per_row].button(label, key=f"ex_{i}"):
         st.session_state["query"] = example_cas
         st.session_state["result_for"] = None  # force re-fetch
         st.rerun()
@@ -160,6 +176,13 @@ if current_query:
         clean_cas = result["clean_cas"]
         toxval_data = result.get("toxval_data")
 
+        if result.get("is_example"):
+            snapshot = result.get("snapshot_date") or "bundled snapshot"
+            st.info(
+                f"**Example report** — 1,3-dioxolane PubChem snapshot ({snapshot}). "
+                "Use a live CAS search if you need a freshly fetched record."
+            )
+
         # --- Molecular structure at top ---
         if pubchem_data.get("smiles"):
             st.subheader("Molecular Structure")
@@ -195,6 +218,36 @@ if current_query:
             if mol_img is not None:
                 st.image(mol_img, width="stretch")
             # If mol_img is None, draw_smiles already rendered the JS fallback
+
+        summary = hazard_summary.build_hazard_summary(
+            query=clean_cas,
+            preferred_name=preferred_name,
+            iupac_name=pubchem_data.get("iupac_name"),
+            formula=pubchem_data.get("formula"),
+            ghs=pubchem_data.get("ghs") or {},
+            flash_point=pubchem_data.get("flash_point"),
+            vapor_pressure=pubchem_data.get("vapor_pressure"),
+            nfpa=pubchem_data.get("nfpa"),
+            iarc=pubchem_data.get("iarc"),
+            prop65=pubchem_data.get("prop65"),
+            exposure_bands=pubchem_data.get("exposure_bands") or {},
+            ecotoxicity=pubchem_data.get("ecotoxicity") or {},
+        )
+        st.subheader("Hazard summary")
+        concern = summary["concern_level"]
+        if concern == "high":
+            st.error(f"**{summary['headline']}**")
+        elif concern == "moderate":
+            st.warning(f"**{summary['headline']}**")
+        else:
+            st.info(f"**{summary['headline']}**")
+        for paragraph in summary["paragraphs"]:
+            st.write(paragraph)
+        highlight_cols = st.columns(min(3, max(1, len(summary["highlights"]))))
+        for i, item in enumerate(summary["highlights"][:6]):
+            highlight_cols[i % len(highlight_cols)].metric(item["label"], item["value"])
+        st.caption("Lookup synthesis from PubChem GHS and property text. Use the SDS and local controls for work planning.")
+        pubchem_data["hazard_summary"] = summary
 
         # --- Identifiers and properties in columns ---
         col1, col2 = st.columns(2)
