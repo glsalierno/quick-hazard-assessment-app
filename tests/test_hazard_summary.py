@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import unittest
 
+from utils.example_reports import load_dioxolane_example
 from utils.hazard_summary import build_hazard_summary
 
 
@@ -42,6 +43,27 @@ class HazardSummaryTests(unittest.TestCase):
         labels = [item["label"] for item in summary["highlights"]]
         self.assertIn("H360", labels)
         self.assertIn("H225", labels)
+
+    def test_bundled_example_report_opens_as_high_concern(self) -> None:
+        payload = load_dioxolane_example()
+        self.assertEqual(payload["clean_cas"], "646-06-0")
+        self.assertTrue(payload["is_example"])
+        pubchem = payload["pubchem"]
+        summary = build_hazard_summary(
+            query=payload["clean_cas"],
+            preferred_name=payload["preferred_name"],
+            iupac_name=pubchem.get("iupac_name"),
+            formula=pubchem.get("formula"),
+            ghs=pubchem.get("ghs") or {},
+            flash_point=pubchem.get("flash_point"),
+            vapor_pressure=pubchem.get("vapor_pressure"),
+            nfpa=pubchem.get("nfpa"),
+            exposure_bands=pubchem.get("exposure_bands") or {},
+            ecotoxicity=pubchem.get("ecotoxicity") or {},
+        )
+        self.assertEqual(summary["concern_level"], "high")
+        self.assertIn("reproductive", summary["headline"])
+        self.assertIn("H360", " ".join(summary["paragraphs"]))
 
     def test_unknown_when_no_ghs(self) -> None:
         summary = build_hazard_summary(query="unknown-chemical", ghs={"h_codes": [], "signal_word": ""})

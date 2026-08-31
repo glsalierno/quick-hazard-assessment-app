@@ -12,7 +12,7 @@ import pandas as pd
 import streamlit as st
 
 import config
-from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, hazard_summary, pubchem_client, smiles_drawer
+from utils import cas_validator, chemical_db, data_formatter, dsstox_local, example_reports, ghs_formatter, hazard_summary, pubchem_client, smiles_drawer
 from utils import toxvaldb_client
 
 # Page config
@@ -77,8 +77,22 @@ with st.form("cas_input"):
     with col1:
         submitted = st.form_submit_button("Assess")
 
+# Bundled example report — open without a live PubChem fetch
+st.markdown("**Example report**")
+example_left, example_right = st.columns([3, 2])
+with example_left:
+    st.write("**1,3-Dioxolane** · CAS 646-06-0")
+    st.caption("Danger — highly flammable liquid; reproductive toxicity. Bundled PubChem snapshot with a generated hazard summary.")
+with example_right:
+    if st.button("Open example report", type="primary", key="open_dioxolane_example"):
+        st.session_state["query"] = "646-06-0"
+        payload = example_reports.load_dioxolane_example()
+        st.session_state["result_for"] = payload["clean_cas"]
+        st.session_state["result_data"] = payload
+        st.rerun()
+
 # Example buttons (outside form — use session state to set query and rerun)
-st.markdown("**Examples:**")
+st.markdown("**Live examples:**")
 example_cols_per_row = 3
 for i, (example_cas, label) in enumerate(config.EXAMPLE_CHEMICALS):
     if i % example_cols_per_row == 0:
@@ -161,6 +175,13 @@ if current_query:
         preferred_name = result.get("preferred_name")
         clean_cas = result["clean_cas"]
         toxval_data = result.get("toxval_data")
+
+        if result.get("is_example"):
+            snapshot = result.get("snapshot_date") or "bundled snapshot"
+            st.info(
+                f"**Example report** — 1,3-dioxolane PubChem snapshot ({snapshot}). "
+                "Use a live CAS search if you need a freshly fetched record."
+            )
 
         # --- Molecular structure at top ---
         if pubchem_data.get("smiles"):

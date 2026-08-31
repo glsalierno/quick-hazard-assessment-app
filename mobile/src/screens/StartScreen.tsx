@@ -16,6 +16,7 @@ import { Card } from '../components/Card';
 import { Chip } from '../components/Chip';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Screen } from '../components/Screen';
+import { getDioxolaneExampleReport } from '../constants/dioxolaneExample';
 import { exampleChemicals } from '../constants/examples';
 import { colors, radius, spacing } from '../constants/theme';
 import { normalizeCasInput } from '../domain/cas';
@@ -61,6 +62,27 @@ export function StartScreen({ navigation }: Props) {
               Search by CAS number or chemical name to build a mobile report from PubChem hazard, GHS, toxicity, and structure data.
             </Text>
           </View>
+
+          <Card>
+            <Text style={styles.examplesTitle}>Example report</Text>
+            <Text style={styles.exampleCas}>646-06-0</Text>
+            <Text style={styles.exampleReportTitle}>1,3-Dioxolane</Text>
+            <Text style={styles.exampleHeadline}>Danger — highly flammable liquid; reproductive toxicity</Text>
+            <Text style={styles.note}>
+              Open a bundled PubChem snapshot with the generated hazard summary, GHS statements, and screening endpoints. No live lookup required.
+            </Text>
+            <View style={styles.exampleActions}>
+              <PrimaryButton
+                disabled={loading}
+                onPress={() => {
+                  const report = getDioxolaneExampleReport();
+                  void saveReportToHistory(report);
+                  navigation.navigate('Results', { report });
+                }}
+                title="Open example report"
+              />
+            </View>
+          </Card>
 
           <Card>
             <Text style={styles.label}>CAS number or chemical name</Text>
@@ -203,6 +225,23 @@ const styles = StyleSheet.create({
   exampleLabel: {
     color: colors.muted,
     marginTop: spacing.xs,
+  },
+  exampleReportTitle: {
+    color: colors.text,
+    fontSize: 24,
+    fontWeight: '900',
+    letterSpacing: -0.4,
+    marginTop: spacing.xs,
+  },
+  exampleHeadline: {
+    color: colors.danger,
+    fontSize: 16,
+    fontWeight: '700',
+    lineHeight: 22,
+    marginTop: spacing.sm,
+  },
+  exampleActions: {
+    marginTop: spacing.md,
   },
   chips: {
     flexDirection: 'row',
