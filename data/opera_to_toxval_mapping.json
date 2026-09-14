@@ -1,0 +1,2848 @@
+{
+  "meta": {
+    "n_opera_endpoints": 150,
+    "n_toxval_types_profiled": 56,
+    "min_count_filter": 5
+  },
+  "mapping": {
+    "MoleculeID": {
+      "keywords": [
+        "moleculeid"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "MolWeight": {
+      "keywords": [
+        "molweight"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbAtoms": {
+      "keywords": [
+        "nbatoms"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbHeavyAtoms": {
+      "keywords": [
+        "nbheavyatoms"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbC": {
+      "keywords": [
+        "nbc"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbO": {
+      "keywords": [
+        "nbo"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbN": {
+      "keywords": [
+        "nbn"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbAromAtom": {
+      "keywords": [
+        "nbaromatom"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbRing": {
+      "keywords": [
+        "nbring"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbHeteroRing": {
+      "keywords": [
+        "nbheteroring"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Sp3Sp2HybRatio": {
+      "keywords": [
+        "sp3sp2hybratio"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbRotBd": {
+      "keywords": [
+        "nbrotbd"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbHBdAcc": {
+      "keywords": [
+        "nbhbdacc"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "ndHBdDon": {
+      "keywords": [
+        "ndhbddon"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "nbLipinskiFailures": {
+      "keywords": [
+        "nblipinskifailures"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "TopoPolSurfAir": {
+      "keywords": [
+        "topopolsurfair"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "MolarRefract": {
+      "keywords": [
+        "molarrefract"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "CombDipolPolariz": {
+      "keywords": [
+        "combdipolpolariz"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogP_pred": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "octanol"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogP_predRange": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_LogP": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_LogP": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_LogP": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "MP_pred": {
+      "keywords": [
+        "melting point"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "MP_predRange": {
+      "keywords": [
+        "mprange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_MP": {
+      "keywords": [
+        "ad mp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_MP": {
+      "keywords": [
+        "ad index mp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_MP": {
+      "keywords": [
+        "conf index mp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "BP_pred": {
+      "keywords": [
+        "boiling point"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "BP_predRange": {
+      "keywords": [
+        "bprange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_BP": {
+      "keywords": [
+        "ad bp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_BP": {
+      "keywords": [
+        "ad index bp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_BP": {
+      "keywords": [
+        "conf index bp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogVP_pred": {
+      "keywords": [
+        "vapor pressure",
+        "vapour pressure"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "VP_predRange": {
+      "keywords": [
+        "vprange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_VP": {
+      "keywords": [
+        "ad vp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_VP": {
+      "keywords": [
+        "ad index vp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_VP": {
+      "keywords": [
+        "conf index vp"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogWS_pred": {
+      "keywords": [
+        "solubility",
+        "water solubility",
+        "aqueous"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "WS_predRange": {
+      "keywords": [
+        "solubility"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_WS": {
+      "keywords": [
+        "solubility"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_WS": {
+      "keywords": [
+        "solubility"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_WS": {
+      "keywords": [
+        "solubility"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogHL_pred": {
+      "keywords": [
+        "henry",
+        "air water"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "HL_predRange": {
+      "keywords": [
+        "hlrange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_HL": {
+      "keywords": [
+        "ad hl"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_HL": {
+      "keywords": [
+        "ad index hl"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_HL": {
+      "keywords": [
+        "conf index hl"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "RT_pred": {
+      "keywords": [
+        "rt"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [
+        "short term",
+        "not reported",
+        "short term repeated dose toxicity",
+        "epidemiological (cohort)",
+        "fertility, other",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "short term": 16262,
+        "not reported": 562,
+        "short term repeated dose toxicity": 71,
+        "epidemiological (cohort)": 7,
+        "fertility, other": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "RT_predRange": {
+      "keywords": [
+        "rtrange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_RT": {
+      "keywords": [
+        "ad rt"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_RT": {
+      "keywords": [
+        "ad index rt"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_RT": {
+      "keywords": [
+        "conf index rt"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogKOA_pred": {
+      "keywords": [
+        "logkoa"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "KOA_predRange": {
+      "keywords": [
+        "koarange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_KOA": {
+      "keywords": [
+        "ad koa"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_KOA": {
+      "keywords": [
+        "ad index koa"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_KOA": {
+      "keywords": [
+        "conf index koa"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "ionization": {
+      "keywords": [
+        "ionization"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "pKa_a_pred": {
+      "keywords": [
+        "pka a"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "pKa_a_predRange": {
+      "keywords": [
+        "pka arange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "pKa_b_pred": {
+      "keywords": [
+        "pka b"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "pKa_b_predRange": {
+      "keywords": [
+        "pka brange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_pKa": {
+      "keywords": [
+        "ad pka"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_pKa": {
+      "keywords": [
+        "ad index pka"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_pKa": {
+      "keywords": [
+        "conf index pka"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogD55_pred": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogD55_predRange": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogD74_pred": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogD74_predRange": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_LogD": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_LogD": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_LogD": {
+      "keywords": [
+        "logp",
+        "log p",
+        "kow",
+        "partition"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogOH_pred": {
+      "keywords": [
+        "logoh"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogOH_predRange": {
+      "keywords": [
+        "logohrange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_AOH": {
+      "keywords": [
+        "ad aoh"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_AOH": {
+      "keywords": [
+        "ad index aoh"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_AOH": {
+      "keywords": [
+        "conf index aoh"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogBCF_pred": {
+      "keywords": [
+        "bioconcentration",
+        "bcf"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "BCF_predRange": {
+      "keywords": [
+        "bioconcentration",
+        "bcf"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_BCF": {
+      "keywords": [
+        "bioconcentration",
+        "bcf"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_BCF": {
+      "keywords": [
+        "bioconcentration",
+        "bcf"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_BCF": {
+      "keywords": [
+        "bioconcentration",
+        "bcf"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "BioDeg_LogHalfLife_pred": {
+      "keywords": [
+        "half life",
+        "half life",
+        "biodeg"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "BioDeg_predRange": {
+      "keywords": [
+        "biodegrange"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "AD_BioDeg": {
+      "keywords": [
+        "ad biodeg"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "AD_index_BioDeg": {
+      "keywords": [
+        "ad index biodeg"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "Conf_index_BioDeg": {
+      "keywords": [
+        "conf index biodeg"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "ReadyBiodeg_pred": {
+      "keywords": [
+        "readybiodeg"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "AD_ReadyBiodeg": {
+      "keywords": [
+        "ad readybiodeg"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "AD_index_ReadyBiodeg": {
+      "keywords": [
+        "ad index readybiodeg"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "Conf_index_ReadyBiodeg": {
+      "keywords": [
+        "conf index readybiodeg"
+      ],
+      "domain_keywords": [
+        "chronic",
+        "subchronic",
+        "short term"
+      ],
+      "toxval_types": [
+        "chronic",
+        "subchronic",
+        "short term",
+        "chronic long term",
+        "short term repeated dose toxicity",
+        "sub chronic toxicity",
+        "subchronic prospective supplementation trial",
+        "subchronic, developmental reproductive",
+        "chronic dietary",
+        "chronic toxicity",
+        "epidemiological (chronic)",
+        "case report of chronic self intoxication"
+      ],
+      "toxval_type_counts": {
+        "chronic": 23305,
+        "subchronic": 17813,
+        "short term": 16262,
+        "chronic long term": 1756,
+        "short term repeated dose toxicity": 71,
+        "sub chronic toxicity": 42,
+        "subchronic prospective supplementation trial": 12,
+        "subchronic, developmental reproductive": 10,
+        "chronic dietary": 9,
+        "chronic toxicity": 8,
+        "epidemiological (chronic)": 5,
+        "case report of chronic self intoxication": 5
+      }
+    },
+    "LogKM_pred": {
+      "keywords": [
+        "logkm"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "KM_predRange": {
+      "keywords": [
+        "kmrange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_KM": {
+      "keywords": [
+        "ad km"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_KM": {
+      "keywords": [
+        "ad index km"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_KM": {
+      "keywords": [
+        "conf index km"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "LogKoc_pred": {
+      "keywords": [
+        "koc",
+        "soil adsorption",
+        "organic carbon"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Koc_predRange": {
+      "keywords": [
+        "kocrange"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_Koc": {
+      "keywords": [
+        "ad koc"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "AD_index_Koc": {
+      "keywords": [
+        "ad index koc"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "Conf_index_Koc": {
+      "keywords": [
+        "conf index koc"
+      ],
+      "domain_keywords": [],
+      "toxval_types": [],
+      "toxval_type_counts": {}
+    },
+    "FUB_pred": {
+      "keywords": [
+        "fub"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "FUB_predRange": {
+      "keywords": [
+        "fubrange"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "AD_FUB": {
+      "keywords": [
+        "ad fub"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "AD_index_FUB": {
+      "keywords": [
+        "ad index fub"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "Conf_index_FUB": {
+      "keywords": [
+        "conf index fub"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "Clint_pred": {
+      "keywords": [
+        "clint"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "Clint_predRange": {
+      "keywords": [
+        "clintrange"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "AD_Clint": {
+      "keywords": [
+        "ad clint"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "AD_index_Clint": {
+      "keywords": [
+        "ad index clint"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "Conf_index_Clint": {
+      "keywords": [
+        "conf index clint"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "CACO2_pred": {
+      "keywords": [
+        "caco2"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "CACO2_predRange": {
+      "keywords": [
+        "caco2range"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "AD_CACO2": {
+      "keywords": [
+        "ad caco2"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "AD_index_CACO2": {
+      "keywords": [
+        "ad index caco2"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "Conf_index_CACO2": {
+      "keywords": [
+        "conf index caco2"
+      ],
+      "domain_keywords": [
+        "in vitro",
+        "clinical",
+        "occupational"
+      ],
+      "toxval_types": [
+        "in vitro",
+        "clinical",
+        "occupational",
+        "in vitro microbiological",
+        "clinical (double blind)"
+      ],
+      "toxval_type_counts": {
+        "in vitro": 618,
+        "clinical": 154,
+        "occupational": 75,
+        "in vitro microbiological": 35,
+        "clinical (double blind)": 5
+      }
+    },
+    "CERAPP_Ago_pred": {
+      "keywords": [
+        "cerapp ago"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_CERAPP_Ago": {
+      "keywords": [
+        "ad cerapp ago"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_index_CERAPP_Ago": {
+      "keywords": [
+        "ad index cerapp ago"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "Conf_index_CERAPP_Ago": {
+      "keywords": [
+        "conf index cerapp ago"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "CERAPP_Anta_pred": {
+      "keywords": [
+        "cerapp anta"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_CERAPP_Anta": {
+      "keywords": [
+        "ad cerapp anta"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_index_CERAPP_Anta": {
+      "keywords": [
+        "ad index cerapp anta"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "Conf_index_CERAPP_Anta": {
+      "keywords": [
+        "conf index cerapp anta"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "CERAPP_Bind_pred": {
+      "keywords": [
+        "cerapp bind"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_CERAPP_Bind": {
+      "keywords": [
+        "ad cerapp bind"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_index_CERAPP_Bind": {
+      "keywords": [
+        "ad index cerapp bind"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "Conf_index_CERAPP_Bind": {
+      "keywords": [
+        "conf index cerapp bind"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "CoMPARA_Ago_pred": {
+      "keywords": [
+        "compara ago"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_CoMPARA_Ago": {
+      "keywords": [
+        "ad compara ago"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_index_CoMPARA_Ago": {
+      "keywords": [
+        "ad index compara ago"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "Conf_index_CoMPARA_Ago": {
+      "keywords": [
+        "conf index compara ago"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "CoMPARA_Anta_pred": {
+      "keywords": [
+        "compara anta"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_CoMPARA_Anta": {
+      "keywords": [
+        "ad compara anta"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_index_CoMPARA_Anta": {
+      "keywords": [
+        "ad index compara anta"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "Conf_index_CoMPARA_Anta": {
+      "keywords": [
+        "conf index compara anta"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "CoMPARA_Bind_pred": {
+      "keywords": [
+        "compara bind"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_CoMPARA_Bind": {
+      "keywords": [
+        "ad compara bind"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "AD_index_CoMPARA_Bind": {
+      "keywords": [
+        "ad index compara bind"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "Conf_index_CoMPARA_Bind": {
+      "keywords": [
+        "conf index compara bind"
+      ],
+      "domain_keywords": [
+        "reproductive",
+        "developmental",
+        "uterotrophic",
+        "hershberger",
+        "in vitro"
+      ],
+      "toxval_types": [
+        "reproduction developmental",
+        "developmental",
+        "uterotrophic",
+        "in vitro",
+        "hershberger",
+        "reproductive",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "screening for reproductive developmental toxicity",
+        "in vitro microbiological",
+        "developmental toxicity",
+        "subchronic, developmental reproductive"
+      ],
+      "toxval_type_counts": {
+        "reproduction developmental": 32156,
+        "developmental": 9676,
+        "uterotrophic": 771,
+        "in vitro": 618,
+        "hershberger": 526,
+        "reproductive": 194,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "screening for reproductive developmental toxicity": 58,
+        "in vitro microbiological": 35,
+        "developmental toxicity": 25,
+        "subchronic, developmental reproductive": 10
+      }
+    },
+    "CATMoS_VT_pred": {
+      "keywords": [
+        "ld50",
+        "acute",
+        "oral"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    },
+    "CATMoS_NT_pred": {
+      "keywords": [
+        "ld50",
+        "acute",
+        "oral"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    },
+    "CATMoS_EPA_pred": {
+      "keywords": [
+        "ld50",
+        "acute",
+        "oral"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    },
+    "CATMoS_GHS_pred": {
+      "keywords": [
+        "ld50",
+        "acute",
+        "oral"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    },
+    "CATMoS_LD50_pred": {
+      "keywords": [
+        "ld50",
+        "oral",
+        "acute",
+        "lethal dose"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    },
+    "CATMoS_LD50_predRange": {
+      "keywords": [
+        "ld50",
+        "acute",
+        "oral"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    },
+    "AD_CATMoS": {
+      "keywords": [
+        "ld50",
+        "acute",
+        "oral"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    },
+    "AD_index_CATMoS": {
+      "keywords": [
+        "ld50",
+        "acute",
+        "oral"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    },
+    "Conf_index_CATMoS": {
+      "keywords": [
+        "ld50",
+        "acute",
+        "oral"
+      ],
+      "domain_keywords": [
+        "acute",
+        "oral",
+        "lethal",
+        "toxicity"
+      ],
+      "toxval_types": [
+        "acute",
+        "acute exposure guidelines",
+        "toxicity value",
+        "two generation reproductive toxicity",
+        "one generation reproductive toxicity",
+        "short term repeated dose toxicity",
+        "screening for reproductive developmental toxicity",
+        "sub chronic toxicity",
+        "developmental toxicity",
+        "neurotoxicity",
+        "toxicity",
+        "chronic toxicity"
+      ],
+      "toxval_type_counts": {
+        "acute": 69869,
+        "acute exposure guidelines": 13475,
+        "toxicity value": 13018,
+        "two generation reproductive toxicity": 86,
+        "one generation reproductive toxicity": 73,
+        "short term repeated dose toxicity": 71,
+        "screening for reproductive developmental toxicity": 58,
+        "sub chronic toxicity": 42,
+        "developmental toxicity": 25,
+        "neurotoxicity": 18,
+        "toxicity": 8,
+        "chronic toxicity": 8
+      }
+    }
+  }
+}

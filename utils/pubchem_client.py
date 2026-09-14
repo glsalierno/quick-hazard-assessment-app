@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import re
 import time
+from datetime import datetime, timezone
 from typing import Any, Optional
 from urllib.parse import quote
 
@@ -23,19 +24,54 @@ GHS_H_CODE = re.compile(r"H\d+(?:\+\d+)?(?:\s*\([^)]+\))?")
 GHS_P_CODE = re.compile(r"P\d+(?:\+\d+)?(?:\s*\([^)]+\))?")
 
 
+def _cid_from_xref_url(url: str) -> Optional[int]:
+    """GET a PubChem compound xref URL; return first CID or None (404 / empty)."""
+    time.sleep(REQUEST_DELAY)
+    try:
+        r = requests.get(url, timeout=30)
+        if r.status_code == 404:
+            return None
+        r.raise_for_status()
+        data = r.json()
+        cids = data.get("IdentifierList", {}).get("CID", [])
+        return int(cids[0]) if cids else None
+    except (ValueError, requests.RequestException, json.JSONDecodeError):
+        return None
+
+
+def _cid_for_cas(cas: str) -> Optional[int]:
+    """
+    Resolve a CAS RN to PubChem CID.
+
+    PubChem's ``xref/RegistryID/{cas}`` works for many CAS values but returns 404 for
+    some dashed RNs (e.g. 1607-31-4). ``xref/RN/{cas}`` is the reliable CAS fallback.
+    Do **not** strip dashes for RegistryID — undashed values can map to the wrong CID.
+    """
+    cas = (cas or "").strip()
+    if not cas:
+        return None
+    strategies = (
+        f"{PUBCHEM_BASE}/compound/xref/RegistryID/{quote(cas)}/cids/JSON",
+        f"{PUBCHEM_BASE}/compound/xref/RN/{quote(cas)}/cids/JSON",
+    )
+    for url in strategies:
+        cid = _cid_from_xref_url(url)
+        if cid is not None:
+            return cid
+    try:
+        cids = pcp.get_cids(cas, "name", "compound")
+        return int(cids[0]) if cids else None
+    except (pcp.BadRequestError, pcp.NotFoundError, ValueError):
+        return None
+
+
 def get_cid(identifier: str, input_type: str = "name") -> Optional[int]:
     """Resolve chemical identifier (CAS or name) to PubChem CID."""
     try:
         if input_type.lower() == "cid":
             return int(identifier)
         if input_type.lower() == "cas":
-            url = f"{PUBCHEM_BASE}/compound/xref/RegistryID/{quote(identifier)}/cids/JSON"
-            time.sleep(REQUEST_DELAY)
-            r = requests.get(url, timeout=30)
-            r.raise_for_status()
-            data = r.json()
-            cids = data.get("IdentifierList", {}).get("CID", [])
-            return int(cids[0]) if cids else None
+            return _cid_for_cas(identifier)
         cids = pcp.get_cids(identifier, input_type, "compound")
         return cids[0] if cids else None
     except (pcp.BadRequestError, pcp.NotFoundError, ValueError, requests.RequestException):
@@ -234,8 +270,12 @@ def _extract_toxicities(data: dict) -> list[dict[str, Any]]:
 _SPECIES_TOKENS = {"rat", "mouse", "rabbit", "dog", "guinea pig", "human", "fish", "trout", "daphnia", "algae"}
 _ROUTE_TOKENS = {"oral", "dermal", "inhalation", "ip", "iv", "sc"}
 
-# Ecotoxicity parsing patterns
-_ECOTOX_ENDPOINT_RE = re.compile(r"\b(LC50|EC50|LC10|LC20|LC90|EC10|EC20|EC90|NOEC|LOEC)\b", re.I)
+# Ecotoxicity parsing patterns (v6: stricter aquatic endpoint guards)
+PUBCHEM_CLIENT_VERSION = "pubchem_client_v6"
+_ECOTOX_ENDPOINT_RE = re.compile(
+    r"\b(LC50|EC50|LC10|LC20|LC90|EC10|EC20|EC90|NOEC|LOEC|IC50|ErC50|EbC50)\b",
+    re.I,
+)
 _ECOTOX_DURATION_RE = re.compile(r"(\d+\s*(?:h|hr|hrs|hour|hours|d|day|days))\b", re.I)
 _ECOTOX_VALUE_UNIT_RE = re.compile(
     r"([<>~]?\s*\d+(?:[.,]\d+)?)\s*(mg/L|µg/L|ug/L|mg/kg|g/L|mg/l)\b", re.I
@@ -243,6 +283,24 @@ _ECOTOX_VALUE_UNIT_RE = re.compile(
 _ECOTOX_CI_RE = re.compile(
     r"(?:CI|confidence interval)[^0-9]*([0-9]+(?:\.\d+)?)\s*[–-]\s*([0-9]+(?:\.\d+)?)",
     re.I,
+)
+_AQUATIC_ORGANISM_RE = re.compile(
+    r"\b(fish|trout|daphnia|algae|aquatic\s+invertebrate|crustacean|microorganism|"
+    r"aquatic\s+plant|fathead\s+minnow|bluegill|zebrafish|lemna)\b",
+    re.I,
+)
+_AQUATIC_SECTION_RE = re.compile(
+    r"\b(ecotox|eco-?tox|aquatic|environmental\s+tox|water\s+organism|"
+    r"environmental\s+fate|hazards?\s+to\s+(?:the\s+)?aquatic)\b",
+    re.I,
+)
+_ECOTOX_CONTAMINATION_RE = re.compile(
+    r"\b(flammable\s+liquids?|skin\s+corrosion|serious\s+eye\s+damage|"
+    r"eye\s+irritation|skin\s+irritation|stôt|stot\s+se|category\s+[1-5])\b",
+    re.I,
+)
+_AQUATIC_GHS_CODES = frozenset(
+    {"H400", "H401", "H402", "H410", "H411", "H412", "H413"}
 )
 
 
@@ -327,54 +385,85 @@ def _parse_ecotox_text(raw: str) -> dict[str, Any]:
     return out
 
 
+def _looks_like_aquatic_context(raw: str, source_section: str = "") -> bool:
+    blob = f"{source_section or ''} {raw or ''}"
+    return bool(_AQUATIC_SECTION_RE.search(blob) or _AQUATIC_ORGANISM_RE.search(blob))
+
+
+def _is_quantitative_ecotox_candidate(raw: str, source_section: str = "") -> bool:
+    """
+    v6 guard: require aquatic context + endpoint-like evidence; reject GHS class text.
+    """
+    text = (raw or "").strip()
+    if not text:
+        return False
+    if _ECOTOX_CONTAMINATION_RE.search(text) and not _ECOTOX_ENDPOINT_RE.search(text):
+        return False
+    if not _looks_like_aquatic_context(text, source_section):
+        return False
+    has_endpoint = bool(_ECOTOX_ENDPOINT_RE.search(text))
+    has_duration = bool(_ECOTOX_DURATION_RE.search(text))
+    has_value = bool(_ECOTOX_VALUE_UNIT_RE.search(text))
+    has_organism = bool(_AQUATIC_ORGANISM_RE.search(text))
+    # Need an aquatic endpoint (or value+organism) — not bare "aquatic" in GHS class strings
+    if has_endpoint and (has_value or has_duration or has_organism):
+        return True
+    if has_value and has_organism and _looks_like_aquatic_context(text, source_section):
+        return True
+    return False
+
+
 def _extract_ecotoxicity(ghs: dict, toxicities: list[dict]) -> dict[str, Any]:
-    """Extract ecotoxicity endpoints (aquatic LC50/EC50, species, H4xx codes)."""
-    out = {
+    """Extract quantitative aquatic endpoints; keep aquatic GHS codes separately (v6)."""
+    out: dict[str, Any] = {
         "aquatic_lc50_mg_l": None,
         "aquatic_ec50_mg_l": None,
         "aquatic_species": None,
         "aquatic_value_raw": None,
         "h_codes_aquatic": [],
-        "entries": [],  # list of {value, species, unit} for display
+        "entries": [],
+        "aquatic_ghs_classification_only": False,
+        "flags": [],
     }
     h_codes = ghs.get("h_codes") or []
-    out["h_codes_aquatic"] = [h for h in h_codes if h.startswith("H4")]
+    out["h_codes_aquatic"] = [h for h in h_codes if h in _AQUATIC_GHS_CODES or str(h).startswith("H4")]
+
     for t in toxicities:
-        val = (t.get("value") or "").lower()
-        if "fish" in val or "trout" in val or "daphnia" in val or "algae" in val or "aquatic" in val:
-            raw = t.get("value", "")
-            species = "fish" if "fish" in val or "trout" in val else "Daphnia" if "daphnia" in val else "algae" if "algae" in val else "aquatic"
-            parsed = _parse_ecotox_text(raw)
-            num = parsed.get("value_num")
-            if num is not None:
-                if (parsed.get("endpoint") or "").upper().startswith("EC"):
-                    out["aquatic_ec50_mg_l"] = num
-                else:
-                    out["aquatic_lc50_mg_l"] = out["aquatic_lc50_mg_l"] or num
-                out["aquatic_value_raw"] = raw[:250]
-                out["aquatic_species"] = out["aquatic_species"] or species
-            entry = {
-                "value": raw[:400],
-                "species": species,
-                "unit": parsed.get("unit") or "mg/L",
-            }
-            entry.update(parsed)
-            out["entries"].append(entry)
-    if not out["entries"]:
-        for t in toxicities:
-            if "LC50" in (t.get("value") or "").upper() and "mg" in (t.get("value") or "").lower() and "L" in (t.get("value") or ""):
-                raw = t.get("value") or ""
-                parsed = _parse_ecotox_text(raw)
-                entry = {
-                    "value": raw[:400],
-                    "species": "—",
-                    "unit": parsed.get("unit") or t.get("unit") or "mg/L",
-                }
-                entry.update(parsed)
-                out["entries"].append(entry)
-                if out["aquatic_lc50_mg_l"] is None:
-                    out["aquatic_value_raw"] = (t.get("value") or "")[:250]
-                break
+        raw = t.get("value") or ""
+        section = t.get("source_section") or ""
+        if not _is_quantitative_ecotox_candidate(raw, section):
+            continue
+        val_l = raw.lower()
+        m_org = _AQUATIC_ORGANISM_RE.search(raw)
+        species = m_org.group(1) if m_org else "aquatic"
+        if "trout" in val_l or "fish" in val_l or "minnow" in val_l:
+            species = "fish"
+        elif "daphnia" in val_l:
+            species = "Daphnia"
+        elif "algae" in val_l or "lemna" in val_l:
+            species = "algae"
+        parsed = _parse_ecotox_text(raw)
+        num = parsed.get("value_num")
+        ep = (parsed.get("endpoint") or "").upper()
+        if num is not None:
+            if ep.startswith("EC") or ep.startswith("ERC") or ep.startswith("EBC") or ep == "IC50":
+                out["aquatic_ec50_mg_l"] = out["aquatic_ec50_mg_l"] or num
+            else:
+                out["aquatic_lc50_mg_l"] = out["aquatic_lc50_mg_l"] or num
+            out["aquatic_value_raw"] = raw[:250]
+            out["aquatic_species"] = out["aquatic_species"] or species
+        entry = {
+            "value": raw[:400],
+            "species": species,
+            "unit": parsed.get("unit") or "mg/L",
+            "source_section": section,
+        }
+        entry.update(parsed)
+        out["entries"].append(entry)
+
+    if out["h_codes_aquatic"] and not out["entries"]:
+        out["aquatic_ghs_classification_only"] = True
+        out["flags"].append("aquatic_ghs_only_no_quantitative_endpoints")
     return out
 
 
@@ -474,27 +563,43 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
     iupac_name = getattr(comp, "iupac_name", None) or getattr(comp, "iupac_name_legacy", None)
     if mw is not None:
         mw = f"{mw:.2f}" if isinstance(mw, (int, float)) else str(mw)
+    retrieved_at = datetime.now(timezone.utc).isoformat()
     out = {
         "cid": cid,
         "smiles": smiles,
         "formula": formula,
         "mw": mw,
         "iupac_name": iupac_name,
+        "title": getattr(comp, "title", None) or iupac_name,
         "ghs": {"h_codes": [], "p_codes": [], "signal_word": "", "pictograms": []},
         "flash_point": [],  # list of strings, one per value
         "vapor_pressure": [],  # list of strings
         "toxicities": [],  # list of {type, value, unit, species_route, route, species} for LD50/LC50 etc.
         "ld50": [],  # subset of toxicities containing LD50
         "lc50": [],  # subset of toxicities containing LC50
-        "ecotoxicity": {"aquatic_lc50_mg_l": None, "aquatic_ec50_mg_l": None, "aquatic_species": None, "h_codes_aquatic": [], "entries": []},
+        "ecotoxicity": {
+            "aquatic_lc50_mg_l": None,
+            "aquatic_ec50_mg_l": None,
+            "aquatic_species": None,
+            "h_codes_aquatic": [],
+            "entries": [],
+            "aquatic_ghs_classification_only": False,
+            "flags": [],
+        },
         "exposure_bands": {"oral": {}, "dermal": {}, "inhalation": {}},
         "nfpa": None,
         "iarc": None,
         "prop65": None,
+        "retrieved_at": retrieved_at,
+        "parser_version": PUBCHEM_CLIENT_VERSION,
+        "phrase_lexicon_version": "ghs_formatter_v6",
+        "xlogp": getattr(comp, "xlogp", None),
     }
     pug = _fetch_pug_view(cid)
     if pug:
         out["ghs"] = _extract_ghs_codes(pug)
+        out["ghs"]["source_section"] = "PUG View GHS / Classification"
+        out["pug_view_retrieved_at"] = retrieved_at
         hazards = _extract_hazard_metrics(pug)
         out["flash_point"] = list(hazards["flash_point"]) if hazards["flash_point"] else []
         out["vapor_pressure"] = list(hazards["vapor_pressure"]) if hazards["vapor_pressure"] else []

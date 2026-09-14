@@ -1,0 +1,17 @@
+# Starter CAS list for GHaz7 database expansion (TCI seed + common solvents).
+# One CAS per line. Used by pages/04_CAS_Database_Builder.py
+67-56-1
+67-64-1
+108-88-3
+141-78-6
+67-68-5
+109-99-9
+68-12-2
+67-63-0
+71-23-8
+115-86-6
+64-17-5
+71-43-2
+75-09-2
+110-54-3
+78-33-1

@@ -1,0 +1,851 @@
+{
+  "n_expert_cas_category_db": 1108,
+  "n_priority62_subcat": 62,
+  "n_auto6_subcat_slots": 36,
+  "n_all_subcat_slots": 52,
+  "category_fill_1108": [
+    {
+      "category": "acute",
+      "expert_filled": 1108,
+      "expert_pct": 100.0,
+      "auto_filled": 888,
+      "auto_pct": 80.1,
+      "auto_missing_when_expert": 220,
+      "gap_pp": 19.9,
+      "auto_scorable": true
+    },
+    {
+      "category": "chronic",
+      "expert_filled": 1108,
+      "expert_pct": 100.0,
+      "auto_filled": 588,
+      "auto_pct": 53.1,
+      "auto_missing_when_expert": 520,
+      "gap_pp": 46.9,
+      "auto_scorable": true
+    },
+    {
+      "category": "ecological",
+      "expert_filled": 1105,
+      "expert_pct": 99.7,
+      "auto_filled": 452,
+      "auto_pct": 40.8,
+      "auto_missing_when_expert": 654,
+      "gap_pp": 58.9,
+      "auto_scorable": true
+    },
+    {
+      "category": "fate",
+      "expert_filled": 1107,
+      "expert_pct": 99.9,
+      "auto_filled": 1052,
+      "auto_pct": 94.9,
+      "auto_missing_when_expert": 56,
+      "gap_pp": 5.0,
+      "auto_scorable": true
+    },
+    {
+      "category": "atmospheric",
+      "expert_filled": 1104,
+      "expert_pct": 99.6,
+      "auto_filled": 1093,
+      "auto_pct": 98.6,
+      "auto_missing_when_expert": 15,
+      "gap_pp": 1.0,
+      "auto_scorable": true
+    },
+    {
+      "category": "physical",
+      "expert_filled": 1108,
+      "expert_pct": 100.0,
+      "auto_filled": 698,
+      "auto_pct": 63.0,
+      "auto_missing_when_expert": 410,
+      "gap_pp": 37.0,
+      "auto_scorable": true
+    },
+    {
+      "category": "process",
+      "expert_filled": 1089,
+      "expert_pct": 98.3,
+      "auto_filled": 0,
+      "auto_pct": 0.0,
+      "auto_missing_when_expert": 0,
+      "gap_pp": 98.3,
+      "auto_scorable": false
+    },
+    {
+      "category": "life_cycle",
+      "expert_filled": 1101,
+      "expert_pct": 99.4,
+      "auto_filled": 0,
+      "auto_pct": 0.0,
+      "auto_missing_when_expert": 0,
+      "gap_pp": 99.4,
+      "auto_scorable": false
+    }
+  ],
+  "auto6_cats_filled_mean": 4.31,
+  "expert6_cats_filled_mean": 5.99,
+  "priority62_expert_auto6_subcats_mean": 24.82,
+  "priority62_expert_all_subcats_mean": 27.98,
+  "priority62_expert_auto6_density_pct": 69.0,
+  "join62_n": 62,
+  "join62_expert_n_sub_mean": 29.65,
+  "join62_expert_n_cells_mean": 45.47,
+  "join62_auto_n_units_mean": 18.77,
+  "join62_auto6_cats_mean": 4.31,
+  "subcat_fill_62": [
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Inhalation Toxicity",
+      "acronym": "Inh",
+      "expert_n": 56,
+      "expert_pct": 90.3,
+      "auto_scorable_category": true,
+      "n_wired_units": 3,
+      "n_matrix_units": 7,
+      "wiring_gap": false
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Oral Toxicity",
+      "acronym": "Oral",
+      "expert_n": 56,
+      "expert_pct": 90.3,
+      "auto_scorable_category": true,
+      "n_wired_units": 3,
+      "n_matrix_units": 4,
+      "wiring_gap": false
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Dermal Toxicity",
+      "acronym": "Derm",
+      "expert_n": 51,
+      "expert_pct": 82.3,
+      "auto_scorable_category": true,
+      "n_wired_units": 3,
+      "n_matrix_units": 4,
+      "wiring_gap": false
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Respiratory Irritation",
+      "acronym": "RIr",
+      "expert_n": 30,
+      "expert_pct": 48.4,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Dermal Irritation",
+      "acronym": "DIr",
+      "expert_n": 57,
+      "expert_pct": 91.9,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Eye Irritation",
+      "acronym": "Eye",
+      "expert_n": 61,
+      "expert_pct": 98.4,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Specific Target Organ Toxicity - STOT Single Exposure",
+      "acronym": "STOT",
+      "expert_n": 43,
+      "expert_pct": 69.4,
+      "auto_scorable_category": true,
+      "n_wired_units": 0,
+      "n_matrix_units": 0,
+      "wiring_gap": true
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Specific Target Organ Toxicity - STOT Other Organ Effects",
+      "acronym": "STOT2",
+      "expert_n": 30,
+      "expert_pct": 48.4,
+      "auto_scorable_category": true,
+      "n_wired_units": 0,
+      "n_matrix_units": 0,
+      "wiring_gap": true
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Exposure Limits",
+      "acronym": "OEL",
+      "expert_n": 15,
+      "expert_pct": 24.2,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 4,
+      "wiring_gap": false
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "IDLH",
+      "acronym": "IDLH",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": true,
+      "n_wired_units": 0,
+      "n_matrix_units": 2,
+      "wiring_gap": false
+    },
+    {
+      "category": "Acute Human Effects",
+      "subcategory": "Health",
+      "acronym": "Hlth",
+      "expert_n": 55,
+      "expert_pct": 88.7,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 1,
+      "wiring_gap": true
+    },
+    {
+      "category": "Chronic Human Effects",
+      "subcategory": "Carcinogen",
+      "acronym": "Carc",
+      "expert_n": 60,
+      "expert_pct": 96.8,
+      "auto_scorable_category": true,
+      "n_wired_units": 4,
+      "n_matrix_units": 8,
+      "wiring_gap": false
+    },
+    {
+      "category": "Chronic Human Effects",
+      "subcategory": "Mutagen/ Teratogen",
+      "acronym": "Mut",
+      "expert_n": 56,
+      "expert_pct": 90.3,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Chronic Human Effects",
+      "subcategory": "Reproductive/ Developmental",
+      "acronym": "Repro",
+      "expert_n": 54,
+      "expert_pct": 87.1,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 4,
+      "wiring_gap": false
+    },
+    {
+      "category": "Chronic Human Effects",
+      "subcategory": "Neurotoxicity",
+      "acronym": "Neuro",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 4,
+      "wiring_gap": false
+    },
+    {
+      "category": "Chronic Human Effects",
+      "subcategory": "Respiratory Sensitivity/ Disease",
+      "acronym": "RSens",
+      "expert_n": 28,
+      "expert_pct": 45.2,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 4,
+      "wiring_gap": false
+    },
+    {
+      "category": "Chronic Human Effects",
+      "subcategory": "Endocrine System Effects",
+      "acronym": "Endo",
+      "expert_n": 22,
+      "expert_pct": 35.5,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 5,
+      "wiring_gap": false
+    },
+    {
+      "category": "Chronic Human Effects",
+      "subcategory": "Other Chronic Organ Effects",
+      "acronym": "Org",
+      "expert_n": 36,
+      "expert_pct": 58.1,
+      "auto_scorable_category": true,
+      "n_wired_units": 3,
+      "n_matrix_units": 5,
+      "wiring_gap": false
+    },
+    {
+      "category": "Ecological Hazards",
+      "subcategory": "Acute Aquatic Toxicity",
+      "acronym": "AqA",
+      "expert_n": 56,
+      "expert_pct": 90.3,
+      "auto_scorable_category": true,
+      "n_wired_units": 4,
+      "n_matrix_units": 5,
+      "wiring_gap": false
+    },
+    {
+      "category": "Ecological Hazards",
+      "subcategory": "Chronic Aquatic Toxicity (fish, crustacea or algae)",
+      "acronym": "AqC",
+      "expert_n": 54,
+      "expert_pct": 87.1,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 5,
+      "wiring_gap": false
+    },
+    {
+      "category": "Environmental Fate & Transport",
+      "subcategory": "Persistence",
+      "acronym": "Pers",
+      "expert_n": 61,
+      "expert_pct": 98.4,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 7,
+      "wiring_gap": true
+    },
+    {
+      "category": "Environmental Fate & Transport",
+      "subcategory": "Rapid Degradability",
+      "acronym": "Deg",
+      "expert_n": 61,
+      "expert_pct": 98.4,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 5,
+      "wiring_gap": true
+    },
+    {
+      "category": "Environmental Fate & Transport",
+      "subcategory": "Bioconcentration/ Bioaccumulation",
+      "acronym": "BCF",
+      "expert_n": 61,
+      "expert_pct": 98.4,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 3,
+      "wiring_gap": true
+    },
+    {
+      "category": "Atmospheric Hazard",
+      "subcategory": "Greenhouse Gas",
+      "acronym": "GHG",
+      "expert_n": 62,
+      "expert_pct": 100.0,
+      "auto_scorable_category": true,
+      "n_wired_units": 0,
+      "n_matrix_units": 0,
+      "wiring_gap": true
+    },
+    {
+      "category": "Atmospheric Hazard",
+      "subcategory": "Ozone Depletor",
+      "acronym": "ODP",
+      "expert_n": 62,
+      "expert_pct": 100.0,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 4,
+      "wiring_gap": true
+    },
+    {
+      "category": "Atmospheric Hazard",
+      "subcategory": "Acid Rain Formation",
+      "acronym": "Acid",
+      "expert_n": 62,
+      "expert_pct": 100.0,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 2,
+      "wiring_gap": true
+    },
+    {
+      "category": "Atmospheric Hazard",
+      "subcategory": "NESHAP",
+      "acronym": "NESH",
+      "expert_n": 62,
+      "expert_pct": 100.0,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 2,
+      "wiring_gap": true
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "Vapor Pressure",
+      "acronym": "VP",
+      "expert_n": 21,
+      "expert_pct": 33.9,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "Flammability: Liquid",
+      "acronym": "FlamL",
+      "expert_n": 61,
+      "expert_pct": 98.4,
+      "auto_scorable_category": true,
+      "n_wired_units": 4,
+      "n_matrix_units": 5,
+      "wiring_gap": false
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "Flammability: Gas",
+      "acronym": "FlamG",
+      "expert_n": 4,
+      "expert_pct": 6.5,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "Reactivity",
+      "acronym": "React",
+      "expert_n": 62,
+      "expert_pct": 100.0,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 5,
+      "wiring_gap": false
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "Corrosivity to Materials",
+      "acronym": "Corr",
+      "expert_n": 21,
+      "expert_pct": 33.9,
+      "auto_scorable_category": true,
+      "n_wired_units": 2,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "pH",
+      "acronym": "pH",
+      "expert_n": 60,
+      "expert_pct": 96.8,
+      "auto_scorable_category": true,
+      "n_wired_units": 0,
+      "n_matrix_units": 0,
+      "wiring_gap": true
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "Odor",
+      "acronym": "Odor",
+      "expert_n": 56,
+      "expert_pct": 90.3,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 1,
+      "wiring_gap": true
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "Volatile Organic Compound",
+      "acronym": "VOC",
+      "expert_n": 3,
+      "expert_pct": 4.8,
+      "auto_scorable_category": true,
+      "n_wired_units": 1,
+      "n_matrix_units": 2,
+      "wiring_gap": false
+    },
+    {
+      "category": "Physical Properties",
+      "subcategory": "Reportable Quantity",
+      "acronym": "RQ",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": true,
+      "n_wired_units": 0,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Heat",
+      "acronym": "Heat",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Cold",
+      "acronym": "Cold",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Noise Generation",
+      "acronym": "Noise",
+      "expert_n": 1,
+      "expert_pct": 1.6,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 2,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Vibration",
+      "acronym": "Vib",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Ergonomic Hazard",
+      "acronym": "Ergo",
+      "expert_n": 55,
+      "expert_pct": 88.7,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 2,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Psychosocial Hazard",
+      "acronym": "Psych",
+      "expert_n": 56,
+      "expert_pct": 90.3,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "High/Low Pressure System",
+      "acronym": "Press",
+      "expert_n": 20,
+      "expert_pct": 32.3,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "High/Low Temperature System",
+      "acronym": "Temp",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 3,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Water Use",
+      "acronym": "H2O",
+      "expert_n": 1,
+      "expert_pct": 1.6,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 2,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Energy Use",
+      "acronym": "Ener",
+      "expert_n": 1,
+      "expert_pct": 1.6,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 2,
+      "wiring_gap": false
+    },
+    {
+      "category": "Process Factors",
+      "subcategory": "Exposure Potential",
+      "acronym": "ExpP",
+      "expert_n": 59,
+      "expert_pct": 95.2,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Life Cycle Factors",
+      "subcategory": "Upstream Effects",
+      "acronym": "Up",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Life Cycle Factors",
+      "subcategory": "Consumer Hazard",
+      "acronym": "Cons",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Life Cycle Factors",
+      "subcategory": "Disposal Hazard (landfill, incineration)",
+      "acronym": "Disp",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 1,
+      "wiring_gap": false
+    },
+    {
+      "category": "Life Cycle Factors",
+      "subcategory": "Recycling",
+      "acronym": "Recyc",
+      "expert_n": 0,
+      "expert_pct": 0.0,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 2,
+      "wiring_gap": false
+    },
+    {
+      "category": "Life Cycle Factors",
+      "subcategory": "Renewable to Nonrenewable Resource",
+      "acronym": "Ren",
+      "expert_n": 3,
+      "expert_pct": 4.8,
+      "auto_scorable_category": false,
+      "n_wired_units": 0,
+      "n_matrix_units": 2,
+      "wiring_gap": false
+    }
+  ],
+  "coverage_holes_1108": [
+    {
+      "category": "ecological",
+      "expert_filled": 1105,
+      "expert_pct": 99.7,
+      "auto_filled": 452,
+      "auto_pct": 40.8,
+      "auto_missing_when_expert": 654,
+      "gap_pp": 58.9,
+      "auto_scorable": true
+    },
+    {
+      "category": "chronic",
+      "expert_filled": 1108,
+      "expert_pct": 100.0,
+      "auto_filled": 588,
+      "auto_pct": 53.1,
+      "auto_missing_when_expert": 520,
+      "gap_pp": 46.9,
+      "auto_scorable": true
+    },
+    {
+      "category": "physical",
+      "expert_filled": 1108,
+      "expert_pct": 100.0,
+      "auto_filled": 698,
+      "auto_pct": 63.0,
+      "auto_missing_when_expert": 410,
+      "gap_pp": 37.0,
+      "auto_scorable": true
+    },
+    {
+      "category": "acute",
+      "expert_filled": 1108,
+      "expert_pct": 100.0,
+      "auto_filled": 888,
+      "auto_pct": 80.1,
+      "auto_missing_when_expert": 220,
+      "gap_pp": 19.9,
+      "auto_scorable": true
+    },
+    {
+      "category": "fate",
+      "expert_filled": 1107,
+      "expert_pct": 99.9,
+      "auto_filled": 1052,
+      "auto_pct": 94.9,
+      "auto_missing_when_expert": 56,
+      "gap_pp": 5.0,
+      "auto_scorable": true
+    },
+    {
+      "category": "atmospheric",
+      "expert_filled": 1104,
+      "expert_pct": 99.6,
+      "auto_filled": 1093,
+      "auto_pct": 98.6,
+      "auto_missing_when_expert": 15,
+      "gap_pp": 1.0,
+      "auto_scorable": true
+    }
+  ],
+  "subcat_opportunities": [
+    {
+      "subcategory": "Greenhouse Gas",
+      "category": "Atmospheric Hazard",
+      "expert_fill_pct_on_62": 100.0,
+      "wired_units": 0,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "Ozone Depletor",
+      "category": "Atmospheric Hazard",
+      "expert_fill_pct_on_62": 100.0,
+      "wired_units": 1,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "Acid Rain Formation",
+      "category": "Atmospheric Hazard",
+      "expert_fill_pct_on_62": 100.0,
+      "wired_units": 1,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "NESHAP",
+      "category": "Atmospheric Hazard",
+      "expert_fill_pct_on_62": 100.0,
+      "wired_units": 1,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "Persistence",
+      "category": "Environmental Fate & Transport",
+      "expert_fill_pct_on_62": 98.4,
+      "wired_units": 1,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "Rapid Degradability",
+      "category": "Environmental Fate & Transport",
+      "expert_fill_pct_on_62": 98.4,
+      "wired_units": 1,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "Bioconcentration/ Bioaccumulation",
+      "category": "Environmental Fate & Transport",
+      "expert_fill_pct_on_62": 98.4,
+      "wired_units": 1,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "pH",
+      "category": "Physical Properties",
+      "expert_fill_pct_on_62": 96.8,
+      "wired_units": 0,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "Odor",
+      "category": "Physical Properties",
+      "expert_fill_pct_on_62": 90.3,
+      "wired_units": 1,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "Health",
+      "category": "Acute Human Effects",
+      "expert_fill_pct_on_62": 88.7,
+      "wired_units": 1,
+      "why": "Experts score this often; auto has few wired extractors"
+    },
+    {
+      "subcategory": "Specific Target Organ Toxicity - STOT Single Exposure",
+      "category": "Acute Human Effects",
+      "expert_fill_pct_on_62": 69.4,
+      "wired_units": 0,
+      "why": "Experts score this often; auto has few wired extractors"
+    }
+  ],
+  "baseline_mae": [
+    {
+      "category": "acute",
+      "pct_auto_filled": 80.1,
+      "mae": 1.42,
+      "n_miss_auto": 220
+    },
+    {
+      "category": "chronic",
+      "pct_auto_filled": 53.1,
+      "mae": 1.71,
+      "n_miss_auto": 520
+    },
+    {
+      "category": "ecological",
+      "pct_auto_filled": 40.8,
+      "mae": 1.8,
+      "n_miss_auto": 656
+    },
+    {
+      "category": "fate",
+      "pct_auto_filled": 94.9,
+      "mae": 2.22,
+      "n_miss_auto": 56
+    },
+    {
+      "category": "atmospheric",
+      "pct_auto_filled": 98.6,
+      "mae": 0.73,
+      "n_miss_auto": 15
+    },
+    {
+      "category": "physical",
+      "pct_auto_filled": 63.0,
+      "mae": 1.51,
+      "n_miss_auto": 410
+    }
+  ]
+}

@@ -1,0 +1,157 @@
+"""Best-effort extraction of study / endpoint signals from IUCLID ``Document.i6d`` inside an ``.i6z`` dossier."""
+
+from __future__ import annotations
+
+import re
+import zipfile
+from pathlib import Path
+from typing import Any
+import xml.etree.ElementTree as ET
+
+
+def _tag_local(tag: str) -> str:
+    if not tag:
+        return ""
+    return tag.split("}")[-1]
+
+
+
+def iter_i6d_bytes_from_i6z(i6z_path: Path) -> list[tuple[str, bytes]]:
+    """Return all ``*.i6d`` payloads from a dossier zip (name, bytes)."""
+    out: list[tuple[str, bytes]] = []
+    try:
+        with zipfile.ZipFile(i6z_path, "r") as zf:
+            names = [n for n in zf.namelist() if n.lower().endswith(".i6d")]
+            # Prefer a literal Document.i6d first, then the rest in archive order.
+            names.sort(key=lambda n: (0 if n.lower().endswith("document.i6d") else 1, n.lower()))
+            for n in names:
+                try:
+                    out.append((n, zf.read(n)))
+                except KeyError:
+                    continue
+    except (OSError, zipfile.BadZipFile, KeyError):
+        return []
+    return out
+
+
+def read_i6d_bytes_from_i6z(i6z_path: Path) -> bytes | None:
+    """Return ``Document.i6d`` payload from a dossier zip, or ``None``."""
+    try:
+        with zipfile.ZipFile(i6z_path, "r") as zf:
+            names = zf.namelist()
+            doc = next((n for n in names if n.lower().endswith("document.i6d")), None)
+            if not doc:
+                doc = next((n for n in names if n.lower().endswith(".i6d")), None)
+            if not doc:
+                return None
+            return zf.read(doc)
+    except (OSError, zipfile.BadZipFile, KeyError):
+        return None
+
+
+def extract_endpoints_from_i6d(xml_bytes: bytes, *, max_rows: int = 150) -> list[dict[str, Any]]:
+    """
+    Heuristic scan of IUCLID XML for numeric / textual study results.
+
+    Returns rows like::
+        ``{'endpoint_name': '...', 'result': '...', 'units': ''}``
+    """
+    out: list[dict[str, Any]] = []
+    if not xml_bytes:
+        return out
+    try:
+        root = ET.fromstring(xml_bytes)
+    except ET.ParseError:
+        return out
+
+    # Regex pass on decoded text (catches LD50 / NOAEL phrases not tied to a single element)
+    try:
+        text_blob = xml_bytes.decode("utf-8", errors="replace")
+    except Exception:
+        text_blob = ""
+    for m in re.finditer(
+        r"\b(LD50|LC50|LOAEL|NOAEL|EC50|IC50)\b[^<\n]{0,12}([0-9][0-9.,\s]*\s*(?:mg/kg|mg/L|ppm|μg/L|ug/L|g/kg)?)",
+        text_blob,
+        re.I,
+    ):
+        label, rest = m.group(1), (m.group(2) or "").strip()
+        out.append({"endpoint_name": label, "result": rest[:500], "units": ""})
+        if len(out) >= max_rows:
+            return out
+
+    interest = (
+        "acute",
+        "toxicity",
+        "corrosion",
+        "irritation",
+        "sensiti",
+        "mutagen",
+        "reproduction",
+        "aquatic",
+        "chronic",
+        "bioaccum",
+        "pbt",
+        "cmr",
+        "dose",
+        "endpoint",
+        "conclusion",
+        "result",
+    )
+
+    for el in root.iter():
+        loc = _tag_local(el.tag).lower()
+        if not any(k in loc for k in interest):
+            continue
+        blob = " ".join((el.text or "").split()) if el.text else ""
+        if not blob:
+            blob = " ".join("".join(el.itertext()).split())[:800]
+        if len(blob) < 6 or len(blob) > 1200:
+            continue
+        if not any(c.isdigit() for c in blob):
+            continue
+        out.append({"endpoint_name": _tag_local(el.tag), "result": blob, "units": ""})
+        if len(out) >= max_rows:
+            break
+
+    # Dedupe by (endpoint_name, result[:120])
+    seen: set[tuple[str, str]] = set()
+    deduped: list[dict[str, Any]] = []
+    for row in out:
+        key = (row["endpoint_name"], row["result"][:120])
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(row)
+    return deduped
+
+
+def extract_endpoints_for_uuid(i6z_path: Path | None) -> list[dict[str, Any]]:
+    """
+    Extract endpoint snippets from **all** ``.i6d`` documents in the dossier.
+
+    Older builds only read the first ``.i6d`` (often a composition / reference
+    stub), which produced the methanol-like "UUIDs found, 0 endpoints" false
+    negative when study results lived in sibling documents. Cache rebuild already
+    scanned every ``.i6d``; this aligns the live ``unified_lookup`` path.
+    """
+    if i6z_path is None or not i6z_path.is_file():
+        return []
+    payloads = iter_i6d_bytes_from_i6z(i6z_path)
+    if not payloads:
+        raw = read_i6d_bytes_from_i6z(i6z_path)
+        if not raw:
+            return []
+        payloads = [("Document.i6d", raw)]
+    merged: list[dict[str, Any]] = []
+    seen: set[tuple[str, str]] = set()
+    per_doc_budget = max(40, 150 // max(1, len(payloads)))
+    for _name, raw in payloads:
+        for row in extract_endpoints_from_i6d(raw, max_rows=per_doc_budget):
+            key = (str(row.get("endpoint_name") or ""), str(row.get("result") or "")[:120])
+            if key in seen:
+                continue
+            seen.add(key)
+            merged.append(row)
+            if len(merged) >= 150:
+                return merged
+    return merged
