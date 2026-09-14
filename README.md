@@ -1,26 +1,87 @@
 ﻿
 # Quick Hazard Assessment — Streamlit App
 
-Interactive web app for **chemical hazard assessment** from **PubChem** and **DSSTox** local data (no API key required for core lookups). Optional modules (offline REACH dossiers, local LLMs) are configured via environment variables.
+Interactive web app for **chemical hazard assessment** from **PubChem**, **DSSTox**, and optional local/network sources (no API key required for core lookups). **P2OASys** Auto6 drafts combine measured evidence (SDS, IUCLID, CAMEO, lookups) with optional **OPERA** (local) and **ECOSAR** (EPI Suite HTTP API — no Windows EPI install required).
 
 [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://quick-hazard-assessment-app.streamlit.app)
+
+**Branch note:** active development for GHaz7 / v7 P2OASys lives on branch **`v7`**.
 
 ---
 
 ## Features
 
+### Core report
 - **Input:** CAS number (e.g. `67-64-1`) or chemical name
-- **DSSTox local:** CAS → DTXSID lookup from a local mapping file (no EPA API key)
+- **DSSTox local:** CAS → DTXSID from a local mapping file (no EPA CompTox API key)
 - **PubChem:** Properties, GHS H/P codes with phrase legends, flash point, vapor pressure, IUPAC name, SMILES
 - **CAMEO Chemicals NFPA 704:** local desktop sqlite or bundled `data/cameo_nfpa.sqlite` (not a website scrape)
-- **Molecular structure:** 2D rendering at the top of the report (client-side [smiles-drawer](https://github.com/reymond-group/smiles-drawer))
-- **Graceful fallback:** If the DSSTox file is missing, the app runs in **PubChem-only** mode
-- **Download:** Report as CSV
-- **Citation:** Zenodo DOI reminder for research use
+- **Molecular structure:** 2D rendering (client-side [smiles-drawer](https://reymond-group.github.io/smilesDrawer/))
+- **Graceful fallback:** Missing DSSTox → **PubChem-only** mode
+- **Download:** Report as CSV; Zenodo DOI reminder for research use
 
-*OPERA (local QSAR) and **ECOSAR** (EPI Suite HTTP API, aquatic LC50/EC50/ChV) can gap-fill P2OASys when measured IUCLID/SDS evidence is missing. Disable ECOSAR with `HAZQUERY_SKIP_ECOSAR=1`. See [docs/ECOSAR_EPI_SUITE_FEASIBILITY.md](docs/ECOSAR_EPI_SUITE_FEASIBILITY.md).*
+### SDS upload (v1.4)
+- Pipelines: **Hybrid** (`hybrid_md_ocr`) and **MarkItDown + regex** only — [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md)
+- Optional OCR (Tesseract / EasyOCR + Poppler) — [docs/OCR_SETUP.md](docs/OCR_SETUP.md)
+- Optional local LLM (Ollama) for other flows — [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md)
 
-**v1.4 SDS upload:** **MarkItDown + regex** and **Hybrid** (MarkItDown → OCR if no CAS) only — see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md). Optional **local LLM** (Ollama) for other flows: [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
+### P2OASys human-in-the-loop
+- Sidebar page **P2OASys Assessment** (`pages/05_P2OASys_Assessment.py`): Generate draft → review Auto6 subcategory scores (2/4/6/8/10) → export
+- **Process Factors** and **Life Cycle Factors** are manual-only (never auto-filled)
+- Expert / auto ribbon from `data/p2oasys_score_lookup.sqlite` when present
+
+### Auto P2OASys evidence stack (priority)
+| Priority | Source | What it fills | Needs |
+|----------|--------|---------------|--------|
+| 1 | Lookups (IARC, ODP/GWP, IPCC, CAA §112 HAP/NESHAP) | Atmospheric / chronic lists | CSV / parquet under config paths |
+| 2 | SDS (upload / structured) | Acute tox, flash, VP, eco phrases, GHS | PDF + extraction stack |
+| 3 | IUCLID / REACH offline | Measured acute/chronic/eco when dossiers cached | Large local archive (optional) |
+| 4 | CAMEO NFPA | Health / Fire diamonds | Bundled or desktop sqlite |
+| 5 | **OPERA** (local CLI) | Fate (LogP, BCF, ReadyBiodeg), CATMoS LD50 gap-fill | Windows `OPERA.exe` **or** `opera_precompute.sqlite` |
+| 6 | **ECOSAR** (EPI Suite **HTTP API**) | Aquatic LC50/EC50 + ChV (predicted) when measured eco missing | **Network only** — see below |
+| — | Acid rain / pH heuristics | Atmospheric acid rain; Physical pH | Formula / pKa / SMARTS (no extra install) |
+
+Scores are **never invented as integers in clients** — clients emit evidence (mg/L, phrases); `utils/p2oasys_scorer.py` applies the TURI matrix bands.
+
+---
+
+## ECOSAR / EPI Suite API (works alone in this GitHub repo)
+
+**Yes — the GitHub clone can use ECOSAR without installing EPA EPI Suite or Ecowinnt.exe.**
+
+| Mode | How | Local EPI Suite 4.x? |
+|------|-----|----------------------|
+| **Default (recommended)** | HTTPS to [EPI Suite CLI API](https://episuite.dev/api) (`ecosar.organics` → ECOSAR **v2.20** JSON) | **No** |
+| Offline / air-gap | Point `HAZQUERY_EPISUITE_API_BASE` at a local [pyepisuite](https://pypi.org/project/pyepisuite/) ≥1.3 JAR reverse-proxy | Optional JAR download |
+| Desktop Ecowinnt.exe | GUI-only (ECOSAR v1.11); **not** used by this app | Installed on some lab PCs; ignore for automation |
+
+Implementation: `utils/ecosar_client.py` (uses `requests`, already in `requirements.txt`). Results are tagged **`predicted`** and merged **after** IUCLID/SDS. Cache: `data/ecosar_cache.sqlite` (gitignored).
+
+```bash
+# Smoke test (needs outbound HTTPS)
+python -c "from utils.ecosar_client import fetch_ecosar_extra_sources; print(fetch_ecosar_extra_sources('71-43-2'))"
+```
+
+| Variable | Default | Meaning |
+|----------|---------|---------|
+| `HAZQUERY_EPISUITE_API_BASE` | `https://episuite.dev/api` | API root (OpenAPI) |
+| `HAZQUERY_EPISUITE_API_KEY` | (empty) | Optional Bearer token |
+| `HAZQUERY_SKIP_ECOSAR` / `HAZQUERY_ECOSAR=0` | off | Disable network ECOSAR |
+| `ECOSAR_CACHE_DB_PATH` | `data/ecosar_cache.sqlite` | On-disk cache |
+
+Details: [docs/ECOSAR_EPI_SUITE_FEASIBILITY.md](docs/ECOSAR_EPI_SUITE_FEASIBILITY.md). Harvest overlay: `python scripts/overlay_ecosar_on_auto.py`.
+
+**Teams / DoSS note:** the slim **DoSS on-demand** app does **not** call ECOSAR live — it reads **precomputed** Auto6 / overall scores from `p2oasys_score_lookup.sqlite`. That is simpler for Teams packaging (no API dependency at display time). Recompute autos in this repo (or hazquery overlays), then copy/refresh the sqlite the Teams DoSS points at.
+
+**Streamlit Community Cloud:** ECOSAR works if the host allows outbound HTTPS to `episuite.dev`. **OPERA does not** (Windows GUI/CLI). Prefer precompute sqlite + API ECOSAR on Cloud; set `HAZQUERY_SKIP_ECOSAR=1` if the platform blocks egress.
+
+---
+
+## OPERA (local QSAR — optional)
+
+- Prefer non-parallel `…\OPERA\application\OPERA.exe`; set `HAZQUERY_OPERA_EXE` / `OPERA_JAVA_HOME` as needed.
+- Batch cache: `data/opera_precompute.sqlite` (`scripts/precompute_opera_for_cas_list.py`).
+- Headless merge uses precompute when the exe is missing (`utils/p2oasys_extras_merge.py`).
 
 ---
 
@@ -28,8 +89,9 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 
 1. **Clone and enter the repo**
    ```bash
-   git clone <YOUR_REPOSITORY_URL>
+   git clone https://github.com/glsalierno/quick-hazard-assessment-app.git
    cd quick-hazard-assessment-app
+   git checkout v7   # P2OASys / ECOSAR stack
    ```
 
 2. **Create a virtual environment and install dependencies**
@@ -39,12 +101,12 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
    # source .venv/bin/activate  # Linux/macOS
    pip install -r requirements.txt
    ```
+   Core P2OASys + ECOSAR need only what is in `requirements.txt` (`requests`, `pandas`, `openpyxl`, Streamlit, …). Heavy optional stacks (Docling, torch, EasyOCR) are listed there for SDS; on constrained hosts set `HAZQUERY_DISABLE_DOCLING=1`.
 
 3. **DSSTox mapping (optional but recommended)**
    - Download the [EPA Figshare CAS–DTXSID mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566) (CSV).
    - Place it in the **`DSS/`** folder (e.g. `DSS/cas_dtxsid_mapping.csv`).
-   - See **`DSS/README.md`** for column names, Excel support, and update instructions.
-   - If the file is missing, the app runs in PubChem-only mode.
+   - See **`DSS/README.md`**. If missing, the app runs in PubChem-only mode.
 
 4. **Run the app**
    ```bash
@@ -52,93 +114,73 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
    ```
    Open the URL shown in the terminal (usually http://localhost:8501).
 
-   **P2OASys human-in-the-loop assessment:** after `streamlit run app.py`, open the sidebar
-   page **P2OASys Assessment** (`pages/05_P2OASys_Assessment.py`). Enter a CAS (and optional
-   SDS), click **Generate draft**, review/override subcategory dropdowns (Process / Life Cycle
-   start blank), then export JSON/HTML. Helpers live in `utils/p2oasys_form.py`.
+   **P2OASys assessment:** sidebar → **P2OASys Assessment**. Enter a CAS (and optional SDS), **Generate draft**, review subcategory dropdowns, export JSON/HTML.
 
-   **Tip:** Test the app locally before deploying to Streamlit Cloud. Each Cloud redeploy clones the repo and fetches Git LFS files, which consumes your LFS bandwidth quota. Running locally avoids LFS entirely.
+   **Tip:** Test locally before Streamlit Cloud redeploys (LFS bandwidth).
 
-5. **Optional — Local LLM (Qwen / Gemma) for SDS extraction**
-   - Install [Ollama](https://ollama.com) on your machine.
-   - In a terminal: `ollama pull qwen2:0.5b` and/or `ollama pull gemma2:2b`.
-   - The app uses `OLLAMA_HOST` and `OLLAMA_MODEL` (see [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md)). Nothing is pushed to GitHub except instructions; models stay local.
+5. **Optional — Local LLM (Qwen / Gemma) for SDS extraction** — [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
 
-6. **Run SDS examples (batch)**
-   - If you have a folder of SDS PDFs (e.g. `sds_examples/` in the repo root), from the repo root run:
-     ```bash
-     python scripts/run_sds_examples.py [--limit N] [--compare]
-     ```
-   - `--limit N` processes at most N PDFs; `--compare` runs SDS vs PubChem for each extracted CAS.
-   - Override the folder: `SDS_EXAMPLES_DIR` or `python scripts/run_sds_examples.py --dir "path/to/sds examples"`.
-   - Test readers (OCR + extraction): `python scripts/test_sds_readers.py [--limit N]` to print text length, CAS, GHS, and quantitative fields per PDF.
+6. **Run SDS examples (batch)** — `python scripts/run_sds_examples.py [--limit N] [--compare]`.
 
-7. **OCR for scanned SDS PDFs**
-   - If embedded text is short (< 250 chars), the app runs **Tesseract** OCR automatically (via `pdf2image` + `pytesseract`). **EasyOCR** is used as a fallback for pages where Tesseract returns little text.
-   - Install **Tesseract** and **Poppler** on your system and ensure both are on `PATH`, then `pip install pdf2image pytesseract easyocr`. See [docs/OCR_SETUP.md](docs/OCR_SETUP.md). Without Poppler, `pdf2image` cannot rasterize PDF pages (`Unable to get page count`).
-   - Optional: **ocrmypdf** to produce searchable PDFs: `pip install ocrmypdf`, then `python scripts/make_searchable_pdf.py input.pdf [output.pdf]`.
+7. **OCR for scanned SDS PDFs** — [docs/OCR_SETUP.md](docs/OCR_SETUP.md).
 
-8. **SDS CAS extraction (two pipelines only)**
-   - Full rationale and list of **removed** parsers: **[docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md)**.
-   - Install: `pip install "markitdown[pdf]"` (see `requirements.txt`). **Default:** **Hybrid** (`hybrid_md_ocr`). Valid values: `hybrid_md_ocr` | `markitdown_fast`. Legacy env values (e.g. `default`, `ocr_tesseract`) are **remapped** to a supported pipeline.
-   - Sidebar: **“SDS CAS extraction (v1.4 — two pipelines only)”** — **Hybrid** or **MarkItDown + regex**.
-   - Caching: `cache/{sha256}/` (see `utils/cache_manager.py`). Env: `HAZQUERY_EXTRACTION_PIPELINE`, `HAZQUERY_DEFAULT_SDS_PIPELINE`, `HAZQUERY_EXTRACTION_CACHE`, `HAZQUERY_POPPLER_PATH`, `HAZQUERY_OCR_ENGINE`, `HAZQUERY_TESSERACT_PSM`.
-   - Benchmark: `python tests/test_extraction_pipelines.py --folder "sds_examples" --limit 20` → `reports/extraction_benchmark.csv` and `extraction_benchmark_summary.md`.
+8. **SDS CAS extraction** — [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md).
 
-9. **Windows terminal PATH & pip script warnings**
-   - If pip warns that scripts are installed outside `PATH`, open the integrated terminal **from this workspace** so `.vscode/settings.json` applies: it appends common **user** Python `Scripts` folders and sets `HF_HUB_DISABLE_SYMLINKS_WARNING=1` and `TF_ENABLE_ONEDNN_OPTS=0` to reduce Hugging Face / oneDNN noise.
-   - For **system-wide** fixes, add to your user `PATH`: `%APPDATA%\Python\Python313\Scripts` (adjust version) or use a venv and `pip` only from that environment.
+9. **Windows PATH / pip warnings** — use the workspace terminal so `.vscode/settings.json` applies.
 
-10. **SDS parsing agreement / accuracy report (batch)**
-   - Compares **pure Docling + DistilBERT CAS** and **Docling-only composition** against the **unified SDS parser** (reference proxy, not human labels):
-     ```bash
-     python scripts/sds_parsing_accuracy_report.py --folder "sds_examples" --out-dir artifacts
-     ```
-   - Optional: `--limit N` for a subset. Outputs `artifacts/sds_parsing_accuracy_report.md`, `.csv`, and `sds_parsing_accuracy_summary.json` (micro/macro F1, pooled TP/FP/FN).
+10. **SDS parsing agreement report** — `python scripts/sds_parsing_accuracy_report.py --folder "sds_examples" --out-dir artifacts`.
 
-11. **IUCLID / offline REACH (optional)** — see [Offline REACH / IUCLID](#offline-reach--iuclid-optional) below.
+11. **IUCLID / offline REACH (optional)** — [Offline REACH / IUCLID](#offline-reach--iuclid-optional).
 
-12. **P2OASys validation vs `fastP2OASys` reference CSVs (`--source fast`)**
-    - Compares **category-level** expert scores (columns = chemical **names**, not CAS) to scores from this app’s pipeline: `ChemicalAssessmentService` → `build_hazard_data` → `compute_p2oasys_scores`, with the same optional **IARC / ODP–GWP / IPCC** and **IUCLID** merges as the P2OASys tab (no QSAR Toolbox in the script).
-    - Default reference folder: sibling `../fastP2OASys/` under `hazquery` (override with `--reference-dir`).
-    - Run from the repo root:
-      ```bash
-      python scripts/validate_p2oasys_vs_fast_reference.py --source fast --limit 50 -o data/p2oasys_validation.csv
-      ```
-    - **Output CSV columns:** `reference_name`, `resolved_cas`, `category`, `computed_score`, `reference_score`, `absolute_error`, `diff`, `pipeline_note` (e.g. `lookups+IUCLID` vs `PubChem-only`), `matrix_kind` (`official` vs `placeholder`), `error`.
-    - **Interpretation:** Use the **official TURI matrix** (`P2OASYS_MATRIX_PATH` or `data/Hazard Matrix Group Review 9-19-23.xlsx`) for meaningful error metrics; the dev placeholder is layout-only. Rows with empty `computed_score` mean the matrix produced no category max for that bucket (often missing PubChem endpoints). Use `--iuclid-audit-dir path/to/dir` to dump `*_iuclid_normalized.csv` per CAS when dossiers exist (tuning IUCLID heuristics).
-    - See also [docs/P2OASYS_LOOKUP_SOURCES.md](docs/P2OASYS_LOOKUP_SOURCES.md) (section 7).
+12–13. **P2OASys validation scripts** — see previous sections below (fast reference / expert CAS).
 
-13. **P2OASys CAS validation (offline expert, default for `run_full_validation`)**
-    - **`--source expert`** (recommended for CAS lists): deterministic, no browser. For each CAS, loads **`../sds examples/scripts/lookup_p2oasys_by_cas.py`** (`get_best_match`) to (1) find rows in **`allP2OASys_*`** `P2OASys_Database_Results*.csv`, (2) match product **Name** to a column in **`fastP2OASys/P2OASys_Category_Scores_Data_*.csv`**, (3) read expert **top-level category** scores and compare to the app’s `_category_max` per category.
-    - Environment variables (optional): **`P2OASYS_ARCHIVE_DIR`**, **`FAST_P2OASYS_DIR`**, **`P2OASYS_LOOKUP_SCRIPT`** (override path to `lookup_p2oasys_by_cas.py` if not under `GHhaz4/sds examples/scripts/`).
-    - **Orchestrator** (`scripts/run_full_validation.py`, **`--source expert` by default**):
-      ```bash
-      python scripts/run_full_validation.py --cas-file cas_list.txt \\
-        --archive-dir path/to/allP2OASys_120825 --fastp2oasys-dir path/to/fastP2OASys -o validation_report.csv
-      ```
-      **Check retrieval only** (no PubChem / matrix scoring): `python scripts/run_full_validation.py --check --cas-file cas_list.txt --archive-dir ... --fastp2oasys-dir ...` (optional `--strict`, `--json`). Same flags exist on `validate_p2oasys_vs_fast_reference.py` as `--check-retrieval` / `--dry-run`.
-      Optional: `--summary summary.txt` (full validation only). For Playwright-based reference instead, use **`--source scraped`** and see below.
-    - **Validator directly:**
-      ```bash
-      python scripts/validate_p2oasys_vs_fast_reference.py --source expert --cas 67-63-0 \\
-        --archive-dir path/to/allP2OASys_120825 --fastp2oasys-dir path/to/fastP2OASys \\
-        -o data/p2oasys_expert_validation_comparison.csv
-      ```
-    - **Expert mode output columns:** `CAS`, `category`, `computed_score`, `reference_score`, `absolute_error`, `source_of_lowest_value` (app pipeline + which expert column / matched name / archive evaluation), `matrix_kind`, `error`. CAS rows with no archive match or no expert column are skipped with a warning.
+---
 
-    **Optional: `--source scraped`** (compare-raw-data Playwright CSV)
-    - The sibling **`../sds examples/scripts/fetch_p2oasys_category_scores.py`** builds a wide CSV: first column **`CAS`**, remaining columns = endpoint labels from the P2OASys web table. Respect [p2oasys.turi.org](https://p2oasys.turi.org) terms of use; install Playwright (`pip install playwright`, `python -m playwright install chromium`). Set **`P2OASYS_SCRAPER_SCRIPT`** if the script path differs.
-    - Example:
-      ```bash
-      python scripts/run_full_validation.py --source scraped --cas-file cas_list.txt --auto-fetch -o validation_report.csv
-      ```
-      Or validate only:
-      ```bash
-      python scripts/validate_p2oasys_vs_fast_reference.py --source scraped --cas-file cas_list.txt \\
-        --reference-csv data/p2oasys_category_scores.csv -o data/scraped_compare.csv
-      ```
-    - Edit **`SCRAPED_COLUMN_TO_COMPUTED_KEY`** in `scripts/validate_p2oasys_vs_fast_reference.py` so scraped headers map to matrix unit names or **`category:TopLevelCategoryName`**.
+## Capabilities checklist
+
+| Capability | In this GitHub app | Notes |
+|------------|-------------------|--------|
+| PubChem + GHS report | Yes | Always |
+| DSSTox / ToxVal / CPDB | Yes | SQLite or CSV fallbacks |
+| SDS PDF → CAS / fields | Yes | Hybrid / MarkItDown; OCR optional |
+| CAMEO NFPA | Yes | Bundled slim sqlite or desktop path |
+| P2OASys Auto6 draft + HITL | Yes | Official matrix Excel recommended |
+| IARC / ODP / GWP / NESHAP | Yes | Lookup CSVs / atmo parquet |
+| Acid rain + pH heuristics | Yes | No extra binary |
+| OPERA fate / CATMoS | Optional | Local exe or precompute DB |
+| **ECOSAR aquatic** | **Yes (API)** | No EPI Suite install; or skip / offline JAR |
+| IUCLID measured studies | Optional | Large REACH zip + cache rebuild |
+| QSAR Toolbox / VEGA | Optional | Windows WebSuite |
+| DoSS row export | Sibling **DoSS on-demand** / Teams pack | Reads lookup sqlite; no live ECOSAR |
+
+---
+
+## P2OASys validation scripts
+
+### vs `fastP2OASys` reference (`--source fast`)
+
+Compares category-level expert scores to this app’s pipeline (`ChemicalAssessmentService` → `build_hazard_data` → `compute_p2oasys_scores`), with the same optional IARC / ODP–GWP / IPCC / IUCLID / ECOSAR merges as the P2OASys tab.
+
+```bash
+python scripts/validate_p2oasys_vs_fast_reference.py --source fast --limit 50 -o data/p2oasys_validation.csv
+```
+
+Use the **official TURI matrix** for meaningful errors. See [docs/P2OASYS_LOOKUP_SOURCES.md](docs/P2OASYS_LOOKUP_SOURCES.md).
+
+### Offline expert CAS (`--source expert`, default for `run_full_validation`)
+
+```bash
+python scripts/run_full_validation.py --cas-file cas_list.txt \
+  --archive-dir path/to/allP2OASys_120825 --fastp2oasys-dir path/to/fastP2OASys -o validation_report.csv
+```
+
+Retrieval-only: add `--check`. Optional Playwright scrape mode: `--source scraped` (respect [p2oasys.turi.org](https://p2oasys.turi.org) terms).
+
+```bash
+python scripts/validate_p2oasys_vs_fast_reference.py --source expert --cas 67-63-0 \
+  --archive-dir path/to/allP2OASys_120825 --fastp2oasys-dir path/to/fastP2OASys \
+  -o data/p2oasys_expert_validation_comparison.csv
+```
 
 ---
 
@@ -277,38 +319,34 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 
 ```
 ├── app.py                 # Main Streamlit app
-├── config.py              # App and path settings
-├── requirements.txt
-├── .gitattributes         # Git LFS tracking for DSS/*.csv, DSS/*.xlsx
-├── DSS/                   # DSSTox local database (LFS-tracked)
-│   ├── README.md          # Source, LFS instructions, update steps
-│   └── cas_dtxsid_mapping.csv   # (user-downloaded; add to repo via LFS)
-├── COMPTOX_Public (Data Excel Files Folder)/   # ToxValDB Excel files (optional; LFS)
-│   └── Data Excel Files/*.xlsx
-├── COMPTOX_Public (Data MySQL Dump File Folder)/   # MySQL dump (optional)
-├── data/                  # Built SQLite DB (after setup_chemical_db.py)
+├── config.py
+├── requirements.txt       # Includes requests (ECOSAR API); no EPI Suite binary
+├── pages/05_P2OASys_Assessment.py
+├── DSS/                   # DSSTox mapping (Git LFS)
+├── data/
 │   ├── chemical_db.sqlite
-│   ├── cameo_nfpa.sqlite  # Slim CAMEO Chemicals NFPA 704 extract (commit this, not the 33 MB desktop DB)
-│   ├── p2oasys_harvest.sqlite       # p2oasys.turi.org pages 1–101, single-CAS expert split
-│   └── p2oasys_score_lookup.sqlite  # Expert + auto Auto6 / subcategory lookup (DoSS + ribbon)
+│   ├── cameo_nfpa.sqlite
+│   ├── p2oasys_harvest.sqlite
+│   ├── p2oasys_score_lookup.sqlite
+│   ├── opera_precompute.sqlite   # optional
+│   └── ecosar_cache.sqlite       # runtime cache (gitignored)
 ├── docs/
-│   └── OLLAMA_SETUP.md    # How to install Ollama + Qwen/Gemma locally (models stay on your machine)
+│   ├── ECOSAR_EPI_SUITE_FEASIBILITY.md
+│   ├── SDS_EXTRACTION_PIPELINES.md
+│   ├── OCR_SETUP.md
+│   └── OLLAMA_SETUP.md
 ├── scripts/
-│   ├── setup_chemical_db.py   # Build data/chemical_db.sqlite from DSS + COMPTOX
-│   ├── run_sds_examples.py   # Batch run SDS extraction on PDFs in sds_examples/ (optional)
-│   ├── make_searchable_pdf.py # Add text layer to a PDF (ocrmypdf + Tesseract)
-│   └── test_sds_readers.py   # Test SDS extraction + OCR on example PDFs
+│   ├── overlay_ecosar_on_auto.py
+│   ├── overlay_opera_iuclid_fate_eco.py
+│   ├── run_priority62_auto_assess.py
+│   ├── run_harvest_full_auto_assess.py
+│   └── setup_chemical_db.py
 └── utils/
-    ├── cameo_lookup.py    # CAMEO Chemicals NFPA 704 (local sqlite)
-    ├── chemical_db.py     # SQLite DSSTox + ToxValDB (fast lookups)
-    ├── dsstox_local.py    # DSSTox loader from DSS/ (CSV/Excel fallback)
-    ├── cas_validator.py   # CAS validation/normalization
-    ├── pubchem_client.py  # PubChem API wrapper
-    ├── ghs_formatter.py   # GHS H/P phrase formatting
-    ├── smiles_drawer.py   # 2D structure (smiles-drawer)
-    ├── sds_pdf_utils.py   # PDF text extraction for SDS uploads
-    ├── sds_regex_extractor.py  # SDS field extraction (regex, Phase 1)
-    └── sds_compare.py     # SDS vs PubChem comparison report
+    ├── ecosar_client.py          # EPI Suite HTTP API → aquatic extras
+    ├── opera_client.py
+    ├── p2oasys_extras_merge.py   # lookups → OPERA → IUCLID → ECOSAR → CAMEO
+    ├── p2oasys_scorer.py
+    └── …
 ```
 
 ---
