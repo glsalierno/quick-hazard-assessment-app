@@ -34,6 +34,8 @@ def prioritize_toxicity_data(
         "categorical": [],
     }
 
+    incomplete: list[dict] = []
+
     # From PubChem toxicities
     for t in pubchem_data.get("toxicities") or []:
         value = t.get("value") or ""
@@ -43,9 +45,22 @@ def prioritize_toxicity_data(
         species = t.get("species") or "—"
         source_section = t.get("source_section") or ""
 
+        # v6: never put blank endpoint+value into prioritized view
+        if not str(endpoint).strip() and not str(value).strip():
+            incomplete.append(
+                {
+                    "source": "PubChem",
+                    "endpoint": endpoint,
+                    "value": value,
+                    "flag": "parser_incomplete",
+                    "details": source_section,
+                }
+            )
+            continue
+
         item = {
             "source": "PubChem",
-            "endpoint": endpoint,
+            "endpoint": endpoint or "—",
             "value": value,
             "units": unit or "",
             "species": species,
@@ -55,8 +70,10 @@ def prioritize_toxicity_data(
 
         if unit and _has_numeric_value(value):
             prioritized["quantitative"].append(item)
-        else:
+        elif str(value).strip() or (endpoint and endpoint != "Toxicity"):
             prioritized["categorical"].append(item)
+        else:
+            incomplete.append({**item, "flag": "parser_incomplete"})
 
     # From ToxValDB if provided
     if toxval_data:
@@ -66,10 +83,21 @@ def prioritize_toxicity_data(
             for rec in records:
                 val = rec.get("value") or rec.get("toxval_numeric", "")
                 units = rec.get("units") or rec.get("toxval_units", "")
+                endpoint = rec.get("endpoint") or rec.get("toxval_type") or rec.get("study_type", category)
+                if (val is None or str(val).strip() == "") and not str(endpoint or "").strip():
+                    incomplete.append(
+                        {
+                            "source": "ToxValDB",
+                            "endpoint": endpoint or "",
+                            "value": "",
+                            "flag": "parser_incomplete",
+                        }
+                    )
+                    continue
                 item = {
                     "source": "ToxValDB",
                     "category": category,
-                    "endpoint": rec.get("study_type", rec.get("endpoint", category)),
+                    "endpoint": endpoint,
                     "value": str(val),
                     "units": str(units),
                     "species": rec.get("species", ""),
@@ -81,6 +109,7 @@ def prioritize_toxicity_data(
                 else:
                     prioritized["categorical"].append(item)
 
+    prioritized["incomplete"] = incomplete
     return prioritized
 
 

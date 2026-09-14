@@ -1,0 +1,151 @@
+endpoint,clarification
+MoleculeID,User / file identifier for each row (from .smi second column)
+MolWeight,Molecular weight (OPERA structural property)
+nbAtoms,Total atom count (structure descriptor)
+nbHeavyAtoms,Non-hydrogen atom count (structure descriptor)
+nbC,Carbon atom count
+nbO,Oxygen atom count
+nbN,Nitrogen atom count
+nbAromAtom,Aromatic atom count
+nbRing,Ring count
+nbHeteroRing,Heterocyclic ring count
+Sp3Sp2HybRatio,sp³ / sp² carbon ratio (shape descriptor)
+nbRotBd,Rotatable bond count (flexibility)
+nbHBdAcc,H-bond acceptor count (Lipinski-related)
+ndHBdDon,H-bond donor count (Lipinski-related)
+nbLipinskiFailures,Lipinski rule-of-five failure count
+TopoPolSurfAir,Topological polar surface area (Å²)
+MolarRefract,Molar refractivity (cm³/mol)
+CombDipolPolariz,Combined dipole moment × polarizability descriptor
+LogP_pred,Octanol–water partition coefficient (log Kow)
+LogP_predRange,Numeric interval or uncertainty range paired with LogP_pred (OPERA)
+AD_LogP,"Applicability-domain outcome for LogP models (inside/outside domain, OPERA)"
+AD_index_LogP,Applicability-domain distance index for LogP (lower = closer to training domain)
+Conf_index_LogP,Model confidence index for LogP predictions (OPERA)
+MP_pred,Melting point (°C)
+MP_predRange,Numeric interval or uncertainty range paired with MP_pred (OPERA)
+AD_MP,"Applicability-domain outcome for MP models (inside/outside domain, OPERA)"
+AD_index_MP,Applicability-domain distance index for MP (lower = closer to training domain)
+Conf_index_MP,Model confidence index for MP predictions (OPERA)
+BP_pred,Boiling point (°C)
+BP_predRange,Numeric interval or uncertainty range paired with BP_pred (OPERA)
+AD_BP,"Applicability-domain outcome for BP models (inside/outside domain, OPERA)"
+AD_index_BP,Applicability-domain distance index for BP (lower = closer to training domain)
+Conf_index_BP,Model confidence index for BP predictions (OPERA)
+LogVP_pred,Vapor pressure (log mmHg)
+VP_predRange,Numeric interval or uncertainty range paired with VP_pred (OPERA)
+AD_VP,"Applicability-domain outcome for VP models (inside/outside domain, OPERA)"
+AD_index_VP,Applicability-domain distance index for VP (lower = closer to training domain)
+Conf_index_VP,Model confidence index for VP predictions (OPERA)
+LogWS_pred,Aqueous solubility (log mol/L at 25 °C)
+WS_predRange,Numeric interval or uncertainty range paired with WS_pred (OPERA)
+AD_WS,"Applicability-domain outcome for WS models (inside/outside domain, OPERA)"
+AD_index_WS,Applicability-domain distance index for WS (lower = closer to training domain)
+Conf_index_WS,Model confidence index for WS predictions (OPERA)
+LogHL_pred,Henry’s law constant (log atm·m³/mol)
+HL_predRange,Numeric interval or uncertainty range paired with HL_pred (OPERA)
+AD_HL,"Applicability-domain outcome for HL models (inside/outside domain, OPERA)"
+AD_index_HL,Applicability-domain distance index for HL (lower = closer to training domain)
+Conf_index_HL,Model confidence index for HL predictions (OPERA)
+RT_pred,QSAR prediction for RT (OPERA model output)
+RT_predRange,Numeric interval or uncertainty range paired with RT_pred (OPERA)
+AD_RT,"Applicability-domain outcome for RT models (inside/outside domain, OPERA)"
+AD_index_RT,Applicability-domain distance index for RT (lower = closer to training domain)
+Conf_index_RT,Model confidence index for RT predictions (OPERA)
+LogKOA_pred,Octanol–air partition coefficient (log)
+KOA_predRange,Numeric interval or uncertainty range paired with KOA_pred (OPERA)
+AD_KOA,"Applicability-domain outcome for KOA models (inside/outside domain, OPERA)"
+AD_index_KOA,Applicability-domain distance index for KOA (lower = closer to training domain)
+Conf_index_KOA,Model confidence index for KOA predictions (OPERA)
+ionization,Ionization / speciation hint used with pKa and LogD models (OPERA)
+pKa_a_pred,QSAR prediction for pKa_a (OPERA model output)
+pKa_a_predRange,Numeric interval or uncertainty range paired with pKa_a_pred (OPERA)
+pKa_b_pred,QSAR prediction for pKa_b (OPERA model output)
+pKa_b_predRange,Numeric interval or uncertainty range paired with pKa_b_pred (OPERA)
+AD_pKa,"Applicability-domain outcome for pKa models (inside/outside domain, OPERA)"
+AD_index_pKa,Applicability-domain distance index for pKa (lower = closer to training domain)
+Conf_index_pKa,Model confidence index for pKa predictions (OPERA)
+LogD55_pred,QSAR prediction for LogD55 (OPERA model output)
+LogD55_predRange,Numeric interval or uncertainty range paired with LogD55_pred (OPERA)
+LogD74_pred,QSAR prediction for LogD74 (OPERA model output)
+LogD74_predRange,Numeric interval or uncertainty range paired with LogD74_pred (OPERA)
+AD_LogD,"Applicability-domain outcome for LogD models (inside/outside domain, OPERA)"
+AD_index_LogD,Applicability-domain distance index for LogD (lower = closer to training domain)
+Conf_index_LogD,Model confidence index for LogD predictions (OPERA)
+LogOH_pred,OH radical reaction rate (log cm³/molecule·s)
+LogOH_predRange,Numeric interval or uncertainty range paired with LogOH_pred (OPERA)
+AD_AOH,"Applicability-domain outcome for AOH models (inside/outside domain, OPERA)"
+AD_index_AOH,Applicability-domain distance index for AOH (lower = closer to training domain)
+Conf_index_AOH,Model confidence index for AOH predictions (OPERA)
+LogBCF_pred,Fish bioconcentration factor (log)
+BCF_predRange,Numeric interval or uncertainty range paired with BCF_pred (OPERA)
+AD_BCF,"Applicability-domain outcome for BCF models (inside/outside domain, OPERA)"
+AD_index_BCF,Applicability-domain distance index for BCF (lower = closer to training domain)
+Conf_index_BCF,Model confidence index for BCF predictions (OPERA)
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output)
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA)
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)"
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain)
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA)
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output)
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)"
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain)
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA)
+LogKM_pred,QSAR prediction for LogKM (OPERA model output)
+KM_predRange,Numeric interval or uncertainty range paired with KM_pred (OPERA)
+AD_KM,"Applicability-domain outcome for KM models (inside/outside domain, OPERA)"
+AD_index_KM,Applicability-domain distance index for KM (lower = closer to training domain)
+Conf_index_KM,Model confidence index for KM predictions (OPERA)
+LogKoc_pred,QSAR prediction for LogKoc (OPERA model output)
+Koc_predRange,Numeric interval or uncertainty range paired with Koc_pred (OPERA)
+AD_Koc,"Applicability-domain outcome for Koc models (inside/outside domain, OPERA)"
+AD_index_Koc,Applicability-domain distance index for Koc (lower = closer to training domain)
+Conf_index_Koc,Model confidence index for Koc predictions (OPERA)
+FUB_pred,QSAR prediction for FUB (OPERA model output)
+FUB_predRange,Numeric interval or uncertainty range paired with FUB_pred (OPERA)
+AD_FUB,"Applicability-domain outcome for FUB models (inside/outside domain, OPERA)"
+AD_index_FUB,Applicability-domain distance index for FUB (lower = closer to training domain)
+Conf_index_FUB,Model confidence index for FUB predictions (OPERA)
+Clint_pred,QSAR prediction for Clint (OPERA model output)
+Clint_predRange,Numeric interval or uncertainty range paired with Clint_pred (OPERA)
+AD_Clint,"Applicability-domain outcome for Clint models (inside/outside domain, OPERA)"
+AD_index_Clint,Applicability-domain distance index for Clint (lower = closer to training domain)
+Conf_index_Clint,Model confidence index for Clint predictions (OPERA)
+CACO2_pred,QSAR prediction for CACO2 (OPERA model output)
+CACO2_predRange,Numeric interval or uncertainty range paired with CACO2_pred (OPERA)
+AD_CACO2,"Applicability-domain outcome for CACO2 models (inside/outside domain, OPERA)"
+AD_index_CACO2,Applicability-domain distance index for CACO2 (lower = closer to training domain)
+Conf_index_CACO2,Model confidence index for CACO2 predictions (OPERA)
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output)
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)"
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain)
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA)
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output)
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)"
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain)
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA)
+CERAPP_Bind_pred,CERAPP estrogen receptor binding
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)"
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain)
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA)
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output)
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)"
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain)
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA)
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output)
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)"
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain)
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA)
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)"
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain)
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA)
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output)
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output)
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg)
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA)
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)"
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain)
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA)
