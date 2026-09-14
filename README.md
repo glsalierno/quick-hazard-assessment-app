@@ -11,6 +11,7 @@
 - **Input:** CAS number (e.g. `67-64-1`) or chemical name
 - **DSSTox local:** CAS to DTXSID lookup from a local mapping file (no EPA API key)
 - **PubChem:** Properties, GHS H/P codes with phrase legends, flash point, vapor pressure, IUPAC name, SMILES
+- **CAMEO Chemicals NFPA 704:** local desktop sqlite or bundled `data/cameo_nfpa.sqlite` (not a website scrape)
 - **Molecular structure:** 2D rendering at the top of the report (client-side [smiles-drawer](https://github.com/reymond-group/smiles-drawer))
 - **Graceful fallback:** If the DSSTox file is missing, the app runs in **PubChem-only** mode
 - **Download:** Report as CSV
@@ -100,6 +101,8 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 3. **Run the app**
  If `data/chemical_db.sqlite` exists, the app uses it for DSSTox (and ToxValDB when the table is present) and falls back to CSV/API otherwise.
 
+**CAMEO Chemicals NFPA 704** ships as a slim bundled extract (`data/cameo_nfpa.sqlite`, ~970 CAS). If you install [CAMEO Chemicals 3.1.0](https://www.epa.gov/cameo/cameo-chemicals-software), the app prefers that desktop database. Optional override: `CAMEO_SQLITE`. This is local NOAA/EPA data — **not** a scrape of cameochemicals.noaa.gov.
+
 **Performance:** DSSTox lookups drop from seconds (CSV) to milliseconds (SQLite). ToxValDB queries are also served from SQLite when the table is built.
 
 ---
@@ -117,12 +120,14 @@ For **faster lookups**, you can build a single SQLite database that combines DSS
 - COMPTOX_Public (Data Excel Files Folder)/ # ToxValDB Excel files (optional; LFS)
  - Data Excel Files/*.xlsx
 - COMPTOX_Public (Data MySQL Dump File Folder)/ # MySQL dump (optional)
-- data/ # Built SQLite DB (after setup_chemical_db.py)
+- data/ # Built SQLite DB (after setup_chemical_db.py) plus bundled CAMEO NFPA
  - chemical_db.sqlite
+ - cameo_nfpa.sqlite  # Slim CAMEO Chemicals NFPA 704 extract
 - scripts/
  - setup_chemical_db.py # Build data/chemical_db.sqlite from DSS + COMPTOX
 - utils/
  - chemical_db.py # SQLite DSSTox + ToxValDB (fast lookups)
+ - cameo_lookup.py # CAMEO Chemicals NFPA 704 (local sqlite)
  - dsstox_local.py # DSSTox loader from DSS/ (CSV/Excel fallback)
  - cas_validator.py # CAS validation/normalization
  - pubchem_client.py # PubChem API wrapper
