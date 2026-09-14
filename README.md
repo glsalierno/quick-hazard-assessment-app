@@ -245,19 +245,27 @@ For **faster** DSSTox and ToxValDB access, build the local SQLite database:
 |----------|----------|-------------|
 | `OFFLINE_LOCAL_ARCHIVE` | No | Path to REACH `reach_study_results_dossiers_*.zip` or folder of `.i6z` files. |
 | `OFFLINE_DOSSIER_INFO_XLSX` | No | Optional Excel index for dossier metadata (CAS ↔ UUID). |
-| `OFFLINE_CACHE_DIR` | No | Where offline snapshots and `offline_snippets_cache.db` live (default `data/offline_cache`). |
+| `OFFLINE_CACHE_DIR` | No | Offline snapshots / `offline_snippets_cache.db` (default `data/offline_cache`). |
 | `IUCLID_FORMAT_DIR` | No | Extracted IUCLID format bundle for picklist / phrase decoding. |
-| `CHEMICAL_DB_PATH` | No | Override path to SQLite chemical DB (default `data/chemical_db.sqlite`). |
-| `CAMEO_SQLITE` | No | Optional path to CAMEO Chemicals `cameo.sqlite` or bundled `data/cameo_nfpa.sqlite`. |
-| `P2OASYS_MATRIX_PATH` | No | P2OASys hazard matrix Excel (default under `data/`). If missing, a dev placeholder is auto-written unless `P2OASYS_DISABLE_AUTO_PLACEHOLDER=1`. |
-| `QSAR_TOOLBOX_PORT` | No | Local OECD QSAR Toolbox WebSuite port (Windows; optional). |
+| `CHEMICAL_DB_PATH` | No | Override SQLite chemical DB (default `data/chemical_db.sqlite`). |
+| `CAMEO_SQLITE` | No | CAMEO Chemicals `cameo.sqlite` or bundled `data/cameo_nfpa.sqlite`. |
+| `P2OASYS_MATRIX_PATH` | No | Hazard matrix Excel under `data/`. Placeholder unless `P2OASYS_DISABLE_AUTO_PLACEHOLDER=1`. |
+| `P2OASYS_SCORE_LOOKUP_DB` | No | Override `data/p2oasys_score_lookup.sqlite`. |
+| `OPERA_PRECOMPUTE_DB_PATH` | No | OPERA batch cache sqlite. |
+| `HAZQUERY_OPERA_EXE` / `OPERA_JAVA_HOME` | No | Local OPERA CLI + Java for PaDEL/CDK. |
+| `HAZQUERY_EPISUITE_API_BASE` | No | ECOSAR API root (default `https://episuite.dev/api`). |
+| `HAZQUERY_EPISUITE_API_KEY` | No | Optional Bearer for EPI Suite API. |
+| `HAZQUERY_SKIP_ECOSAR` | No | `1` disables ECOSAR network calls. |
+| `ECOSAR_CACHE_DB_PATH` | No | ECOSAR response cache (default `data/ecosar_cache.sqlite`). |
+| `QSAR_TOOLBOX_PORT` | No | OECD QSAR Toolbox WebSuite port (Windows; optional). |
 | `USE_PUBCHEM_CAS_VALIDATION` | No | `1` / `0` — validate extracted CAS against PubChem (default on). |
 | `SHOW_ONLY_PUBCHEM_VERIFIED` | No | `1` hides SDS CAS not found in PubChem. |
 | `MIN_CAS_CONFIDENCE` | No | Minimum confidence (0–1) to show SDS extractions in UI. |
-| `HAZQUERY_DISABLE_DOCLING` | No | `1` to skip Docling on constrained hosts. |
-| `OLLAMA_HOST`, `OLLAMA_MODEL` | No | Local LLM for optional SDS flows (see `docs/OLLAMA_SETUP.md`). |
+| `HAZQUERY_DISABLE_DOCLING` | No | `1` to skip Docling on constrained hosts / Cloud. |
+| `HAZQUERY_EXTRACTION_PIPELINE` | No | `hybrid_md_ocr` \| `markitdown_fast`. |
+| `OLLAMA_HOST`, `OLLAMA_MODEL` | No | Local LLM for optional SDS flows. |
 
-Contributors can install dev tools (e.g. **vulture**) with `pip install -r requirements-dev.txt`.
+Contributors: `pip install -r requirements-dev.txt` (pytest, vulture, …).
 
 ---
 
