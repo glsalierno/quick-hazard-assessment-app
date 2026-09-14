@@ -1,0 +1,4 @@
+endpoint,n_compounds,r2,rmse,agreement_2x,agreement_5x
+CATMoS_LD50_pred,5,-0.027367668624692865,861.3118572636615,0.4,0.4
+FUB_pred,5,-0.8897453039548271,287.6911744523978,0.2,0.4
+CERAPP_Bind_pred,0,,,,

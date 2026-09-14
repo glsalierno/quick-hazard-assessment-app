@@ -1,0 +1,101 @@
+{
+  "n_cas": 1108,
+  "categories": [
+    {
+      "category": "acute",
+      "n_both": 888,
+      "pct_auto_filled": 80.14440433212997,
+      "pct_expert_filled": 100.0,
+      "mae": 1.4166666666666667,
+      "bias_auto_minus_expert": 0.5337837837837838,
+      "rmse": 2.0919192446473946,
+      "exact_match_pct": 36.486486486486484,
+      "within1_pct": 62.5,
+      "within2_pct": 79.27927927927928,
+      "n_miss_auto": 220
+    },
+    {
+      "category": "chronic",
+      "n_both": 588,
+      "pct_auto_filled": 53.068592057761734,
+      "pct_expert_filled": 100.0,
+      "mae": 1.7108843537414966,
+      "bias_auto_minus_expert": 1.4625850340136055,
+      "rmse": 2.3262769882046164,
+      "exact_match_pct": 27.210884353741495,
+      "within1_pct": 50.51020408163265,
+      "within2_pct": 75.34013605442176,
+      "n_miss_auto": 520
+    },
+    {
+      "category": "ecological",
+      "n_both": 451,
+      "pct_auto_filled": 40.7942238267148,
+      "pct_expert_filled": 99.72924187725631,
+      "mae": 1.8004434589800444,
+      "bias_auto_minus_expert": 0.5277161862527716,
+      "rmse": 2.594553394531161,
+      "exact_match_pct": 30.155210643015522,
+      "within1_pct": 52.549889135254986,
+      "within2_pct": 74.72283813747228,
+      "n_miss_auto": 656
+    },
+    {
+      "category": "fate",
+      "n_both": 1051,
+      "pct_auto_filled": 94.94584837545126,
+      "pct_expert_filled": 99.90974729241877,
+      "mae": 2.2207421503330163,
+      "bias_auto_minus_expert": -1.7887725975261655,
+      "rmse": 2.718649690013844,
+      "exact_match_pct": 9.800190294957183,
+      "within1_pct": 35.87059942911513,
+      "within2_pct": 67.84015223596575,
+      "n_miss_auto": 56
+    },
+    {
+      "category": "atmospheric",
+      "n_both": 1089,
+      "pct_auto_filled": 98.64620938628158,
+      "pct_expert_filled": 99.63898916967509,
+      "mae": 0.72910927456382,
+      "bias_auto_minus_expert": -0.03856749311294766,
+      "rmse": 1.5121181757423816,
+      "exact_match_pct": 65.47291092745638,
+      "within1_pct": 85.9504132231405,
+      "within2_pct": 87.51147842056933,
+      "n_miss_auto": 15
+    },
+    {
+      "category": "physical",
+      "n_both": 698,
+      "pct_auto_filled": 62.99638989169675,
+      "pct_expert_filled": 100.0,
+      "mae": 1.507163323782235,
+      "bias_auto_minus_expert": 0.0057306590257879654,
+      "rmse": 2.1135393799505415,
+      "exact_match_pct": 25.501432664756447,
+      "within1_pct": 60.17191977077364,
+      "within2_pct": 81.6618911174785,
+      "n_miss_auto": 410
+    }
+  ],
+  "overall": {
+    "n": 1093,
+    "mae": 2.5934975820154227,
+    "bias": 2.376754672591818,
+    "exact_match_pct": 0.9149130832570905,
+    "within1_pct": 13.906678865507777,
+    "within2_pct": 38.06038426349497
+  },
+  "auto_cats_filled_mean": 4.305956678700361,
+  "auto_cats_filled_hist": {
+    "0": 15,
+    "1": 3,
+    "2": 129,
+    "3": 169,
+    "4": 244,
+    "5": 261,
+    "6": 287
+  }
+}

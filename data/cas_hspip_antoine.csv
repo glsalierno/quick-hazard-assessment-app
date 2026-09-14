@@ -1,0 +1,23 @@
+cas,AntA,AntB,AntC,log_base,t_unit,p_unit,source,notes
+67-56-1,8.08097,1582.271,239.726,log10,C,mmHg,cas_hspip_literature_antoine,Methanol literature Antoine (mmHg °C form matching HSPiP). Prefer over Y-MBSX AntA/B/C which over-predict ~373 vs ~127 mmHg @25C. Populate additional rows from cas-to-HSPiP_data / HSPiP dataset exports.
+72-19-5,7.768,2024.7,124.6,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+100-49-2,7.303,1632.2,178.7,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+102-52-3,7.261,1562.7,190.8,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+102-86-3,7.211,2035.2,153.7,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+103-45-7,7.194,1811.2,181.1,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+103-75-3,7.157,1485.5,203.6,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+105-38-4,7.084,1315.2,213.6,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+106-21-8,7.313,1746.8,165.9,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+106-36-5,7.086,1399.7,206.1,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+106-79-6,7.412,2019.4,152.7,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+106-91-2,7.249,1700.4,198.1,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+107-29-9,7.506,1452.6,189.9,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+107-54-0,7.279,1459.9,183.6,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+1003-38-9,6.972,1285.2,216.4,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+1067-47-6,7.248,1988.5,155.3,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+1069-23-4,7.613,1677.8,159.0,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+2393-23-9,7.267,1828.3,172.7,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+10031-87-5,7.094,1541.1,195.2,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+10599-70-9,7.201,1591.1,186.4,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+100047-36-7,7.476,2106.2,123.7,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow
+102687-65-0,6.987,1025.4,230.1,log10,C,mmHg,hspip_ymb_sx_cached,Cached from HSPiP Y-MBSX via cas-to-HSPiP_data workflow

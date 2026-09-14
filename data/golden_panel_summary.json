@@ -1,0 +1,37 @@
+{
+  "n_cas": 3,
+  "n_with_error": 0,
+  "all_gt_matches": {
+    "n_cas": 3,
+    "n_category_pairs": 15,
+    "mae_category": 1.7333333333333334,
+    "median_abs_err_category": 1.0,
+    "false_green_rate": 0.06666666666666667
+  },
+  "pure_gt_matches": {
+    "n_cas": 2,
+    "n_category_pairs": 10,
+    "mae_category": 1.6,
+    "median_abs_err_category": 1.0,
+    "false_green_rate": 0.1
+  },
+  "mae_category": 1.6,
+  "median_abs_err_category": 1.0,
+  "false_green_rate": 0.1,
+  "n_category_pairs": 10,
+  "mae_overall_vs_expert": 2.1,
+  "matrix_required_official": true,
+  "notes": [
+    "Primary MAE/false-green use pure-looking GT substance names only (product/mixture SDS scores for the same CAS are reported under all_gt_matches).",
+    "Process Factors / Life Cycle / Atmospheric often under-scored until dedicated rules land."
+  ],
+  "matrix": {
+    "kind": "official",
+    "sha256": "ab0ea28a8b4da02431ed5f5d73d8c0d37f8ac349a41c3e8546004efb08f539ac",
+    "filename": "Hazard Matrix Group Review 9-19-23.xlsx",
+    "size_bytes": 110632
+  },
+  "scorer_version": "p2oasys_scorer_v6.2_assessment",
+  "assessment_schema": "p2oasys_assessment_v6.2",
+  "output": "data\\demo_examples.csv"
+}
