@@ -115,6 +115,7 @@ def create_comprehensive_download_data(
     pubchem_data: dict[str, Any],
     dsstox_info: Optional[dict] = None,
     toxval_data: Optional[dict] = None,
+    cameo_data: Optional[dict] = None,
 ) -> dict[str, Any]:
     """
     Build full structure for download: identifiers, properties, GHS, all toxicity rows (no truncation).
@@ -142,6 +143,15 @@ def create_comprehensive_download_data(
         "physical_properties": {
             "flash_point": fp_str,
             "vapor_pressure": vp_str,
+        },
+        "nfpa": {
+            "health": (cameo_data or {}).get("nfpa_health"),
+            "fire": (cameo_data or {}).get("nfpa_flame"),
+            "instability": (cameo_data or {}).get("nfpa_instability"),
+            "special": (cameo_data or {}).get("nfpa_special"),
+            "source": (cameo_data or {}).get("nfpa_source") or "",
+            "cameo_name": (cameo_data or {}).get("name") or "",
+            "pubchem": pubchem_data.get("nfpa") or "",
         },
         "ghs": {
             "h_codes": ghs.get("h_codes") or [],
@@ -178,6 +188,7 @@ def download_toxicity_csv(
     h_codes: list[str],
     p_codes: list[str],
     eco: dict,
+    cameo_data: Optional[dict] = None,
 ) -> bytes:
     """
     Build CSV with one header row (summary) and one row per toxicity endpoint so nothing is truncated.
@@ -186,6 +197,7 @@ def download_toxicity_csv(
     vp = pubchem_data.get("vapor_pressure")
     fp_str = "; ".join(fp) if isinstance(fp, list) else (fp or "")
     vp_str = "; ".join(vp) if isinstance(vp, list) else (vp or "")
+    cameo = cameo_data or {}
 
     # Base columns (same for every row)
     base = {
@@ -197,6 +209,11 @@ def download_toxicity_csv(
         "MW": pubchem_data.get("mw") or "",
         "Flash_Point": fp_str,
         "Vapor_Pressure": vp_str,
+        "NFPA_Health": "" if cameo.get("nfpa_health") is None else cameo.get("nfpa_health"),
+        "NFPA_Fire": "" if cameo.get("nfpa_flame") is None else cameo.get("nfpa_flame"),
+        "NFPA_Instability": "" if cameo.get("nfpa_instability") is None else cameo.get("nfpa_instability"),
+        "NFPA_Special": cameo.get("nfpa_special") or "",
+        "NFPA_Source": cameo.get("nfpa_source") or "",
         "GHS_H": " | ".join(h_codes),
         "GHS_P": " | ".join(p_codes),
         "Aquatic_H": " | ".join(eco.get("h_codes_aquatic") or []),
