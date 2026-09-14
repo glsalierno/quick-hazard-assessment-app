@@ -36,7 +36,7 @@ DEFAULT_MATRIX_PATH = _default_matrix_path()
 SCORE_COLS = [2, 4, 6, 8, 10]  # P2OASys score levels
 
 # v6 hardening: bump when scoring semantics change so audit traces are comparable.
-SCORER_VERSION = "p2oasys_scorer_v6.4_fate_logkow_bcf"
+SCORER_VERSION = "p2oasys_scorer_v6.5_ph_cascade"
 
 # Ideal-gas factor for mg/m³ → ppm at 25 °C, 1 atm (TURI / EPA convention).
 _MGM3_TO_PPM_FACTOR = 24.45
@@ -325,8 +325,8 @@ def _parse_sheet(df: pd.DataFrame, category: str) -> dict[str, Any]:
             # Subcategory header: text in A, no values in B-F (e.g. "Inhalation Toxicity")
             # Don't overwrite with main category name if it's the sheet title
             if c0 and c0 != category_name:
-                # Avoid treating numeric-only or very short labels as subcategories
-                if len(c0) > 2 and not re.match(r"^[\d.\s]+$", c0):
+                # Allow short labels like "pH" (len==2); skip pure numerics.
+                if len(c0) >= 2 and not re.match(r"^[\d.\s]+$", c0):
                     current_sub = c0.strip()
 
     return rules
@@ -972,11 +972,25 @@ def _extract_biodeg_half_life_days(hazard_data: dict) -> Optional[dict[str, Any]
 
 def _extract_lc50_aquatic(hazard_data: dict) -> Optional[float]:
     """Extract most conservative acute aquatic LC50 / EC50 (lowest mg/L)."""
-    tox = hazard_data.get("toxicities", [])
     candidates: list[float] = []
+    for key in ("lc50_aquatic_mg_l", "aquatic_toxicity"):
+        raw = hazard_data.get(key)
+        if isinstance(raw, dict):
+            raw = raw.get("value")
+        v = _num(raw)
+        if v is not None and v > 0:
+            candidates.append(float(v))
+    tox = hazard_data.get("toxicities", [])
     for t in tox:
         val = str(t.get("value", ""))
-        if ("LC50" in val or "EC50" in val) and ("mg/L" in val or "fish" in val.lower() or "trout" in val.lower() or "aquatic" in val.lower()):
+        if ("LC50" in val or "EC50" in val) and (
+            "mg/L" in val
+            or "fish" in val.lower()
+            or "trout" in val.lower()
+            or "aquatic" in val.lower()
+            or "daphn" in val.lower()
+            or "algae" in val.lower()
+        ):
             m = re.search(r"(\d[\d,]*(?:\.\d+)?)\s*mg/L", val, re.I)
             if m:
                 v = _num(m.group(1))
@@ -1132,6 +1146,15 @@ def compute_p2oasys_scores_with_trace(
     bcf_l_kg = _extract_bcf_l_kg(hazard_data)
     biodeg_hl = _extract_biodeg_half_life_days(hazard_data)
 
+    # Physical Properties → pH: exp 1% pH → pKa (exp/OPERA) → FG SMARTS last resort.
+    ph_info = None
+    try:
+        from utils.p2oasys_ph import estimate_ph_for_hazard
+
+        ph_info = estimate_ph_for_hazard(hazard_data)
+    except Exception:
+        ph_info = None
+
     # Phrase corpus for KEY PHRASE / ODP / GWP style matrix rows.
     phrase_corpus_parts: list[str] = []
     for t in hazard_data.get("toxicities") or []:
@@ -1163,6 +1186,8 @@ def compute_p2oasys_scores_with_trace(
         "bcf_l_kg": bcf_l_kg,
         "biodeg_half_life_days": biodeg_hl,
         "molecular_weight": _num(hazard_data.get("molecular_weight")),
+        "ph_estimate": ph_info,
+        "ph_heuristic": ph_info,
     }
 
     def _record(
@@ -1200,6 +1225,41 @@ def compute_p2oasys_scores_with_trace(
                 predicted = False
                 rtype = rule.get("type", "")
                 miss_reason = "no applicable evidence"
+
+                # pH is U-shaped — never use Excel numeric thresholds or generic phrase corpus.
+                if str(subcat).strip().lower() == "ph":
+                    try:
+                        from utils.p2oasys_ph import apply_ph_rule
+
+                        sc_ph, iv_ph, handled = apply_ph_rule(
+                            subcat=subcat, unit_name=unit_name, ph_info=ph_info
+                        )
+                    except Exception:
+                        sc_ph, iv_ph, handled = None, None, True
+                    if handled:
+                        if sc_ph is not None:
+                            score = sc_ph
+                            input_value = iv_ph
+                            src = str((ph_info or {}).get("source") or "")
+                            predicted = src.startswith(("fg_pka", "opera_pka"))
+                        else:
+                            miss_reason = "no pH estimate (need SMILES/CID or OPERA pKa / experimental pH)"
+                        if score is not None:
+                            status = STATUS_PREDICTED_ONLY if predicted else STATUS_SCORED
+                            sub_scores[unit_name] = score
+                            _record(
+                                category, subcat, unit_name, rule, input_value, score,
+                                status=status, qualifier=qualifier, predicted=predicted,
+                            )
+                        else:
+                            missing.append({
+                                "category": category,
+                                "subcategory": subcat,
+                                "unit": unit_name,
+                                "status": STATUS_NO_DATA,
+                                "reason": miss_reason,
+                            })
+                        continue
 
                 if rtype == "numeric":
                     if "LD50" in unit_name and "Oral" in subcat:

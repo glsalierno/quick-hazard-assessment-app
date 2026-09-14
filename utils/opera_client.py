@@ -36,6 +36,10 @@ DISPLAY_COLUMNS: dict[str, str] = {
     "Water solubility (log mol/L)": "LogWS_pred",
     "BCF (log)": "LogBCF_pred",
     "Acute oral LD50 (mg/kg, CATMoS)": "CATMoS_LD50_pred",
+    "pKa acid (pKa_a)": "pKa_a_pred",
+    "pKa base BH+ (pKa_b)": "pKa_b_pred",
+    "AD pKa": "AD_pKa",
+    "Conf index pKa": "Conf_index_pKa",
 }
 
 # Common OPERA ID column names (column-name based matching)
@@ -51,6 +55,9 @@ _ENDPOINT_ALIASES: dict[str, str] = {
     "bcf": "LogBCF_pred",
     "ld50": "CATMoS_LD50_pred",
     "acute_oral_toxicity": "CATMoS_LD50_pred",
+    "pka": "pKa_a_pred",
+    "pka_a": "pKa_a_pred",
+    "pka_b": "pKa_b_pred",
 }
 
 
@@ -494,6 +501,35 @@ def smiles_from_cas_batch(cas_list: list[str]) -> dict[str, str | None]:
     return opera_batch.smiles_from_cas_batch(cas_list)
 
 
+def extract_opera_pka_from_row(row: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Parse OPERA pKa_a / pKa_b (+ AD/confidence) from a flat CSV row."""
+    if not row:
+        return None
+
+    def _num(x: Any) -> float | None:
+        try:
+            if x is None or x == "" or str(x).lower() in ("nan", "na", "nd", "none"):
+                return None
+            return float(str(x).strip())
+        except (TypeError, ValueError):
+            return None
+
+    pka_a = _num(row.get("pKa_a_pred") or row.get("pKa_a"))
+    pka_b = _num(row.get("pKa_b_pred") or row.get("pKa_b"))
+    if pka_a is None and pka_b is None:
+        return None
+    return {
+        "pka_a": pka_a,
+        "pka_b": pka_b,
+        "ad_pka": row.get("AD_pKa"),
+        "ad_index_pka": row.get("AD_index_pKa"),
+        "conf_index_pka": row.get("Conf_index_pKa"),
+        "ionization": row.get("ionization") or row.get("Ionization"),
+        "predicted": True,
+        "source": "OPERA",
+    }
+
+
 def get_opera_predictions(
     smiles: str,
     cas: str | None = None,
@@ -504,7 +540,7 @@ def get_opera_predictions(
     If OPERA is installed, run it and return a compact summary; otherwise ``None``.
 
     Summary shape:
-        ``{"ok", "error", "exe", "display", "row", "warnings", "parser_version"}``
+        ``{"ok", "error", "exe", "display", "row", "pka", "warnings", "parser_version"}``
     """
     if not is_opera_available():
         return None
@@ -519,6 +555,7 @@ def get_opera_predictions(
             display[label] = str(v).strip()
     warnings = list(out.get("warnings") or [])
     warnings.extend(check_opera_pubchem_logp(row, pubchem_xlogp))
+    pka = extract_opera_pka_from_row(row)
     # Seed precompute SQLite so P2OASys HITL can gap-fill without a cold CLI run.
     if out.get("ok") and row and mid and mid != "query":
         try:
@@ -538,6 +575,7 @@ def get_opera_predictions(
         "exe": out.get("exe"),
         "display": display,
         "row": row,
+        "pka": pka,
         "warnings": warnings,
         "parser_version": OPERA_CLIENT_VERSION,
     }

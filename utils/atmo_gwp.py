@@ -3,11 +3,12 @@ Load IPCC GWP 100-year values from the atmo folder (parquet from Federal LCA Com
 Used by P2OASys for Atmospheric Hazard when atmo/IPCC parquet is available.
 Prefer AR6-100; fallback AR5-100 then AR4-100.
 
-Also implements the Atmospheric GWP rule:
+Also implements the Atmospheric GWP/ODP rule:
   - non-gas (liquid/solid/aerosol liquid at STP) → GWP = 0 and ODP = 0
     (heuristic_non_gas_gwp0 / heuristic_non_gas_odp0)
   - gas → lookup GWP100 / ODP from local IPCC ATMO parquet and/or odp_gwp_by_cas.csv
-  - gas and not in tables → leave missing (do not invent)
+  - gas/unknown and not in authoritative tables → GWP = 0 and ODP = 0
+    (default_not_on_authoritative_list) — closed Montreal ODP set + IPCC GHG metrics
 
 Future refresh sources (prefer local files at runtime; URLs for documentation only):
   - EPA GHG inventory / GWP: https://www.epa.gov/ghgemissions/understanding-global-warming-potentials
@@ -225,98 +226,160 @@ def infer_physical_state_from_sources(
     return state, (source if state != "unknown" else "unknown")
 
 
+def _set_gwp_odp_zero(
+    out: dict[str, Any],
+    *,
+    gwp_source: str,
+    odp_source: str,
+    physical_state: str,
+    state_source: str,
+    note: str,
+) -> dict[str, Any]:
+    hm = dict(out.get("hazard_metrics") or {})
+    designations = [
+        d
+        for d in list(hm.get("other_designations") or [])
+        if not re.match(r"^\s*(GWP|ODP)\b", str(d), re.I)
+    ]
+    designations.append("GWP 0")
+    designations.append("ODP 0")
+    hm["gwp100"] = [0.0]
+    hm["odp"] = [0.0]
+    hm["other_designations"] = designations
+    out["hazard_metrics"] = hm
+    out["gwp_meta"] = {
+        "gwp100": 0.0,
+        "source": gwp_source,
+        "tier": "predicted_or_heuristic",
+        "physical_state": physical_state,
+        "state_source": state_source,
+    }
+    out["odp_meta"] = {
+        "odp": 0.0,
+        "source": odp_source,
+        "tier": "predicted_or_heuristic",
+        "physical_state": physical_state,
+        "state_source": state_source,
+    }
+    notes = list(out.get("_pipeline_notes") or [])
+    if note not in notes:
+        notes.append(note)
+    out["_pipeline_notes"] = notes
+    return out
+
+
 def apply_atmospheric_gwp_rule(
     extra_sources: dict[str, Any] | None,
     *,
     physical_state: str,
     state_source: str = "unknown",
+    default_zero_if_unlisted: bool = True,
 ) -> dict[str, Any]:
     """
-    Apply non-gas → GWP=0 and ODP=0 heuristics; leave gas lookups untouched.
+    Apply atmospheric GWP/ODP fill rules.
 
-    Tags GWP=0 with ``heuristic_non_gas_gwp0`` / predicted-or-heuristic tier for HITL.
+    - non-gas → GWP=0 / ODP=0 (``heuristic_non_gas_*``)
+    - gas/unknown with lookup hit → keep table values
+    - gas/unknown without lookup → GWP=0 / ODP=0 when ``default_zero_if_unlisted``
+      (``default_not_on_authoritative_list``)
     """
     out: dict[str, Any] = dict(extra_sources) if extra_sources else {}
     hm = dict(out.get("hazard_metrics") or {})
-    designations = list(hm.get("other_designations") or [])
     notes = list(out.get("_pipeline_notes") or [])
 
     if physical_state == "non_gas":
-        # Remove prior GWP/ODP designations; set numeric 0 for both.
-        designations = [
-            d
-            for d in designations
-            if not re.match(r"^\s*(GWP|ODP)\b", str(d), re.I)
-        ]
-        designations.append("GWP 0")
-        designations.append("ODP 0")
-        hm["gwp100"] = [0.0]
-        hm["odp"] = [0.0]
-        hm["other_designations"] = designations
-        out["hazard_metrics"] = hm
-        out["gwp_meta"] = {
-            "gwp100": 0.0,
-            "source": "heuristic_non_gas_gwp0",
-            "tier": "predicted_or_heuristic",
-            "physical_state": physical_state,
-            "state_source": state_source,
-        }
-        out["odp_meta"] = {
-            "odp": 0.0,
-            "source": "heuristic_non_gas_odp0",
-            "tier": "predicted_or_heuristic",
-            "physical_state": physical_state,
-            "state_source": state_source,
-        }
-        note = (
-            f"Atmospheric GWP=0/ODP=0 via non-gas heuristic "
-            f"(state={physical_state} from {state_source})"
+        return _set_gwp_odp_zero(
+            out,
+            gwp_source="heuristic_non_gas_gwp0",
+            odp_source="heuristic_non_gas_odp0",
+            physical_state=physical_state,
+            state_source=state_source,
+            note=(
+                f"Atmospheric GWP=0/ODP=0 via non-gas heuristic "
+                f"(state={physical_state} from {state_source})"
+            ),
         )
-        if note not in notes:
-            notes.append(note)
-        out["_pipeline_notes"] = notes
-        return out
 
-    # gas or unknown: do not invent; keep whatever lookups already placed
-    if physical_state == "gas":
-        out.setdefault("gwp_meta", {})
-        meta = dict(out.get("gwp_meta") or {})
-        meta["physical_state"] = "gas"
-        meta["state_source"] = state_source
-        if hm.get("gwp100"):
-            meta.setdefault("source", "lookup_table")
-            try:
-                meta.setdefault("gwp100", float(hm["gwp100"][0]))
-            except Exception:
-                pass
-        else:
-            meta.setdefault("source", "missing")
-            meta.setdefault("gwp100", None)
-        out["gwp_meta"] = meta
+    # gas or unknown: keep lookups; optionally default missing to 0
+    state_label = physical_state if physical_state in ("gas", "unknown") else "unknown"
+    gwp_meta = dict(out.get("gwp_meta") or {})
+    gwp_meta["physical_state"] = state_label
+    gwp_meta["state_source"] = state_source
+    odp_meta = dict(out.get("odp_meta") or {})
+    odp_meta["physical_state"] = state_label
+    odp_meta["state_source"] = state_source
 
-        odp_meta = dict(out.get("odp_meta") or {})
-        odp_meta["physical_state"] = "gas"
-        odp_meta["state_source"] = state_source
-        if hm.get("odp"):
-            odp_meta.setdefault("source", "lookup_table")
-            try:
-                odp_meta.setdefault("odp", float(hm["odp"][0]))
-            except Exception:
-                pass
-        else:
-            odp_meta.setdefault("source", "missing")
-            odp_meta.setdefault("odp", None)
-        out["odp_meta"] = odp_meta
+    has_gwp = bool(hm.get("gwp100"))
+    has_odp = bool(hm.get("odp"))
 
-        if not hm.get("gwp100"):
-            note = "Atmospheric GWP missing for gas (not in ATMO/CSV tables)"
+    if has_gwp:
+        gwp_meta.setdefault("source", "lookup_table")
+        try:
+            gwp_meta.setdefault("gwp100", float(hm["gwp100"][0]))
+        except Exception:
+            pass
+    if has_odp:
+        odp_meta.setdefault("source", "lookup_table")
+        try:
+            odp_meta.setdefault("odp", float(hm["odp"][0]))
+        except Exception:
+            pass
+
+    if default_zero_if_unlisted and (not has_gwp or not has_odp):
+        designations = list(hm.get("other_designations") or [])
+        if not has_gwp:
+            designations = [d for d in designations if not re.match(r"^\s*GWP\b", str(d), re.I)]
+            designations.append("GWP 0")
+            hm["gwp100"] = [0.0]
+            gwp_meta.update(
+                {
+                    "gwp100": 0.0,
+                    "source": "default_not_on_authoritative_list",
+                    "tier": "predicted_or_heuristic",
+                }
+            )
+            note = (
+                f"Atmospheric GWP=0 default (not on IPCC/EPA GHG tables; "
+                f"state={state_label} from {state_source})"
+            )
             if note not in notes:
                 notes.append(note)
-        if not hm.get("odp"):
-            note2 = "Atmospheric ODP missing for gas (not in ODP CSV/list)"
+        if not has_odp:
+            designations = [d for d in designations if not re.match(r"^\s*ODP\b", str(d), re.I)]
+            designations.append("ODP 0")
+            hm["odp"] = [0.0]
+            odp_meta.update(
+                {
+                    "odp": 0.0,
+                    "source": "default_not_on_authoritative_list",
+                    "tier": "predicted_or_heuristic",
+                }
+            )
+            note2 = (
+                f"Atmospheric ODP=0 default (not on Montreal/EPA ODS list; "
+                f"state={state_label} from {state_source})"
+            )
             if note2 not in notes:
                 notes.append(note2)
-        out["_pipeline_notes"] = notes
+        hm["other_designations"] = designations
+        out["hazard_metrics"] = hm
+    elif not has_gwp or not has_odp:
+        if not has_gwp:
+            gwp_meta.setdefault("source", "missing")
+            gwp_meta.setdefault("gwp100", None)
+            note = "Atmospheric GWP missing (not in ATMO/CSV tables; default_zero disabled)"
+            if note not in notes:
+                notes.append(note)
+        if not has_odp:
+            odp_meta.setdefault("source", "missing")
+            odp_meta.setdefault("odp", None)
+            note2 = "Atmospheric ODP missing (not in ODP CSV/list; default_zero disabled)"
+            if note2 not in notes:
+                notes.append(note2)
+
+    out["gwp_meta"] = gwp_meta
+    out["odp_meta"] = odp_meta
+    out["_pipeline_notes"] = notes
     return out
 
 
@@ -353,12 +416,114 @@ def merge_gwp_into_hazard_data(hazard_data: dict[str, Any], extra_sources: dict[
 #   - Product may form SOx or NOx upon combustion
 #   - Produces SOx and NOx
 #
-# We only claim the structural presence/absence of S/N (element counts / SMILES /
-# formula). Presence → "may form SOx or NOx upon combustion" — honest heuristic,
-# not measured acid-rain potential. Absence → "Does not contain S or N".
+# We only claim the structural presence/absence of S/N. Presence →
+# "may form SOx or NOx upon combustion" — honest heuristic, not measured
+# acid-rain potential. Absence → "Does not contain S or N".
+#
+# Structure source precedence (keep current):
+#   1) PubChem molecular formula element symbols + atom counts (primary)
+#      — N/S only; never Ni, Si, Na, Sn, …
+#   2) HSPiP Y-MBSX row Formula / N# / S# when already computed (optional)
+#   3) SMILES via RDKit only when formula is missing (fallback)
+#   4) HSPiP sofx SMILES as last gap-fill when PubChem structure is missing
+# Never treat sofx boolean field "S" (TRUE/FALSE) as sulfur count.
+# Hansen D/P/H/RER and predicted VP stay HSPiP (Teams-licensed install).
 
 _ACID_RAIN_NO_SN = "Does not contain S or N"
 _ACID_RAIN_MAY_FORM = "Product may form SOx or NOx upon combustion"
+
+
+def resolve_acid_rain_structure_inputs(
+    *,
+    pubchem: dict[str, Any] | None = None,
+    formula: str | None = None,
+    smiles: str | None = None,
+    hspip_ymb_row: dict[str, Any] | None = None,
+    sofx_smiles: str | None = None,
+) -> dict[str, Any]:
+    """
+    Build formula / smiles / hspip_row for Acid Rain Formation.
+
+    Prefers PubChem; HSPiP Y-MBSX N#/S#/Formula is optional enrichment;
+    sofx SMILES is gap-fill only.
+    """
+    pc = pubchem or {}
+    formula_out = (
+        formula
+        or pc.get("molecular_formula")
+        or pc.get("formula")
+        or None
+    )
+    if formula_out is not None:
+        formula_out = str(formula_out).strip() or None
+
+    smiles_out = smiles or pc.get("smiles") or None
+    if smiles_out is not None:
+        smiles_out = str(smiles_out).strip() or None
+
+    structure_sources: list[str] = []
+    if formula_out:
+        structure_sources.append("pubchem_formula" if (pc.get("formula") or pc.get("molecular_formula")) else "formula")
+    if smiles_out and (pc.get("smiles") and str(pc.get("smiles")).strip() == smiles_out):
+        structure_sources.append("pubchem_smiles")
+    elif smiles_out and smiles:
+        structure_sources.append("smiles")
+
+    hspip_row: dict[str, Any] | None = None
+    if hspip_ymb_row:
+        # Only numeric element counts + Formula from Y-MBSX Out.dat — never sofx "S".
+        row: dict[str, Any] = {}
+        for k in ("N#", "S#", "Formula"):
+            if hspip_ymb_row.get(k) is not None:
+                row[k] = hspip_ymb_row.get(k)
+        # Y-MBSX parse may leave counts under N/S — copy only if numeric.
+        for k_src, k_dst in (("N", "N#"), ("S", "S#")):
+            if k_dst not in row and hspip_ymb_row.get(k_src) is not None:
+                try:
+                    row[k_dst] = float(hspip_ymb_row[k_src])
+                except (TypeError, ValueError):
+                    pass
+        if row:
+            hspip_row = row
+            structure_sources.append("hspip_ymb")
+            if not formula_out and row.get("Formula"):
+                formula_out = str(row["Formula"]).strip() or None
+
+    if not smiles_out and sofx_smiles:
+        smiles_out = str(sofx_smiles).strip() or None
+        if smiles_out:
+            structure_sources.append("hspip_sofx_smiles")
+
+    return {
+        "formula": formula_out,
+        "smiles": smiles_out,
+        "hspip_row": hspip_row,
+        "structure_sources": structure_sources,
+    }
+
+
+def _formula_element_counts(formula: str) -> dict[str, float]:
+    """
+    Parse a molecular formula into element → atom-count (Hill tokens).
+
+    Uses element *symbols* and their stoichiometric counts (e.g. N₂ → N:2),
+    not atomic numbers. Two-letter symbols (Ni, Si, Na, Sn, …) are kept
+    distinct from N / S so they do not false-trigger acid-rain.
+    """
+    f = str(formula or "").strip()
+    if not f:
+        return {}
+    # Strip charge / hydrate suffixes commonly seen in PubChem formulas.
+    f = re.split(r"[·•.]", f, maxsplit=1)[0]
+    f = re.sub(r"[\[\]()]", "", f)
+    f = re.sub(r"[+\-]\d*$", "", f)
+    out: dict[str, float] = {}
+    for m in re.finditer(r"([A-Z][a-z]?)(\d*)", f):
+        el = m.group(1)
+        raw = m.group(2)
+        n = float(raw) if raw else 1.0
+        out[el] = out.get(el, 0.0) + n
+    return out
 
 
 def molecule_has_s_or_n(
@@ -371,7 +536,12 @@ def molecule_has_s_or_n(
     """
     Detect sulfur and/or nitrogen for Acid Rain combustion heuristic.
 
+    Prefer molecular-formula element symbols + atom counts (PubChem formula).
+    SMILES/RDKit is a fallback when formula is missing — not a substitute for
+    reading N/S out of the formula. Never confuse Ni/Si/Na/Sn with N or S.
+
     Returns (has_s_or_n, detail) where detail includes has_s, has_n, evidence.
+    ``hspip_row`` may supply ``N#`` / ``S#`` / ``Formula`` from Y-MBSX only.
     """
     has_s = False
     has_n = False
@@ -379,7 +549,8 @@ def molecule_has_s_or_n(
 
     counts = dict(element_counts or {})
     if hspip_row:
-        for k_src, k_dst in (("S#", "S"), ("N#", "N"), ("S", "S"), ("N", "N")):
+        # Prefer S#/N# only — bare "S" collides with HSPiP sofx boolean flags.
+        for k_src, k_dst in (("S#", "S"), ("N#", "N")):
             if hspip_row.get(k_src) is not None and k_dst not in counts:
                 try:
                     counts[k_dst] = float(hspip_row[k_src])
@@ -388,7 +559,13 @@ def molecule_has_s_or_n(
         if hspip_row.get("Formula") and not formula:
             formula = str(hspip_row.get("Formula"))
 
-    for el, flag_name in (("S", "has_s"), ("N", "has_n")):
+    if formula:
+        parsed = _formula_element_counts(str(formula))
+        for el in ("S", "N"):
+            if el not in counts and parsed.get(el, 0) > 0:
+                counts[el] = parsed[el]
+
+    for el in ("S", "N"):
         raw = counts.get(el)
         try:
             n = float(raw) if raw is not None else 0.0
@@ -399,25 +576,12 @@ def molecule_has_s_or_n(
                 has_s = True
             else:
                 has_n = True
-            evidence.append(f"element_counts:{el}={n:g}")
+            evidence.append(f"formula_atoms:{el}={n:g}")
 
-    if formula:
-        # Molecular formula tokens like CH4N2O, H2SO4 — element symbols.
-        import re as _re
-
-        f = str(formula).strip()
-        if _re.search(r"(?<![a-z])S(?![a-z])", f):
-            has_s = True
-            evidence.append(f"formula:S:{f}")
-        if _re.search(r"(?<![a-z])N(?![a-z])", f):
-            has_n = True
-            evidence.append(f"formula:N:{f}")
-
-    if smiles:
+    # SMILES/RDKit only when no usable formula — formula atom counts are authoritative.
+    formula_ok = bool(formula and _formula_element_counts(str(formula)))
+    if smiles and not formula_ok:
         s = str(smiles)
-        # Organic SMILES: S/s = sulfur, N/n = nitrogen (ignore Cl, Br, Si, Na, ...)
-        # Strip two-letter elements that contain N/S as second letter is rare in SMILES;
-        # use RDKit atom query when available.
         counted = False
         try:
             from rdkit import Chem
@@ -431,22 +595,17 @@ def molecule_has_s_or_n(
                     elif z == 7:
                         has_n = True
                 counted = True
-                evidence.append("smiles:rdkit")
+                evidence.append("smiles:rdkit_fallback")
         except Exception:
             counted = False
         if not counted:
-            import re as _re
-
-            # Remove bracket atoms' isotope/charge noise; rough fallback
-            if _re.search(r"(?<![A-Z])S(?![a-z])", s) or "[S" in s or "s" in s:
-                # 's' aromatic sulfur; avoid matching inside other tokens
-                if "S" in s or "s" in s:
-                    has_s = True
-                    evidence.append("smiles:regex:S")
-            if _re.search(r"(?<![A-Z])N(?![a-z])", s) or "[N" in s or "n" in s:
-                if "N" in s or "n" in s:
-                    has_n = True
-                    evidence.append("smiles:regex:N")
+            # Last resort: only lone S/N tokens (not Si/Sn/Ni/Na).
+            if re.search(r"(?<![A-Z])S(?![a-z])", s) or "[S" in s:
+                has_s = True
+                evidence.append("smiles:regex:S")
+            if re.search(r"(?<![A-Z])N(?![a-z])", s) or "[N" in s:
+                has_n = True
+                evidence.append("smiles:regex:N")
 
     return (has_s or has_n), {
         "has_s": has_s,
@@ -461,6 +620,7 @@ def acid_rain_phrase_for_structure(
     formula: str | None = None,
     element_counts: dict[str, Any] | None = None,
     hspip_row: dict[str, Any] | None = None,
+    structure_sources: list[str] | None = None,
 ) -> dict[str, Any]:
     """Return phrase + meta for Acid Rain Formation extras."""
     has_sn, detail = molecule_has_s_or_n(
@@ -480,9 +640,12 @@ def acid_rain_phrase_for_structure(
         "support": support,
         "tier": "predicted_or_heuristic",
         "source": "structural_combustion_sox_nox_heuristic",
+        "structure_sources": list(structure_sources or []),
         "honesty": (
-            "Structural heuristic for combustion SOx/NOx potential from S/N "
-            "presence; not measured acid-rain potential."
+            "Structural heuristic for combustion SOx/NOx from formula element "
+            "symbols N/S (atom counts; Ni/Si/Na/Sn ignored). PubChem formula "
+            "primary; RDKit SMILES only if formula missing; HSPiP Y-MBSX N#/S# "
+            "optional. Not measured acid-rain potential."
         ),
         **detail,
     }
@@ -495,13 +658,35 @@ def apply_acid_rain_combustion_heuristic(
     formula: str | None = None,
     element_counts: dict[str, Any] | None = None,
     hspip_row: dict[str, Any] | None = None,
+    pubchem: dict[str, Any] | None = None,
+    hspip_ymb_row: dict[str, Any] | None = None,
+    sofx_smiles: str | None = None,
+    structure_sources: list[str] | None = None,
 ) -> dict[str, Any]:
     """
     Feed Atmospheric Acid Rain Formation key phrase into other_designations.
 
+    Prefer PubChem formula/SMILES via ``pubchem=``; HSPiP Y-MBSX / sofx are optional.
     Safe to call with empty structure: leaves extras unchanged when no cues.
     """
     out: dict[str, Any] = dict(extra_sources) if extra_sources else {}
+    resolved = resolve_acid_rain_structure_inputs(
+        pubchem=pubchem,
+        formula=formula,
+        smiles=smiles,
+        hspip_ymb_row=hspip_ymb_row or hspip_row,
+        sofx_smiles=sofx_smiles,
+    )
+    formula = resolved["formula"]
+    smiles = resolved["smiles"]
+    hspip_row = resolved["hspip_row"]
+    sources = list(structure_sources or []) + list(resolved.get("structure_sources") or [])
+    deduped: list[str] = []
+    for s in sources:
+        if s and s not in deduped:
+            deduped.append(s)
+    sources = deduped
+
     if not any([smiles, formula, element_counts, hspip_row]):
         return out
 
@@ -510,6 +695,7 @@ def apply_acid_rain_combustion_heuristic(
         formula=formula,
         element_counts=element_counts,
         hspip_row=hspip_row,
+        structure_sources=sources,
     )
     hm = dict(out.get("hazard_metrics") or {})
     designations = list(hm.get("other_designations") or [])
@@ -531,9 +717,10 @@ def apply_acid_rain_combustion_heuristic(
     out["hazard_metrics"] = hm
     out["acid_rain_meta"] = info
     notes = list(out.get("_pipeline_notes") or [])
+    src_note = ",".join(sources) if sources else "structure"
     note = (
         f"Atmospheric Acid Rain Formation: '{info['phrase']}' "
-        f"({info['honesty']} support={info['support']})"
+        f"({info['honesty']} support={info['support']}; via={src_note})"
     )
     if note not in notes:
         notes.append(note)

@@ -99,6 +99,42 @@ def test_acid_rain_has_s_from_hspip_counts():
     assert "may form" in info["phrase"]
 
 
+def test_acid_rain_formula_not_ni_si():
+    for f in ("SiH4", "NiO", "NaCl", "SnCl2"):
+        info = atmo_gwp.acid_rain_phrase_for_structure(formula=f)
+        assert info["has_s"] is False and info["has_n"] is False, f
+        assert info["phrase"] == "Does not contain S or N"
+
+
+def test_acid_rain_formula_atom_counts():
+    info = atmo_gwp.acid_rain_phrase_for_structure(formula="C2H3N")
+    assert info["has_n"] is True and info["has_s"] is False
+    assert any(e.startswith("formula_atoms:N=") for e in info["evidence"])
+    # With formula present, SMILES/RDKit must not be required
+    info2 = atmo_gwp.acid_rain_phrase_for_structure(formula="C2H6OS", smiles="CS(C)=O")
+    assert info2["has_s"] is True
+    assert not any("rdkit" in e for e in info2["evidence"])
+
+
+def test_acid_rain_ignores_sofx_boolean_s():
+    """HSPiP sofx 'S' is a boolean flag, not sulfur count — must not trigger."""
+    info = atmo_gwp.acid_rain_phrase_for_structure(
+        formula="C3H6O",
+        hspip_row={"S": "FALSE", "N": "FALSE"},  # sofx-shaped; ignored without S#/N#
+    )
+    assert info["has_s"] is False and info["has_n"] is False
+    assert info["phrase"] == "Does not contain S or N"
+
+
+def test_acid_rain_pubchem_formula_primary():
+    extra = atmo_gwp.apply_acid_rain_combustion_heuristic(
+        {},
+        pubchem={"formula": "C2H7N", "smiles": "CCN"},
+    )
+    assert "may form SOx or NOx" in extra["acid_rain_meta"]["phrase"]
+    assert "pubchem_formula" in extra["acid_rain_meta"]["structure_sources"]
+
+
 def test_acid_rain_wires_into_extras_and_scores():
     extra = atmo_gwp.apply_acid_rain_combustion_heuristic(
         {}, smiles="CO", formula="CH4O"
