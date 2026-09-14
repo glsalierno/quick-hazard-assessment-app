@@ -24,6 +24,7 @@ from utils import (
     p2oasys_scorer,
 )
 from utils.p2oasys_extras_merge import merge_extra_sources_for_cas
+from utils import p2oasys_score_lookup
 
 AUTO6 = [
     "Acute Human Effects",
@@ -62,8 +63,7 @@ CAS_LIST = [
     ('124-38-9', 'CO2 Sc (Supercritical CO2)'),
     ('110-82-7', 'Cyclohexane (Hexahydrobenzene)'),
     ('108-94-1', 'Cyclohexanone'),
-    ('5989-27-5', 'D Limonone (d-p-Mentha-1,8-diene 4-Isopropenyl-1-methylcyclohex
-ene)'),
+    ('5989-27-5', 'D Limonene (d-p-Mentha-1,8-diene 4-Isopropenyl-1-methylcyclohexene)'),
     ('107-06-2', 'DCE (Ethylene dichloride)'),
     ('123-42-2', 'Diacetone Alcohol (DAA)'),
     ('60-29-7', 'Diethyl Ether'),
@@ -148,9 +148,21 @@ def score_one(svc, matrix, cas: str) -> dict:
         extra_sources=extra,
     )
     hazard_data = atmo_gwp.merge_gwp_into_hazard_data(hazard_data, extra)
+    hazard_data = atmo_gwp.merge_acid_rain_into_hazard_data(hazard_data, extra)
 
     scores, trace = p2oasys_scorer.compute_p2oasys_scores_with_trace(hazard_data, matrix)
     scores = p2oasys_form.strip_manual_only_scores(scores)
+
+    name = ar.identity.chemical_name or pub.get("iupac_name") or pub.get("title")
+    p2oasys_score_lookup.upsert_auto_from_draft(
+        {
+            "ok": True,
+            "cas": clean,
+            "scores": scores,
+            "chemical_name": name,
+            "sources_used": sources,
+        }
+    )
 
     cat = {}
     status = (trace or {}).get("category_status") or {}
@@ -180,7 +192,7 @@ def score_one(svc, matrix, cas: str) -> dict:
     return {
         "cas": clean,
         "error": None,
-        "name": ar.identity.chemical_name or pub.get("iupac_name") or pub.get("title"),
+        "name": name,
         "scores": cat,
         "fill": fill,
         "sources": sources,

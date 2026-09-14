@@ -3,9 +3,9 @@
   "n_auto_cas_with_subcats": 1228,
   "auto_coverage_pct": 100.0,
   "expert_auto6_subcats_mean": 23.14,
-  "auto_auto6_subcats_mean": 12.1,
+  "auto_auto6_subcats_mean": 12.73,
   "expert_all_subcats_mean": 29.04,
-  "auto_all_subcats_mean": 12.1,
+  "auto_all_subcats_mean": 12.73,
   "n_auto6_slots": 36,
   "n_all_slots": 52,
   "score_scale_note": "P2OASys scores are integers 2\u201310. exact = identical score; within_1 = |auto\u2212expert|\u22641 (adjacent bands, not exact); within_2 = |diff|\u22642.",
@@ -43,12 +43,12 @@
     {
       "category": "Ecological Hazards",
       "expert_fill_pct": 96.1,
-      "auto_fill_pct": 34.1,
-      "both_n": 404,
-      "mae": 1.33,
-      "exact_pct": 53.0,
-      "within_1_pct": 53.0,
-      "within_2_pct": 85.1
+      "auto_fill_pct": 91.6,
+      "both_n": 1081,
+      "mae": 1.44,
+      "exact_pct": 46.8,
+      "within_1_pct": 46.8,
+      "within_2_pct": 85.8
     },
     {
       "category": "Environmental Fate & Transport",
@@ -98,16 +98,16 @@
       "auto_scorable": true,
       "expert_n": 1144,
       "expert_pct": 93.2,
-      "auto_n": 330,
-      "auto_pct": 26.9,
-      "both_n": 308,
-      "expert_only": 836,
-      "auto_only": 22,
-      "mae": 1.28,
-      "exact_pct": 57.5,
-      "within_1_pct": 57.5,
-      "within_2_pct": 82.5,
-      "gap_pp": 66.3
+      "auto_n": 1113,
+      "auto_pct": 90.6,
+      "both_n": 1033,
+      "expert_only": 111,
+      "auto_only": 80,
+      "gap_pp": 2.5,
+      "mae": 1.48,
+      "exact_pct": 47.4,
+      "within_1_pct": 47.4,
+      "within_2_pct": 85.2
     },
     {
       "category": "Ecological Hazards",
@@ -120,11 +120,11 @@
       "both_n": 277,
       "expert_only": 816,
       "auto_only": 20,
+      "gap_pp": 64.8,
       "mae": 1.38,
       "exact_pct": 50.5,
       "within_1_pct": 50.5,
-      "within_2_pct": 86.6,
-      "gap_pp": 64.8
+      "within_2_pct": 86.6
     },
     {
       "category": "Environmental Fate & Transport",
@@ -137,11 +137,11 @@
       "both_n": 0,
       "expert_only": 1085,
       "auto_only": 0,
+      "gap_pp": 88.4,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 88.4
+      "within_2_pct": null
     },
     {
       "category": "Environmental Fate & Transport",
@@ -154,11 +154,11 @@
       "both_n": 1040,
       "expert_only": 171,
       "auto_only": 10,
+      "gap_pp": 13.1,
       "mae": 1.89,
       "exact_pct": 40.4,
       "within_1_pct": 40.4,
-      "within_2_pct": 74.0,
-      "gap_pp": 13.1
+      "within_2_pct": 74.0
     },
     {
       "category": "Environmental Fate & Transport",
@@ -171,62 +171,11 @@
       "both_n": 963,
       "expert_only": 147,
       "auto_only": 99,
+      "gap_pp": 3.9,
       "mae": 1.54,
       "exact_pct": 37.7,
       "within_1_pct": 37.7,
-      "within_2_pct": 88.2,
-      "gap_pp": 3.9
-    },
-    {
-      "category": "Atmospheric Hazard",
-      "subcategory": "Greenhouse Gas",
-      "auto_scorable": true,
-      "expert_n": 1206,
-      "expert_pct": 98.2,
-      "auto_n": 1228,
-      "auto_pct": 100.0,
-      "both_n": 1206,
-      "expert_only": 0,
-      "auto_only": 22,
-      "mae": 0.08,
-      "exact_pct": 98.8,
-      "within_1_pct": 98.8,
-      "within_2_pct": 98.8,
-      "gap_pp": -1.8
-    },
-    {
-      "category": "Atmospheric Hazard",
-      "subcategory": "NESHAP",
-      "auto_scorable": true,
-      "expert_n": 1208,
-      "expert_pct": 98.4,
-      "auto_n": 1228,
-      "auto_pct": 100.0,
-      "both_n": 1208,
-      "expert_only": 0,
-      "auto_only": 20,
-      "mae": 0.26,
-      "exact_pct": 94.0,
-      "within_1_pct": 94.0,
-      "within_2_pct": 94.5,
-      "gap_pp": -1.6
-    },
-    {
-      "category": "Physical Properties",
-      "subcategory": "pH",
-      "auto_scorable": true,
-      "expert_n": 1149,
-      "expert_pct": 93.6,
-      "auto_n": 1067,
-      "auto_pct": 86.9,
-      "both_n": 999,
-      "expert_only": 150,
-      "auto_only": 68,
-      "mae": 1.08,
-      "exact_pct": 70.5,
-      "within_1_pct": 70.5,
-      "within_2_pct": 84.1,
-      "gap_pp": 6.7
+      "within_2_pct": 88.2
     }
   ],
   "thin_auto_subcats": [
@@ -241,11 +190,11 @@
       "both_n": 0,
       "expert_only": 1085,
       "auto_only": 0,
+      "gap_pp": 88.4,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 88.4
+      "within_2_pct": null
     },
     {
       "category": "Chronic Human Effects",
@@ -258,11 +207,11 @@
       "both_n": 142,
       "expert_only": 1076,
       "auto_only": 1,
+      "gap_pp": 87.5,
       "mae": 1.85,
       "exact_pct": 38.0,
       "within_1_pct": 38.0,
-      "within_2_pct": 79.6,
-      "gap_pp": 87.5
+      "within_2_pct": 79.6
     },
     {
       "category": "Chronic Human Effects",
@@ -275,11 +224,11 @@
       "both_n": 56,
       "expert_only": 1022,
       "auto_only": 9,
+      "gap_pp": 82.5,
       "mae": 1.54,
       "exact_pct": 42.9,
       "within_1_pct": 42.9,
-      "within_2_pct": 82.1,
-      "gap_pp": 82.5
+      "within_2_pct": 82.1
     },
     {
       "category": "Chronic Human Effects",
@@ -292,11 +241,11 @@
       "both_n": 135,
       "expert_only": 951,
       "auto_only": 21,
+      "gap_pp": 75.7,
       "mae": 2.84,
       "exact_pct": 11.1,
       "within_1_pct": 11.1,
-      "within_2_pct": 56.3,
-      "gap_pp": 75.7
+      "within_2_pct": 56.3
     },
     {
       "category": "Physical Properties",
@@ -309,11 +258,11 @@
       "both_n": 14,
       "expert_only": 740,
       "auto_only": 2,
+      "gap_pp": 60.1,
       "mae": 1.43,
       "exact_pct": 42.9,
       "within_1_pct": 42.9,
-      "within_2_pct": 85.7,
-      "gap_pp": 60.1
+      "within_2_pct": 85.7
     },
     {
       "category": "Acute Human Effects",
@@ -326,11 +275,11 @@
       "both_n": 0,
       "expert_only": 591,
       "auto_only": 0,
+      "gap_pp": 48.1,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 48.1
+      "within_2_pct": null
     },
     {
       "category": "Acute Human Effects",
@@ -343,11 +292,11 @@
       "both_n": 0,
       "expert_only": 337,
       "auto_only": 0,
+      "gap_pp": 27.4,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 27.4
+      "within_2_pct": null
     },
     {
       "category": "Chronic Human Effects",
@@ -360,11 +309,11 @@
       "both_n": 0,
       "expert_only": 216,
       "auto_only": 0,
+      "gap_pp": 17.6,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 17.6
+      "within_2_pct": null
     },
     {
       "category": "Physical Properties",
@@ -377,11 +326,11 @@
       "both_n": 12,
       "expert_only": 37,
       "auto_only": 7,
+      "gap_pp": 2.4,
       "mae": 2.33,
       "exact_pct": 16.7,
       "within_1_pct": 16.7,
-      "within_2_pct": 83.3,
-      "gap_pp": 2.4
+      "within_2_pct": 83.3
     },
     {
       "category": "Acute Human Effects",
@@ -394,11 +343,11 @@
       "both_n": 0,
       "expert_only": 21,
       "auto_only": 0,
+      "gap_pp": 1.7,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 1.7
+      "within_2_pct": null
     },
     {
       "category": "Acute Human Effects",
@@ -411,11 +360,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Physical Properties",
@@ -428,11 +377,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     }
   ],
   "subcat_rows": [
@@ -447,11 +396,11 @@
       "both_n": 362,
       "expert_only": 705,
       "auto_only": 41,
+      "gap_pp": 54.1,
       "mae": 2.14,
       "exact_pct": 40.3,
       "within_1_pct": 40.3,
-      "within_2_pct": 68.2,
-      "gap_pp": 54.1
+      "within_2_pct": 68.2
     },
     {
       "category": "Acute Human Effects",
@@ -464,11 +413,11 @@
       "both_n": 535,
       "expert_only": 606,
       "auto_only": 33,
+      "gap_pp": 46.7,
       "mae": 1.12,
       "exact_pct": 59.8,
       "within_1_pct": 59.8,
-      "within_2_pct": 88.8,
-      "gap_pp": 46.7
+      "within_2_pct": 88.8
     },
     {
       "category": "Acute Human Effects",
@@ -481,11 +430,11 @@
       "both_n": 273,
       "expert_only": 811,
       "auto_only": 18,
+      "gap_pp": 64.6,
       "mae": 1.25,
       "exact_pct": 55.3,
       "within_1_pct": 55.3,
-      "within_2_pct": 87.2,
-      "gap_pp": 64.6
+      "within_2_pct": 87.2
     },
     {
       "category": "Acute Human Effects",
@@ -498,11 +447,11 @@
       "both_n": 304,
       "expert_only": 320,
       "auto_only": 152,
+      "gap_pp": 13.7,
       "mae": 0.82,
       "exact_pct": 63.8,
       "within_1_pct": 63.8,
-      "within_2_pct": 97.0,
-      "gap_pp": 13.7
+      "within_2_pct": 97.0
     },
     {
       "category": "Acute Human Effects",
@@ -515,11 +464,11 @@
       "both_n": 603,
       "expert_only": 587,
       "auto_only": 14,
+      "gap_pp": 46.7,
       "mae": 1.56,
       "exact_pct": 56.1,
       "within_1_pct": 56.1,
-      "within_2_pct": 75.6,
-      "gap_pp": 46.7
+      "within_2_pct": 75.6
     },
     {
       "category": "Acute Human Effects",
@@ -532,11 +481,11 @@
       "both_n": 694,
       "expert_only": 494,
       "auto_only": 15,
+      "gap_pp": 39.0,
       "mae": 1.31,
       "exact_pct": 62.8,
       "within_1_pct": 62.8,
-      "within_2_pct": 80.0,
-      "gap_pp": 39.0
+      "within_2_pct": 80.0
     },
     {
       "category": "Acute Human Effects",
@@ -549,11 +498,11 @@
       "both_n": 0,
       "expert_only": 337,
       "auto_only": 0,
+      "gap_pp": 27.4,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 27.4
+      "within_2_pct": null
     },
     {
       "category": "Acute Human Effects",
@@ -566,11 +515,11 @@
       "both_n": 0,
       "expert_only": 591,
       "auto_only": 0,
+      "gap_pp": 48.1,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 48.1
+      "within_2_pct": null
     },
     {
       "category": "Acute Human Effects",
@@ -583,11 +532,11 @@
       "both_n": 0,
       "expert_only": 21,
       "auto_only": 0,
+      "gap_pp": 1.7,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 1.7
+      "within_2_pct": null
     },
     {
       "category": "Acute Human Effects",
@@ -600,11 +549,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Acute Human Effects",
@@ -617,11 +566,11 @@
       "both_n": 266,
       "expert_only": 901,
       "auto_only": 11,
+      "gap_pp": 72.5,
       "mae": 1.05,
       "exact_pct": 53.0,
       "within_1_pct": 53.0,
-      "within_2_pct": 95.1,
-      "gap_pp": 72.5
+      "within_2_pct": 95.1
     },
     {
       "category": "Chronic Human Effects",
@@ -634,11 +583,11 @@
       "both_n": 142,
       "expert_only": 1076,
       "auto_only": 1,
+      "gap_pp": 87.5,
       "mae": 1.85,
       "exact_pct": 38.0,
       "within_1_pct": 38.0,
-      "within_2_pct": 79.6,
-      "gap_pp": 87.5
+      "within_2_pct": 79.6
     },
     {
       "category": "Chronic Human Effects",
@@ -651,11 +600,11 @@
       "both_n": 56,
       "expert_only": 1022,
       "auto_only": 9,
+      "gap_pp": 82.5,
       "mae": 1.54,
       "exact_pct": 42.9,
       "within_1_pct": 42.9,
-      "within_2_pct": 82.1,
-      "gap_pp": 82.5
+      "within_2_pct": 82.1
     },
     {
       "category": "Chronic Human Effects",
@@ -668,11 +617,11 @@
       "both_n": 135,
       "expert_only": 951,
       "auto_only": 21,
+      "gap_pp": 75.7,
       "mae": 2.84,
       "exact_pct": 11.1,
       "within_1_pct": 11.1,
-      "within_2_pct": 56.3,
-      "gap_pp": 75.7
+      "within_2_pct": 56.3
     },
     {
       "category": "Chronic Human Effects",
@@ -685,11 +634,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 285,
+      "gap_pp": -23.2,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": -23.2
+      "within_2_pct": null
     },
     {
       "category": "Chronic Human Effects",
@@ -702,11 +651,11 @@
       "both_n": 284,
       "expert_only": 251,
       "auto_only": 183,
+      "gap_pp": 5.5,
       "mae": 0.54,
       "exact_pct": 81.7,
       "within_1_pct": 81.7,
-      "within_2_pct": 91.9,
-      "gap_pp": 5.5
+      "within_2_pct": 91.9
     },
     {
       "category": "Chronic Human Effects",
@@ -719,11 +668,11 @@
       "both_n": 0,
       "expert_only": 216,
       "auto_only": 0,
+      "gap_pp": 17.6,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 17.6
+      "within_2_pct": null
     },
     {
       "category": "Chronic Human Effects",
@@ -736,11 +685,11 @@
       "both_n": 170,
       "expert_only": 361,
       "auto_only": 110,
+      "gap_pp": 20.4,
       "mae": 2.55,
       "exact_pct": 34.7,
       "within_1_pct": 34.7,
-      "within_2_pct": 74.7,
-      "gap_pp": 20.4
+      "within_2_pct": 74.7
     },
     {
       "category": "Ecological Hazards",
@@ -748,16 +697,16 @@
       "auto_scorable": true,
       "expert_n": 1144,
       "expert_pct": 93.2,
-      "auto_n": 330,
-      "auto_pct": 26.9,
-      "both_n": 308,
-      "expert_only": 836,
-      "auto_only": 22,
-      "mae": 1.28,
-      "exact_pct": 57.5,
-      "within_1_pct": 57.5,
-      "within_2_pct": 82.5,
-      "gap_pp": 66.3
+      "auto_n": 1113,
+      "auto_pct": 90.6,
+      "both_n": 1033,
+      "expert_only": 111,
+      "auto_only": 80,
+      "gap_pp": 2.5,
+      "mae": 1.48,
+      "exact_pct": 47.4,
+      "within_1_pct": 47.4,
+      "within_2_pct": 85.2
     },
     {
       "category": "Ecological Hazards",
@@ -770,11 +719,11 @@
       "both_n": 277,
       "expert_only": 816,
       "auto_only": 20,
+      "gap_pp": 64.8,
       "mae": 1.38,
       "exact_pct": 50.5,
       "within_1_pct": 50.5,
-      "within_2_pct": 86.6,
-      "gap_pp": 64.8
+      "within_2_pct": 86.6
     },
     {
       "category": "Environmental Fate & Transport",
@@ -787,11 +736,11 @@
       "both_n": 0,
       "expert_only": 1085,
       "auto_only": 0,
+      "gap_pp": 88.4,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 88.4
+      "within_2_pct": null
     },
     {
       "category": "Environmental Fate & Transport",
@@ -804,11 +753,11 @@
       "both_n": 1040,
       "expert_only": 171,
       "auto_only": 10,
+      "gap_pp": 13.1,
       "mae": 1.89,
       "exact_pct": 40.4,
       "within_1_pct": 40.4,
-      "within_2_pct": 74.0,
-      "gap_pp": 13.1
+      "within_2_pct": 74.0
     },
     {
       "category": "Environmental Fate & Transport",
@@ -821,11 +770,11 @@
       "both_n": 963,
       "expert_only": 147,
       "auto_only": 99,
+      "gap_pp": 3.9,
       "mae": 1.54,
       "exact_pct": 37.7,
       "within_1_pct": 37.7,
-      "within_2_pct": 88.2,
-      "gap_pp": 3.9
+      "within_2_pct": 88.2
     },
     {
       "category": "Atmospheric Hazard",
@@ -838,11 +787,11 @@
       "both_n": 1206,
       "expert_only": 0,
       "auto_only": 22,
+      "gap_pp": -1.8,
       "mae": 0.08,
       "exact_pct": 98.8,
       "within_1_pct": 98.8,
-      "within_2_pct": 98.8,
-      "gap_pp": -1.8
+      "within_2_pct": 98.8
     },
     {
       "category": "Atmospheric Hazard",
@@ -855,11 +804,11 @@
       "both_n": 1219,
       "expert_only": 0,
       "auto_only": 9,
+      "gap_pp": -0.7,
       "mae": 0.02,
       "exact_pct": 99.3,
       "within_1_pct": 99.3,
-      "within_2_pct": 99.8,
-      "gap_pp": -0.7
+      "within_2_pct": 99.8
     },
     {
       "category": "Atmospheric Hazard",
@@ -872,11 +821,11 @@
       "both_n": 1066,
       "expert_only": 161,
       "auto_only": 1,
+      "gap_pp": 13.0,
       "mae": 0.64,
       "exact_pct": 73.8,
       "within_1_pct": 73.8,
-      "within_2_pct": 94.9,
-      "gap_pp": 13.0
+      "within_2_pct": 94.9
     },
     {
       "category": "Atmospheric Hazard",
@@ -889,11 +838,11 @@
       "both_n": 1208,
       "expert_only": 0,
       "auto_only": 20,
+      "gap_pp": -1.6,
       "mae": 0.26,
       "exact_pct": 94.0,
       "within_1_pct": 94.0,
-      "within_2_pct": 94.5,
-      "gap_pp": -1.6
+      "within_2_pct": 94.5
     },
     {
       "category": "Physical Properties",
@@ -906,11 +855,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 372,
+      "gap_pp": -30.3,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": -30.3
+      "within_2_pct": null
     },
     {
       "category": "Physical Properties",
@@ -923,11 +872,11 @@
       "both_n": 630,
       "expert_only": 594,
       "auto_only": 1,
+      "gap_pp": 48.3,
       "mae": 1.69,
       "exact_pct": 55.9,
       "within_1_pct": 55.9,
-      "within_2_pct": 80.6,
-      "gap_pp": 48.3
+      "within_2_pct": 80.6
     },
     {
       "category": "Physical Properties",
@@ -940,11 +889,11 @@
       "both_n": 12,
       "expert_only": 37,
       "auto_only": 7,
+      "gap_pp": 2.4,
       "mae": 2.33,
       "exact_pct": 16.7,
       "within_1_pct": 16.7,
-      "within_2_pct": 83.3,
-      "gap_pp": 2.4
+      "within_2_pct": 83.3
     },
     {
       "category": "Physical Properties",
@@ -957,11 +906,11 @@
       "both_n": 275,
       "expert_only": 931,
       "auto_only": 5,
+      "gap_pp": 75.4,
       "mae": 0.95,
       "exact_pct": 62.5,
       "within_1_pct": 62.5,
-      "within_2_pct": 92.0,
-      "gap_pp": 75.4
+      "within_2_pct": 92.0
     },
     {
       "category": "Physical Properties",
@@ -974,11 +923,11 @@
       "both_n": 109,
       "expert_only": 352,
       "auto_only": 154,
+      "gap_pp": 16.1,
       "mae": 2.26,
       "exact_pct": 29.4,
       "within_1_pct": 29.4,
-      "within_2_pct": 58.7,
-      "gap_pp": 16.1
+      "within_2_pct": 58.7
     },
     {
       "category": "Physical Properties",
@@ -991,11 +940,11 @@
       "both_n": 999,
       "expert_only": 150,
       "auto_only": 68,
+      "gap_pp": 6.7,
       "mae": 1.08,
       "exact_pct": 70.5,
       "within_1_pct": 70.5,
-      "within_2_pct": 84.1,
-      "gap_pp": 6.7
+      "within_2_pct": 84.1
     },
     {
       "category": "Physical Properties",
@@ -1008,11 +957,11 @@
       "both_n": 14,
       "expert_only": 740,
       "auto_only": 2,
+      "gap_pp": 60.1,
       "mae": 1.43,
       "exact_pct": 42.9,
       "within_1_pct": 42.9,
-      "within_2_pct": 85.7,
-      "gap_pp": 60.1
+      "within_2_pct": 85.7
     },
     {
       "category": "Physical Properties",
@@ -1025,11 +974,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Physical Properties",
@@ -1042,11 +991,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1059,11 +1008,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1076,11 +1025,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1093,11 +1042,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1110,11 +1059,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1127,11 +1076,11 @@
       "both_n": 0,
       "expert_only": 1100,
       "auto_only": 0,
+      "gap_pp": 89.6,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 89.6
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1144,11 +1093,11 @@
       "both_n": 0,
       "expert_only": 1156,
       "auto_only": 0,
+      "gap_pp": 94.1,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 94.1
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1161,11 +1110,11 @@
       "both_n": 0,
       "expert_only": 1,
       "auto_only": 0,
+      "gap_pp": 0.1,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.1
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1178,11 +1127,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1195,11 +1144,11 @@
       "both_n": 0,
       "expert_only": 3,
       "auto_only": 0,
+      "gap_pp": 0.2,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.2
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1212,11 +1161,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Process Factors",
@@ -1229,11 +1178,11 @@
       "both_n": 0,
       "expert_only": 1201,
       "auto_only": 0,
+      "gap_pp": 97.8,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 97.8
+      "within_2_pct": null
     },
     {
       "category": "Life Cycle Factors",
@@ -1246,11 +1195,11 @@
       "both_n": 0,
       "expert_only": 1215,
       "auto_only": 0,
+      "gap_pp": 98.9,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 98.9
+      "within_2_pct": null
     },
     {
       "category": "Life Cycle Factors",
@@ -1263,11 +1212,11 @@
       "both_n": 0,
       "expert_only": 1214,
       "auto_only": 0,
+      "gap_pp": 98.9,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 98.9
+      "within_2_pct": null
     },
     {
       "category": "Life Cycle Factors",
@@ -1280,11 +1229,11 @@
       "both_n": 0,
       "expert_only": 1214,
       "auto_only": 0,
+      "gap_pp": 98.9,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 98.9
+      "within_2_pct": null
     },
     {
       "category": "Life Cycle Factors",
@@ -1297,11 +1246,11 @@
       "both_n": 0,
       "expert_only": 0,
       "auto_only": 0,
+      "gap_pp": 0.0,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 0.0
+      "within_2_pct": null
     },
     {
       "category": "Life Cycle Factors",
@@ -1314,14 +1263,14 @@
       "both_n": 0,
       "expert_only": 132,
       "auto_only": 0,
+      "gap_pp": 10.7,
       "mae": null,
       "exact_pct": null,
       "within_1_pct": null,
-      "within_2_pct": null,
-      "gap_pp": 10.7
+      "within_2_pct": null
     }
   ],
-  "note": "after OPERA/IUCLID fate-eco; opera_cas=1067, iuclid_hit=0, iuclid_tried=0, fate_cells=0, eco_cells=0",
+  "note": "after ECOSAR eco; ok=783, fail=115, eco_cells=783",
   "updated": "2026-09-14",
   "before": {
     "auto_auto6_subcats_mean": 12.1,
@@ -1420,11 +1369,11 @@
         "both_n": 308,
         "expert_only": 836,
         "auto_only": 22,
+        "gap_pp": 66.3,
         "mae": 1.28,
         "exact_pct": 57.5,
         "within_1_pct": 57.5,
-        "within_2_pct": 82.5,
-        "gap_pp": 66.3
+        "within_2_pct": 82.5
       },
       {
         "category": "Ecological Hazards",
@@ -1437,11 +1386,11 @@
         "both_n": 277,
         "expert_only": 816,
         "auto_only": 20,
+        "gap_pp": 64.8,
         "mae": 1.38,
         "exact_pct": 50.5,
         "within_1_pct": 50.5,
-        "within_2_pct": 86.6,
-        "gap_pp": 64.8
+        "within_2_pct": 86.6
       },
       {
         "category": "Environmental Fate & Transport",
@@ -1454,11 +1403,11 @@
         "both_n": 0,
         "expert_only": 1085,
         "auto_only": 0,
+        "gap_pp": 88.4,
         "mae": null,
         "exact_pct": null,
         "within_1_pct": null,
-        "within_2_pct": null,
-        "gap_pp": 88.4
+        "within_2_pct": null
       },
       {
         "category": "Environmental Fate & Transport",
@@ -1471,11 +1420,11 @@
         "both_n": 1040,
         "expert_only": 171,
         "auto_only": 10,
+        "gap_pp": 13.1,
         "mae": 1.89,
         "exact_pct": 40.4,
         "within_1_pct": 40.4,
-        "within_2_pct": 74.0,
-        "gap_pp": 13.1
+        "within_2_pct": 74.0
       },
       {
         "category": "Environmental Fate & Transport",
@@ -1488,71 +1437,19 @@
         "both_n": 963,
         "expert_only": 147,
         "auto_only": 99,
+        "gap_pp": 3.9,
         "mae": 1.54,
         "exact_pct": 37.7,
         "within_1_pct": 37.7,
-        "within_2_pct": 88.2,
-        "gap_pp": 3.9
-      },
-      {
-        "category": "Atmospheric Hazard",
-        "subcategory": "Greenhouse Gas",
-        "auto_scorable": true,
-        "expert_n": 1206,
-        "expert_pct": 98.2,
-        "auto_n": 1228,
-        "auto_pct": 100.0,
-        "both_n": 1206,
-        "expert_only": 0,
-        "auto_only": 22,
-        "mae": 0.08,
-        "exact_pct": 98.8,
-        "within_1_pct": 98.8,
-        "within_2_pct": 98.8,
-        "gap_pp": -1.8
-      },
-      {
-        "category": "Atmospheric Hazard",
-        "subcategory": "NESHAP",
-        "auto_scorable": true,
-        "expert_n": 1208,
-        "expert_pct": 98.4,
-        "auto_n": 1228,
-        "auto_pct": 100.0,
-        "both_n": 1208,
-        "expert_only": 0,
-        "auto_only": 20,
-        "mae": 0.26,
-        "exact_pct": 94.0,
-        "within_1_pct": 94.0,
-        "within_2_pct": 94.5,
-        "gap_pp": -1.6
-      },
-      {
-        "category": "Physical Properties",
-        "subcategory": "pH",
-        "auto_scorable": true,
-        "expert_n": 1149,
-        "expert_pct": 93.6,
-        "auto_n": 1067,
-        "auto_pct": 86.9,
-        "both_n": 999,
-        "expert_only": 150,
-        "auto_only": 68,
-        "mae": 1.08,
-        "exact_pct": 70.5,
-        "within_1_pct": 70.5,
-        "within_2_pct": 84.1,
-        "gap_pp": 6.7
+        "within_2_pct": 88.2
       }
     ]
   },
   "overlay_stats": {
-    "opera_cas": 1067,
-    "iuclid_hit": 0,
-    "iuclid_tried": 0,
-    "fate_cells_written": 0,
-    "eco_cells_written": 0,
-    "elapsed_s": 13.1
+    "ecosar_ok": 783,
+    "ecosar_fail": 115,
+    "need_acute": 898,
+    "eco_cells_written": 783,
+    "elapsed_s": 81.9
   }
 }
