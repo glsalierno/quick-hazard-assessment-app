@@ -1,14 +1,28 @@
 """
-Bridge SDS and OPERA outputs into P2OASys ``extra_sources`` (v6 Phase C).
+Bridge SDS, OPERA, and ECOSAR outputs into P2OASys ``extra_sources`` (v6 Phase C).
 
 SDS fields fill gaps with experimental (document) evidence.
-OPERA predictions fill gaps only when stronger experimental evidence is absent,
-and are tagged ``predicted`` so the scorer/assessment can label them.
+OPERA predictions fill fate/physchem gaps when stronger experimental evidence is absent.
+ECOSAR (EPI Suite API) fills aquatic LC50/EC50/ChV when measured aquatic evidence is absent.
+Predictions are tagged ``predicted`` so the scorer/assessment can label them.
 """
 
 from __future__ import annotations
 
 from typing import Any, Optional
+
+
+def ecosar_to_extra_sources(
+    ecosar_result: dict[str, Any] | None,
+    *,
+    existing_hazard: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Delegate to ``utils.ecosar_client.ecosar_to_extra_sources`` (aquatic gap-fill only)."""
+    try:
+        from utils.ecosar_client import ecosar_to_extra_sources as _bridge
+    except ImportError:
+        return {}
+    return _bridge(ecosar_result, existing_hazard=existing_hazard)
 
 
 def _f(x: Any) -> Optional[float]:
@@ -172,6 +186,22 @@ def opera_to_extra_sources(
 
     _ = has_fp  # reserved for future flash-point gap-fill
     mw = _f(row.get("MolWeight") or display.get("MolWeight"))
+
+    # Expose OPERA pKa for Physical → pH cascade (Priority 2).
+    try:
+        from utils.opera_client import extract_opera_pka_from_row
+
+        pka = extract_opera_pka_from_row(row)
+    except Exception:
+        pka = None
+        pka_a = _f(row.get("pKa_a_pred") or row.get("pKa_a"))
+        pka_b = _f(row.get("pKa_b_pred") or row.get("pKa_b"))
+        if pka_a is not None or pka_b is not None:
+            pka = {"pka_a": pka_a, "pka_b": pka_b, "predicted": True, "source": "OPERA"}
+    if pka:
+        hazard_metrics.setdefault("opera_pka", []).append(pka)
+        notes.append(f"OPERA pKa_a={pka.get('pka_a')} pKa_b={pka.get('pka_b')} (for pH heuristic)")
+
     out: dict[str, Any] = {}
     if toxicities:
         out["toxicities"] = toxicities
@@ -185,6 +215,9 @@ def opera_to_extra_sources(
         out["bcf_l_kg"] = bcf_out
     if biodeg_hl_out is not None:
         out["biodeg_half_life_days"] = biodeg_hl_out
+    if pka:
+        out["opera_pka"] = pka
+    out["opera_row"] = dict(row)
     if notes:
         out["_pipeline_notes"] = notes
     return out

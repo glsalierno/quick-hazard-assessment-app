@@ -386,6 +386,21 @@ with st.sidebar:
     except Exception:
         st.caption("OPERA (local QSAR): status unknown.")
     try:
+        from utils import ecosar_client as _ecosar_side
+
+        if not _ecosar_side.is_ecosar_enabled():
+            st.caption("ECOSAR: disabled (`HAZQUERY_SKIP_ECOSAR`).")
+        elif _ecosar_side.is_ecosar_api_available():
+            st.success("✅ ECOSAR (EPI Suite API)")
+            st.caption(f"`{_ecosar_side.api_base_url()}` · aquatic LC50/EC50/ChV gap-fill")
+        else:
+            st.caption(
+                "ECOSAR (EPI Suite API): unreachable — check network or "
+                "`HAZQUERY_EPISUITE_API_BASE` (default https://episuite.dev/api)."
+            )
+    except Exception:
+        st.caption("ECOSAR: status unknown.")
+    try:
         from utils.cameo_lookup import cameo_status as _cameo_status
 
         _cs = _cameo_status()
@@ -1964,16 +1979,27 @@ if current_query:
                             extra_sources, physical_state=_state, state_source=_state_src
                         )
 
-                        # Acid Rain Formation: structural S/N combustion heuristic (with GWP/ODP atmo extras).
+                        # NESHAP: CAA §112(b) HAP list membership
                         try:
-                            _formula = None
-                            if pubchem_data:
-                                _formula = pubchem_data.get("molecular_formula") or pubchem_data.get("formula")
-                            _smi_ar = str((pubchem_data or {}).get("smiles") or "").strip() or None
+                            from utils import neshap_hap
+
+                            hap_path = getattr(config, "P2OASYS_HAP_CSV_PATH", None)
+                            if "p2oasys_hap_cas" not in st.session_state:
+                                st.session_state["p2oasys_hap_cas"] = neshap_hap.load_hap_cas_set(hap_path)
+                            _hap = st.session_state["p2oasys_hap_cas"]
+                            if _hap:
+                                extra_sources = neshap_hap.apply_neshap_to_extra_sources(
+                                    extra_sources, result["clean_cas"], hap_cas=_hap
+                                )
+                                sources_used.append("NESHAP/HAP list")
+                        except Exception:
+                            logging.getLogger(__name__).debug("NESHAP HAP lookup skipped", exc_info=True)
+
+                        # Acid Rain Formation: PubChem formula/SMILES primary; HSPiP Y-MBSX optional.
+                        try:
                             extra_sources = atmo_gwp.apply_acid_rain_combustion_heuristic(
                                 extra_sources,
-                                smiles=_smi_ar,
-                                formula=str(_formula) if _formula else None,
+                                pubchem=pubchem_data or result.get("pubchem"),
                             )
                             if (extra_sources or {}).get("acid_rain_meta"):
                                 pipeline_notes.extend(
@@ -2067,6 +2093,28 @@ if current_query:
                                 "IUCLID → P2OASys merge skipped", exc_info=True
                             )
 
+                        try:
+                            from utils import ecosar_client as _ecosar
+
+                            _smi_eco = str((pubchem_data or {}).get("smiles") or "").strip() or None
+                            _ecosar_xs = _ecosar.fetch_ecosar_extra_sources(
+                                str(result.get("clean_cas") or clean_cas or "") or None,
+                                smiles=_smi_eco,
+                                existing_hazard=extra_sources or {},
+                            )
+                            if _ecosar_xs:
+                                extra_sources = hazard_for_p2oasys.merge_extra_sources(
+                                    extra_sources, _ecosar_xs
+                                )
+                                sources_used.append("ECOSAR (predicted)")
+                                pipeline_notes.extend(
+                                    p2oasys_source_bridges.merge_pipeline_notes(_ecosar_xs)
+                                )
+                        except Exception:
+                            logging.getLogger(__name__).debug(
+                                "ECOSAR → P2OASys gap-fill skipped", exc_info=True
+                            )
+
                         extra_sources = hazard_for_p2oasys.merge_cameo_extra(
                             str(clean_cas or ""), extra_sources
                         )
@@ -2109,6 +2157,10 @@ if current_query:
                                     # Merge MW if PubChem lacked it.
                                     if not hazard_data.get("molecular_weight") and _opera_xs.get("molecular_weight"):
                                         hazard_data["molecular_weight"] = _opera_xs["molecular_weight"]
+                                    if _opera_xs.get("opera_row"):
+                                        hazard_data["opera_row"] = _opera_xs["opera_row"]
+                                    if _auto_smiles and not hazard_data.get("smiles"):
+                                        hazard_data["smiles"] = _auto_smiles
                                     for t in _opera_xs.get("toxicities") or []:
                                         hazard_data.setdefault("toxicities", []).append(t)
                                     for k, arr in (_opera_xs.get("hazard_metrics") or {}).items():

@@ -206,7 +206,7 @@ def _gather_draft(cas: str, sds_fields: dict[str, Any] | None) -> dict[str, Any]
             sources_used.append("SDS")
             pipeline_notes.extend(p2oasys_source_bridges.merge_pipeline_notes(sds_xs))
 
-    # Atmospheric GWP/ODP rule: non-gas → GWP=0 & ODP=0; gas → keep lookups (or missing).
+    # Atmospheric GWP/ODP rule: non-gas → 0; unlisted gas/unknown → 0 (authoritative lists).
     _state, _state_src = atmo_gwp.infer_physical_state_from_sources(
         sds_fields=sds_fields, pubchem=pubchem
     )
@@ -214,16 +214,25 @@ def _gather_draft(cas: str, sds_fields: dict[str, Any] | None) -> dict[str, Any]
         extra_sources, physical_state=_state, state_source=_state_src
     )
 
-    # Acid Rain Formation: structural S/N combustion heuristic (with GWP/ODP atmo extras).
+    # NESHAP: CAA §112(b) HAP list membership
     try:
-        _formula = None
-        if pubchem:
-            _formula = pubchem.get("molecular_formula") or pubchem.get("formula")
-        _smi_ar = str((pubchem or {}).get("smiles") or "").strip() or None
+        from utils import neshap_hap
+
+        hap_path = getattr(config, "P2OASYS_HAP_CSV_PATH", None)
+        hap_cas = neshap_hap.load_hap_cas_set(hap_path)
+        if hap_cas:
+            extra_sources = neshap_hap.apply_neshap_to_extra_sources(
+                extra_sources, clean_cas, hap_cas=hap_cas
+            )
+            sources_used.append("NESHAP/HAP list")
+    except Exception:
+        pass
+
+    # Acid Rain Formation: PubChem formula/SMILES primary; HSPiP Y-MBSX N#/S# optional.
+    try:
         extra_sources = atmo_gwp.apply_acid_rain_combustion_heuristic(
             extra_sources,
-            smiles=_smi_ar,
-            formula=str(_formula) if _formula else None,
+            pubchem=pubchem,
         )
         if (extra_sources or {}).get("acid_rain_meta"):
             pipeline_notes.extend(
@@ -314,6 +323,21 @@ def _gather_draft(cas: str, sds_fields: dict[str, Any] | None) -> dict[str, Any]
     except Exception:
         logger.debug("IUCLID → P2OASys merge skipped", exc_info=True)
 
+    try:
+        from utils import ecosar_client
+
+        ecosar_xs = ecosar_client.fetch_ecosar_extra_sources(
+            str(clean_cas or "") or None,
+            smiles=str(pubchem.get("smiles") or "").strip() or None,
+            existing_hazard=extra_sources or {},
+        )
+        if ecosar_xs:
+            extra_sources = hazard_for_p2oasys.merge_extra_sources(extra_sources, ecosar_xs)
+            sources_used.append("ECOSAR (predicted)")
+            pipeline_notes.extend(p2oasys_source_bridges.merge_pipeline_notes(ecosar_xs))
+    except Exception:
+        logger.debug("ECOSAR → P2OASys gap-fill skipped", exc_info=True)
+
     extra_sources = hazard_for_p2oasys.merge_cameo_extra(str(clean_cas or ""), extra_sources)
 
     hazard_data = hazard_for_p2oasys.build_hazard_data(
@@ -330,6 +354,10 @@ def _gather_draft(cas: str, sds_fields: dict[str, Any] | None) -> dict[str, Any]
         sources_used.append("CPDB")
 
     smiles = str(pubchem.get("smiles") or "").strip()
+    if smiles and not hazard_data.get("smiles"):
+        hazard_data["smiles"] = smiles
+    if clean_cas and not hazard_data.get("cas"):
+        hazard_data["cas"] = str(clean_cas)
     if smiles:
         opera_panel = _try_opera_cached_only(smiles, str(clean_cas or ""), pubchem.get("xlogp"))
         if opera_panel:
@@ -341,6 +369,8 @@ def _gather_draft(cas: str, sds_fields: dict[str, Any] | None) -> dict[str, Any]
                 if opera_xs:
                     if not hazard_data.get("molecular_weight") and opera_xs.get("molecular_weight"):
                         hazard_data["molecular_weight"] = opera_xs["molecular_weight"]
+                    if opera_xs.get("opera_row"):
+                        hazard_data["opera_row"] = opera_xs["opera_row"]
                     for t in opera_xs.get("toxicities") or []:
                         hazard_data.setdefault("toxicities", []).append(t)
                     for k, arr in (opera_xs.get("hazard_metrics") or {}).items():

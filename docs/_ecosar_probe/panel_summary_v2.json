@@ -1,0 +1,530 @@
+[
+  {
+    "name": "methanol",
+    "cas": "67-56-1",
+    "padded_cas": "000067-56-1",
+    "smiles_api": "CO",
+    "ecosar_top_keys": [
+      "parameters",
+      "modelResults",
+      "output",
+      "alerts"
+    ],
+    "n_aquatic_rows": 11,
+    "aquatic_sample": [
+      {
+        "organism": "Earthworm",
+        "endpoint": "LC50",
+        "duration": "14-day",
+        "concentration_mg_L": 107.9382553100586,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 9552.0029296875,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 200.38137817382812,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 48629.01171875,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 10019.85546875,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 136.3827362060547,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 170.2763671875,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 584.9817504882812,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "EC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 920.4926147460938,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "LC50",
+        "duration": "48-hr",
+        "concentration_mg_L": 3557.839599609375,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 8092.14111328125,
+        "class": "Neutral Organics"
+      }
+    ],
+    "conservative_acute_LC50_EC50_mg_L": 107.9382553100586
+  },
+  {
+    "name": "benzene",
+    "cas": "71-43-2",
+    "padded_cas": "000071-43-2",
+    "smiles_api": "C1=CC=CC=C1",
+    "ecosar_top_keys": [
+      "parameters",
+      "modelResults",
+      "output",
+      "alerts"
+    ],
+    "n_aquatic_rows": 11,
+    "aquatic_sample": [
+      {
+        "organism": "Earthworm",
+        "endpoint": "LC50",
+        "duration": "14-day",
+        "concentration_mg_L": 131.65919494628906,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 3.4973573684692383,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 7.260944366455078,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 42.05048370361328,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 61.78984832763672,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 5.934103488922119,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 2.841843366622925,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 4.862148284912109,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "EC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 22.062061309814453,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "LC50",
+        "duration": "48-hr",
+        "concentration_mg_L": 28.183319091796875,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 49.043235778808594,
+        "class": "Neutral Organics"
+      }
+    ],
+    "conservative_acute_LC50_EC50_mg_L": 22.062061309814453
+  },
+  {
+    "name": "toluene",
+    "cas": "108-88-3",
+    "padded_cas": "000108-88-3",
+    "smiles_api": "CC1=CC=CC=C1",
+    "ecosar_top_keys": [
+      "parameters",
+      "modelResults",
+      "output",
+      "alerts"
+    ],
+    "n_aquatic_rows": 11,
+    "aquatic_sample": [
+      {
+        "organism": "Earthworm",
+        "endpoint": "LC50",
+        "duration": "14-day",
+        "concentration_mg_L": 134.57215881347656,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 0.6674579977989197,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 3.5853965282440186,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 9.586835861206055,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 21.151504516601562,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 3.0432610511779785,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 1.1953198909759521,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 1.7704031467437744,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "EC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 10.001155853271484,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "LC50",
+        "duration": "48-hr",
+        "concentration_mg_L": 10.160526275634766,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 16.72797203063965,
+        "class": "Neutral Organics"
+      }
+    ],
+    "conservative_acute_LC50_EC50_mg_L": 9.586835861206055
+  },
+  {
+    "name": "phenol",
+    "cas": "108-95-2",
+    "padded_cas": "000108-95-2",
+    "smiles_api": "C1=CC=C(C=C1)O",
+    "ecosar_top_keys": [
+      "parameters",
+      "modelResults",
+      "output",
+      "alerts"
+    ],
+    "n_aquatic_rows": 21,
+    "aquatic_sample": [
+      {
+        "organism": "Lemna gibba",
+        "endpoint": "EC50",
+        "duration": "7-day",
+        "concentration_mg_L": 34.39760208129883,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Green Algae (SW)",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 113.9227066040039,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Mysid (SW)",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 8.267003059387207,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 35.42780303955078,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 4.855859756469727,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 1.0196058750152588,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 2.8274192810058594,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "EC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 37.34239959716797,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "LC50",
+        "duration": "48-hr",
+        "concentration_mg_L": 10.236800193786621,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 30.158672332763672,
+        "class": "Phenols"
+      },
+      {
+        "organism": "Earthworm",
+        "endpoint": "LC50",
+        "duration": "14-day",
+        "concentration_mg_L": 186.14537048339844,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 32.2099609375,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 23.132158279418945,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 317.535400390625,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 296.3631896972656,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 18.12258529663086,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 10.829545974731445,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 21.766382217407227,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "EC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 77.32896423339844,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "LC50",
+        "duration": "48-hr",
+        "concentration_mg_L": 127.5775146484375,
+        "class": "Neutral Organics"
+      }
+    ],
+    "conservative_acute_LC50_EC50_mg_L": 8.267003059387207
+  },
+  {
+    "name": "naphthalene",
+    "cas": "91-20-3",
+    "padded_cas": "000091-20-3",
+    "smiles_api": "C1=CC2=C(C=C1)C=CC=C2",
+    "ecosar_top_keys": [
+      "parameters",
+      "modelResults",
+      "output",
+      "alerts"
+    ],
+    "n_aquatic_rows": 11,
+    "aquatic_sample": [
+      {
+        "organism": "Earthworm",
+        "endpoint": "LC50",
+        "duration": "14-day",
+        "concentration_mg_L": 163.37791442871094,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 0.164544478058815,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 2.1807878017425537,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Mysid",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 2.79829478263855,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish (SW)",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 9.08350658416748,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 1.9188162088394165,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 0.6242857575416565,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "ChV",
+        "duration": "",
+        "concentration_mg_L": 0.8062386512756348,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Green Algae",
+        "endpoint": "EC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 5.608455657958984,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Daphnid",
+        "endpoint": "LC50",
+        "duration": "48-hr",
+        "concentration_mg_L": 4.583564758300781,
+        "class": "Neutral Organics"
+      },
+      {
+        "organism": "Fish",
+        "endpoint": "LC50",
+        "duration": "96-hr",
+        "concentration_mg_L": 7.1593451499938965,
+        "class": "Neutral Organics"
+      }
+    ],
+    "conservative_acute_LC50_EC50_mg_L": 2.79829478263855
+  }
+]

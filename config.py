@@ -23,6 +23,11 @@ OPERA_PRECOMPUTE_DB_PATH = os.environ.get(
     "OPERA_PRECOMPUTE_DB_PATH", os.path.join(DATA_DIR, "opera_precompute.sqlite")
 )
 
+# ECOSAR (EPI Suite API) aquatic predictions cache. Filled on demand by ``utils.ecosar_client``.
+ECOSAR_CACHE_DB_PATH = os.environ.get(
+    "ECOSAR_CACHE_DB_PATH", os.path.join(DATA_DIR, "ecosar_cache.sqlite")
+)
+
 # P2OASys hazard scoring matrix (TURI). Place "Hazard Matrix Group Review 9-19-23.xlsx" in data/ or set path.
 # See https://p2oasys.turi.org/chemical/hazard-score-matrix
 P2OASYS_MATRIX_FILENAME = "Hazard Matrix Group Review 9-19-23.xlsx"
@@ -40,6 +45,8 @@ P2OASYS_REQUIRE_OFFICIAL_MATRIX = os.environ.get(
 # Optional lookup CSVs for P2OASys (see docs/P2OASYS_LOOKUP_SOURCES.md). Set to None to disable.
 P2OASYS_IARC_CSV_PATH = os.environ.get("P2OASYS_IARC_CSV", os.path.join(DATA_DIR, "iarc_by_cas.csv"))
 P2OASYS_ODP_GWP_CSV_PATH = os.environ.get("P2OASYS_ODP_GWP_CSV", os.path.join(DATA_DIR, "odp_gwp_by_cas.csv"))
+# CAA §112(b) HAP list for Atmospheric NESHAP (see scripts/build_caa112b_hap_csv.py).
+P2OASYS_HAP_CSV_PATH = os.environ.get("P2OASYS_HAP_CSV", os.path.join(DATA_DIR, "caa112b_hap_by_cas.csv"))
 # IPCC GWP 100-year (Federal LCA Commons parquet). Final path resolved after FASTP2OASYS_DIR.
 ATMO_DIR = os.environ.get("ATMO_DIR", os.path.join(REPO_ROOT, "data", "atmo"))
 # IARC classifications (CSV or Excel with CAS No. and Group). Place under ``data/iarc`` or set ``IARC_DIR``.

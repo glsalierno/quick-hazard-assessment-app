@@ -70,11 +70,22 @@ def test_gas_with_atmo_hit_gets_numeric_gwp():
     assert atmo.get("_category_max") is not None
 
 
-def test_gas_missing_from_tables_stays_missing():
-    # Helium-like: gas, not in IPCC/CSV → no invented GWP
+def test_gas_missing_from_tables_defaults_to_zero():
+    # Helium-like: gas, not in IPCC/CSV → default GWP/ODP 0 (not on authoritative lists)
     extra = lookup_tables.get_lookup_extra_sources("7440-59-7")
     extra = atmo_gwp.apply_atmospheric_gwp_rule(
         extra or {}, physical_state="gas", state_source="pubchem"
+    )
+    hm = (extra or {}).get("hazard_metrics") or {}
+    assert hm.get("gwp100") == [0.0]
+    assert hm.get("odp") == [0.0]
+    assert (extra.get("gwp_meta") or {}).get("source") == "default_not_on_authoritative_list"
+    assert (extra.get("odp_meta") or {}).get("source") == "default_not_on_authoritative_list"
+
+
+def test_gas_missing_default_zero_can_be_disabled():
+    extra = atmo_gwp.apply_atmospheric_gwp_rule(
+        {}, physical_state="gas", state_source="pubchem", default_zero_if_unlisted=False
     )
     hm = (extra or {}).get("hazard_metrics") or {}
     assert not hm.get("gwp100")

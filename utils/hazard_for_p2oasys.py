@@ -140,6 +140,9 @@ def pubchem_to_hazard_data(pubchem_data: dict[str, Any]) -> dict[str, Any]:
     return {
         "cid": pubchem_data.get("cid"),
         "molecular_weight": pubchem_data.get("mw"),
+        "smiles": pubchem_data.get("smiles") or pubchem_data.get("canonical_smiles"),
+        "formula": pubchem_data.get("formula") or pubchem_data.get("molecular_formula"),
+        "cas": pubchem_data.get("cas") or pubchem_data.get("CAS"),
         "ghs": ghs,
         "toxicities": toxicities,
         "hazard_metrics": hazard_metrics,
@@ -187,7 +190,7 @@ def build_hazard_data(
                 ghs["signal_word"] = extra_ghs["signal_word"]
         extra_hm = extra_sources.get("hazard_metrics")
         if isinstance(extra_hm, dict):
-            for k in ("flash_point", "nfpa", "other_designations", "gwp100", "odp", "log_kow", "bcf_l_kg", "vapor_pressure_mmhg"):
+            for k in ("flash_point", "nfpa", "other_designations", "gwp100", "odp", "log_kow", "bcf_l_kg", "vapor_pressure_mmhg", "opera_pka"):
                 arr = extra_hm.get(k)
                 if isinstance(arr, list) and arr:
                     hazard_metrics.setdefault(k, []).extend(arr)
@@ -197,10 +200,17 @@ def build_hazard_data(
     out = {
         "cid": base.get("cid"),
         "molecular_weight": base.get("molecular_weight") or (extra_sources or {}).get("molecular_weight"),
+        "smiles": base.get("smiles") or (extra_sources or {}).get("smiles"),
+        "formula": base.get("formula") or (extra_sources or {}).get("formula"),
+        "cas": base.get("cas") or (extra_sources or {}).get("cas"),
         "ghs": ghs,
         "toxicities": toxicities,
         "hazard_metrics": hazard_metrics,
     }
+    if extra_sources and extra_sources.get("opera_row") and not out.get("opera_row"):
+        out["opera_row"] = extra_sources["opera_row"]
+    if extra_sources and extra_sources.get("opera_pka") and not out.get("opera_pka"):
+        out["opera_pka"] = extra_sources["opera_pka"]
     if extra_sources and extra_sources.get("gwp_meta"):
         out["gwp_meta"] = extra_sources["gwp_meta"]
     if extra_sources and extra_sources.get("odp_meta"):
@@ -217,6 +227,11 @@ def build_hazard_data(
         for fate_key in ("log_kow", "bcf_l_kg", "biodeg_half_life_days"):
             if extra_sources.get(fate_key) is not None and out.get(fate_key) is None:
                 out[fate_key] = extra_sources[fate_key]
+        for aq_key in ("lc50_aquatic_mg_l", "aquatic_toxicity", "aquatic_chv_mg_l"):
+            if extra_sources.get(aq_key) is not None and out.get(aq_key) is None:
+                out[aq_key] = extra_sources[aq_key]
+        if extra_sources.get("ecosar_meta") and not out.get("ecosar_meta"):
+            out["ecosar_meta"] = extra_sources["ecosar_meta"]
     return out
 
 
@@ -248,9 +263,11 @@ def merge_extra_sources(base: dict[str, Any] | None, additional: dict[str, Any])
     hm = additional.get("hazard_metrics")
     if isinstance(hm, dict):
         out.setdefault("hazard_metrics", {})
-        for k in ("flash_point", "nfpa", "other_designations", "gwp100", "odp", "log_kow", "bcf_l_kg", "vapor_pressure_mmhg"):
+        for k in ("flash_point", "nfpa", "other_designations", "gwp100", "odp", "log_kow", "bcf_l_kg", "vapor_pressure_mmhg", "opera_pka"):
             for v in (hm.get(k) or []):
                 out["hazard_metrics"].setdefault(k, []).append(v)
+    if additional.get("opera_row") and not out.get("opera_row"):
+        out["opera_row"] = additional["opera_row"]
     if additional.get("gwp_meta"):
         out["gwp_meta"] = additional["gwp_meta"]
     if additional.get("odp_meta"):
@@ -266,6 +283,11 @@ def merge_extra_sources(base: dict[str, Any] | None, additional: dict[str, Any])
     for fate_key in ("log_kow", "bcf_l_kg", "biodeg_half_life_days"):
         if additional.get(fate_key) is not None and out.get(fate_key) is None:
             out[fate_key] = additional[fate_key]
+    for aq_key in ("lc50_aquatic_mg_l", "aquatic_toxicity", "aquatic_chv_mg_l"):
+        if additional.get(aq_key) is not None and out.get(aq_key) is None:
+            out[aq_key] = additional[aq_key]
+    if additional.get("ecosar_meta") and not out.get("ecosar_meta"):
+        out["ecosar_meta"] = additional["ecosar_meta"]
     return out
 
 

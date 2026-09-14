@@ -148,6 +148,11 @@ SUBCAT_NAME_ALIASES: dict[str, str] = {
     "Persistence in Air, Water and/or Soil": "Persistence",
     "Persistence in air": "Persistence",
     "Persistence (air, water, soil)": "Persistence",
+    "Persistence in air, water, soil/sediment": "Persistence",
+    "Persistence in air, water, soil / sediment": "Persistence",
+    "Degradability in water, soil, sediment": "Rapid Degradability",
+    "Degradability in water, soil and sediment": "Rapid Degradability",
+    "Rapid degradability": "Rapid Degradability",
     "Bioconcentration / Bioaccumulation": "Bioconcentration/ Bioaccumulation",
     "Bioconcentration/Bioaccumulation": "Bioconcentration/ Bioaccumulation",
     "Mutagen/Teratogen": "Mutagen/ Teratogen",
@@ -156,6 +161,8 @@ SUBCAT_NAME_ALIASES: dict[str, str] = {
     "Chronic Aquatic Toxicity": "Chronic Aquatic Toxicity (fish, crustacea or algae)",
     "Greenhouse Gases": "Greenhouse Gas",
     "GWP / Greenhouse Gas": "Greenhouse Gas",
+    # Excel matrix sheet labels the GHG block subcategory as the category name.
+    "Atmospheric Hazard": "Greenhouse Gas",
 }
 
 _EXPERT_SUBCAT_CACHE: dict[str, Any] | None = None

@@ -18,7 +18,7 @@ Interactive web app for **chemical hazard assessment** from **PubChem** and **DS
 - **Download:** Report as CSV
 - **Citation:** Zenodo DOI reminder for research use
 
-*Enhanced predictions with OPERA QSAR may be available in a separate command-line workflow; OPERA is not bundled with this Streamlit deployment.*
+*OPERA (local QSAR) and **ECOSAR** (EPI Suite HTTP API, aquatic LC50/EC50/ChV) can gap-fill P2OASys when measured IUCLID/SDS evidence is missing. Disable ECOSAR with `HAZQUERY_SKIP_ECOSAR=1`. See [docs/ECOSAR_EPI_SUITE_FEASIBILITY.md](docs/ECOSAR_EPI_SUITE_FEASIBILITY.md).*
 
 **v1.4 SDS upload:** **MarkItDown + regex** and **Hybrid** (MarkItDown → OCR if no CAS) only — see [docs/SDS_EXTRACTION_PIPELINES.md](docs/SDS_EXTRACTION_PIPELINES.md). Optional **local LLM** (Ollama) for other flows: [docs/OLLAMA_SETUP.md](docs/OLLAMA_SETUP.md).
 
