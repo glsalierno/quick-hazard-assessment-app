@@ -14,6 +14,7 @@ import streamlit as st
 import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
 from utils import toxvaldb_client
+from utils import cameo_lookup
 
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
@@ -66,6 +67,12 @@ with st.sidebar:
         st.caption(f"{tox_chems:,} chemicals")
     else:
         st.error("ToxValDB (SQLite) not found. Build it locally with `scripts/setup_chemical_db.py`.")
+    cameo_st = cameo_lookup.cameo_status()
+    if cameo_st.get("available"):
+        st.success(f"✅ CAMEO Chemicals NFPA ({cameo_st.get('schema')})")
+        st.caption(f"{cameo_st.get('n_nfpa', 0)} diamonds · {cameo_st.get('version') or 'local'}")
+    else:
+        st.caption("CAMEO NFPA: sqlite not found (optional `data/cameo_nfpa.sqlite`).")
 
 # Input form
 with st.form("cas_input"):
@@ -250,6 +257,7 @@ if current_query:
                 {"Property": "Flash Point", "Value": " | ".join(fp_list) if fp_list else "—", "Unit": "°C (typical)", "Observations": "Multiple values" if len(fp_list) > 1 else ""},
                 {"Property": "Vapor Pressure", "Value": " | ".join(vp_list) if vp_list else "—", "Unit": "mmHg (typical)", "Observations": "Multiple values" if len(vp_list) > 1 else ""},
             ]
+            prop_rows.extend(cameo_lookup.nfpa_property_rows(str(clean_cas or ""), pubchem_data.get("nfpa")))
             st.dataframe(pd.DataFrame(prop_rows), width="stretch", hide_index=True)
 
         # --- Toxic doses & toxicity endpoints (no truncation; prioritized + full table + raw) ---
@@ -298,7 +306,7 @@ if current_query:
 
         with tab_raw:
             st.caption("Unmodified data from APIs (for advanced use).")
-            raw_sub = st.tabs(["PubChem", "DSSTox", "ToxValDB"])
+            raw_sub = st.tabs(["PubChem", "DSSTox", "ToxValDB", "CAMEO"])
             with raw_sub[0]:
                 st.json(pubchem_data)
             with raw_sub[1]:
@@ -311,6 +319,12 @@ if current_query:
                     st.json(toxval_data)
                 else:
                     st.write("No ToxValDB data (optional: set COMPTOX_API_KEY for EPA ToxValDB).")
+            with raw_sub[3]:
+                cameo_hit = cameo_lookup.lookup_cameo(str(clean_cas or ""))
+                if cameo_hit:
+                    st.json(cameo_hit)
+                else:
+                    st.write("No CAMEO Chemicals NFPA record for this CAS.")
 
         # --- Ecotoxicity (aquatic LC50/EC50, species, H4xx) ---
         eco = pubchem_data.get("ecotoxicity") or {}
@@ -489,7 +503,8 @@ if current_query:
         col_dl1, col_dl2 = st.columns(2)
         with col_dl1:
             full_csv = data_formatter.download_toxicity_csv(
-                clean_cas, pubchem_data, dsstox_info, dtxsid, preferred_name, h_codes, p_codes, eco
+                clean_cas, pubchem_data, dsstox_info, dtxsid, preferred_name, h_codes, p_codes, eco,
+                cameo_data=cameo_lookup.lookup_cameo(str(clean_cas or "")),
             )
             st.download_button(
                 "⬇️ Download full report (CSV)",
@@ -500,7 +515,8 @@ if current_query:
             )
         with col_dl2:
             download_payload = data_formatter.create_comprehensive_download_data(
-                clean_cas, pubchem_data, dsstox_info, toxval_data
+                clean_cas, pubchem_data, dsstox_info, toxval_data,
+                cameo_data=cameo_lookup.lookup_cameo(str(clean_cas or "")),
             )
             json_bytes = json.dumps(download_payload, indent=2, default=str).encode("utf-8")
             st.download_button(
@@ -517,6 +533,7 @@ if current_query:
             - **PubChem**: identifiers, properties, GHS, toxicity text from PUG View.
             - **DSSTox (local)**: DTXSID, preferred/systematic names, formula, InChI/SMILES when present in your mapping file.
             - **ToxValDB (local)**: quantitative toxicity values loaded from the local COMPTOX Excel files into the SQLite database (no API key required).
+            - **CAMEO Chemicals (local)**: NFPA 704 Health/Fire/Instability from desktop `cameo.sqlite` or bundled `data/cameo_nfpa.sqlite` (not a website scrape).
             """)
     else:
         st.error(f"No data found for '{current_query}'. Please check the input.")
