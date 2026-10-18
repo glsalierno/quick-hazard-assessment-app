@@ -1,0 +1,7389 @@
+{
+  "7226-23-5": {
+    "Acute Human Effects": {
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Endocrine System Effects": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 8.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 6.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 6.0
+      },
+      "Odor": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 8.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "110-71-4": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 10.0
+      },
+      "Endocrine System Effects": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 6.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 8.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "115-10-6": {
+    "Acute Human Effects": {
+      "Oral Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 6.0
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 10.0
+      },
+      "Flammability: Gas": {
+        "_max": 10.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 8.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "108-20-3": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 6.0
+      },
+      "Rapid Degradability": {
+        "_max": 6.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 3.869
+      },
+      "_category_max": 6.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 10.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "123-42-2": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 7.23
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 6.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 8.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "108-90-7": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 8.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 6.0
+      },
+      "Rapid Degradability": {
+        "_max": 6.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 8.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "75-15-0": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Exposure Limits": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 6.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 6.574
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 10.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 8.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "680-31-9": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 2.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 10.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 10.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 6.0
+      },
+      "Rapid Degradability": {
+        "_max": 6.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 3.3
+      },
+      "_category_max": 6.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 2.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 8.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 8.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "1634-04-4": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 8.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 6.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 8.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "108-24-7": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 10.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Exposure Limits": {
+        "_max": 5.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 6.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 0.909
+      },
+      "_category_max": 6.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 8.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "67-63-0": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 10.0
+      },
+      "Oral Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 10.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 4.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 4.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "7732-18-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Health": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 4.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 2.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 8.0
+      },
+      "Odor": {
+        "_max": 2.0
+      },
+      "Volatile Organic Compound": {
+        "_max": 2.3
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 4.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 4.0
+      },
+      "Usage and Retail": {
+        "_max": 4.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    }
+  },
+  "64-19-7": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 6.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 4.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 2.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 8.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 4.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 4.0
+      },
+      "Usage and Retail": {
+        "_max": 4.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    }
+  },
+  "108-21-4": {
+    "Acute Human Effects": {
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Endocrine System Effects": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "110-54-3": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 10.0
+      },
+      "Oral Toxicity": {
+        "_max": 10.0
+      },
+      "Dermal Toxicity": {
+        "_max": 10.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 4.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 8.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.7
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 8.0
+      },
+      "_category_max": 8.7
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "872-50-4": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 10.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 8.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 3.2
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.3
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 8.5
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.5
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "75-09-2": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 8.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 10.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 8.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 8.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Renewable to Nonrenewable Resource": {
+        "_max": 0.0
+      },
+      "Upstream Processing and Manufacturing": {
+        "_max": 10.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "71-36-3": {
+    "Acute Human Effects": {
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 2.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 0.81
+      },
+      "_category_max": 2.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 7.78
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 7.78
+    },
+    "Process Factors": {
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 5.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "79-20-9": {
+    "Acute Human Effects": {
+      "Oral Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "Volatile Organic Compound": {
+        "_max": 0.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Psychosocial Hazard": {
+        "_max": 4.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 4.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "67-64-1": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Odor": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 2.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "67-56-1": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 10.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.7
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 3.2
+      },
+      "_category_max": 8.7
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 9.7
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 9.7
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "102-71-6": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 5.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 10.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 3.9
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.01
+      },
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 6.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "64-17-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 2.0
+      },
+      "Oral Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Respiratory Irritation": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 4.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 3.2
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.35
+      },
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "100-51-6": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.8
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.1
+      },
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 10.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "108-94-1": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 10.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 4.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 6.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 8.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 5.0
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Flammability: Gas": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 6.0
+      },
+      "Odor": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 8.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "7664-41-7": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 10.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 2.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 2.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 2.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 2.0
+      },
+      "Rapid Degradability": {
+        "_max": 6.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Flammability: Gas": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 4.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 6.0
+      },
+      "Odor": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "126-33-0": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 6.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 0.8
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.027
+      },
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "141-78-6": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "127-19-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.8
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 1.5
+      },
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 6.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 8.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "96-47-9": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.906
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 10.0
+      },
+      "Flammability: Gas": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 6.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "5989-27-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 4.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 8.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 1.5
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Renewable to Nonrenewable Resource": {
+        "_max": 2.0
+      },
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "8006-64-2": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 4.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 8.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 5.0
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Renewable to Nonrenewable Resource": {
+        "_max": 2.0
+      },
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "110-86-1": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 1.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 8.8
+      },
+      "Odor": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "8052-41-3": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 10.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 8.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 8.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 10.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.7
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 6.0
+      },
+      "_category_max": 8.7
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 1.73
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "75-52-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 2.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 2.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 10.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 6.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "108-10-1": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 0.8
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.5
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "109-86-4": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Respiratory Irritation": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "Exposure Limits": {
+        "_max": 0.1
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 10.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 5.61
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 6.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "107-06-2": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 8.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 6.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "64-18-6": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 8.0
+      },
+      "Dermal Irritation": {
+        "_max": 10.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Exposure Limits": {
+        "_max": 9.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 6.0
+      },
+      "pH": {
+        "_max": 8.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 8.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "108-87-2": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 6.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 8.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "628-63-7": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.7
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 9.4
+      },
+      "_category_max": 9.4
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 4.16
+      },
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "64742-94-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 9.3
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 9.3
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.04
+      },
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "123-91-1": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 1.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 10.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 8.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 10.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 8.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "56-23-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Exposure Limits": {
+        "_max": 5.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 10.0
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 10.0
+      },
+      "Ozone Depletor": {
+        "_max": 10.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 10.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "78-93-3": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 9.3
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 1.031
+      },
+      "_category_max": 9.3
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "123-86-4": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Respiratory Irritation": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 2.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 4.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 6.93
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 6.93
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 8.4
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.4
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Exposure Potential": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "60-29-7": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 4.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 2.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 10.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "109-99-9": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 10.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 10.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 7.5
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "67-66-3": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 8.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 10.0
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 8.706
+      },
+      "_category_max": 10.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "100-66-3": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.5
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 6.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "_category_max": 6.5
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 4.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 2.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.04
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Noise Generation": {
+        "_max": 2.0
+      },
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 4.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "77-93-0": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 2.0
+      },
+      "Health": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.75
+      },
+      "Flammability: Liquid": {
+        "_max": 2.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "71-43-2": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Respiratory Irritation": {
+        "_max": 10.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Exposure Limits": {
+        "_max": 0.1
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 10.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 8.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 6.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.3
+      },
+      "_category_max": 6.3
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.7
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 8.7
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 8.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "75-65-0": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 8.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 9.54
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 9.54
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 7.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "75-05-8": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 6.0
+      },
+      "Respiratory Irritation": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 2.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 6.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 2.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 8.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 8.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "64742-95-6": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 10.0
+      },
+      "Oral Toxicity": {
+        "_max": 10.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 6.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 9.22
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 9.22
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.0
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.04
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "109-66-0": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 10.0
+      },
+      "Dermal Irritation": {
+        "_max": 4.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 9.99
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 9.99
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.67
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 8.67
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 10.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "107-21-1": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 6.0
+      },
+      "Respiratory Irritation": {
+        "_max": 2.0
+      },
+      "Dermal Irritation": {
+        "_max": 2.0
+      },
+      "Eye Irritation": {
+        "_max": 2.0
+      },
+      "Exposure Limits": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.67
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.67
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.06
+      },
+      "Flammability: Liquid": {
+        "_max": 4.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 4.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 4.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 6.0
+    }
+  },
+  "67-68-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Oral Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 6.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 2.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 2.0
+      },
+      "_category_max": 4.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 4.0
+      },
+      "Rapid Degradability": {
+        "_max": 8.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.41
+      },
+      "Flammability: Liquid": {
+        "_max": 6.0
+      },
+      "Reactivity": {
+        "_max": 4.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 4.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 10.0
+      },
+      "Water Use": {
+        "_max": 8.0
+      },
+      "Energy Use": {
+        "_max": 8.0
+      },
+      "Exposure Potential": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 8.0
+    }
+  },
+  "1330-20-7": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 8.0
+      },
+      "Oral Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 6.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 2.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 6.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "Other Chronic Organ Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 8.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 0.57
+      },
+      "Rapid Degradability": {
+        "_max": 2.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 10.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "124-38-9": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 6.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Respiratory Irritation": {
+        "_max": 6.0
+      },
+      "Dermal Irritation": {
+        "_max": 6.0
+      },
+      "Eye Irritation": {
+        "_max": 2.0
+      },
+      "Health": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 2.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.7
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.0
+      },
+      "_category_max": 8.7
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 1.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Vapor Pressure": {
+        "_max": 0.01
+      },
+      "Flammability: Liquid": {
+        "_max": 2.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 6.0
+      },
+      "Corrosivity to Materials": {
+        "_max": 4.0
+      },
+      "Odor": {
+        "_max": 2.0
+      },
+      "Volatile Organic Compound": {
+        "_max": 0.0
+      },
+      "_category_max": 6.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 4.0
+      },
+      "Usage and Retail": {
+        "_max": 4.0
+      },
+      "End of life": {
+        "_max": 4.0
+      },
+      "_category_max": 4.0
+    }
+  },
+  "142-82-5": {
+    "Acute Human Effects": {
+      "Inhalation Toxicity": {
+        "_max": 10.0
+      },
+      "Oral Toxicity": {
+        "_max": 10.0
+      },
+      "Dermal Toxicity": {
+        "_max": 4.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 4.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 8.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 4.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Carcinogen": {
+        "_max": 2.0
+      },
+      "Mutagen/ Teratogen": {
+        "_max": 4.0
+      },
+      "Reproductive/ Developmental": {
+        "_max": 4.0
+      },
+      "Endocrine System Effects": {
+        "_max": 8.0
+      },
+      "_category_max": 8.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 10.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 8.7
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 6.0
+      },
+      "_category_max": 8.7
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 8.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 8.0
+      },
+      "Usage and Retail": {
+        "_max": 10.0
+      },
+      "End of life": {
+        "_max": 8.0
+      },
+      "_category_max": 10.0
+    }
+  },
+  "110-82-7": {
+    "Acute Human Effects": {
+      "Oral Toxicity": {
+        "_max": 10.0
+      },
+      "Dermal Toxicity": {
+        "_max": 8.0
+      },
+      "Dermal Irritation": {
+        "_max": 8.0
+      },
+      "Eye Irritation": {
+        "_max": 6.0
+      },
+      "Specific Target Organ Toxicity - STOT Single Exposure": {
+        "_max": 10.0
+      },
+      "Specific Target Organ Toxicity - STOT Other Organ Effects": {
+        "_max": 6.0
+      },
+      "Health": {
+        "_max": 6.0
+      },
+      "_category_max": 10.0
+    },
+    "Chronic Human Effects": {
+      "Mutagen/ Teratogen": {
+        "_max": 6.0
+      },
+      "Respiratory Sensitivity/ Disease": {
+        "_max": 2.0
+      },
+      "_category_max": 6.0
+    },
+    "Ecological Hazards": {
+      "Acute Aquatic Toxicity": {
+        "_max": 10.0
+      },
+      "Chronic Aquatic Toxicity (fish, crustacea or algae)": {
+        "_max": 10.0
+      },
+      "_category_max": 10.0
+    },
+    "Environmental Fate & Transport": {
+      "Persistence": {
+        "_max": 0.61
+      },
+      "Rapid Degradability": {
+        "_max": 4.0
+      },
+      "Bioconcentration/ Bioaccumulation": {
+        "_max": 2.31
+      },
+      "_category_max": 4.0
+    },
+    "Atmospheric Hazard": {
+      "Greenhouse Gas": {
+        "_max": 2.0
+      },
+      "Ozone Depletor": {
+        "_max": 2.0
+      },
+      "Acid Rain Formation": {
+        "_max": 2.0
+      },
+      "NESHAP": {
+        "_max": 2.0
+      },
+      "_category_max": 2.0
+    },
+    "Physical Properties": {
+      "Flammability: Liquid": {
+        "_max": 8.0
+      },
+      "Reactivity": {
+        "_max": 2.0
+      },
+      "pH": {
+        "_max": 2.0
+      },
+      "Odor": {
+        "_max": 6.0
+      },
+      "_category_max": 8.0
+    },
+    "Process Factors": {
+      "Ergonomic Hazard": {
+        "_max": 6.0
+      },
+      "Psychosocial Hazard": {
+        "_max": 6.0
+      },
+      "High/Low Pressure System": {
+        "_max": 0.0
+      },
+      "High/Low Temperature - System": {
+        "_max": 0.0
+      },
+      "Exposure Potential": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    },
+    "Life Cycle Factors": {
+      "Upstream Processing and Manufacturing": {
+        "_max": 6.0
+      },
+      "Usage and Retail": {
+        "_max": 6.0
+      },
+      "End of life": {
+        "_max": 6.0
+      },
+      "_category_max": 6.0
+    }
+  }
+}

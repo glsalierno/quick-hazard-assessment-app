@@ -7,6 +7,7 @@ Use scripts/setup_chemical_db.py to build the DB from DSS CSV and COMPTOX Excel 
 from __future__ import annotations
 
 import os
+import re
 import sqlite3
 from contextlib import contextmanager
 from typing import Any, Optional
@@ -125,6 +126,66 @@ def get_dsstox_by_dtxsid(dtxsid: str) -> Optional[dict[str, Any]]:
         return None
 
 
+def _sqlite_quote_ident(ident: str) -> str:
+    """Quote a SQLite column name from ``PRAGMA table_info`` (alphanumeric + underscore only)."""
+    if not re.match(r"^[A-Za-z0-9_]+$", ident):
+        raise ValueError(f"Unsafe dsstox column name: {ident!r}")
+    return '"' + ident + '"'
+
+
+def get_dsstox_by_name(name: str) -> Optional[dict[str, Any]]:
+    """
+    Resolve a chemical name to a DSSTox row using ``preferred_name`` / ``systematic_name`` when present.
+
+    Matching order: case-insensitive trimmed equality, then equality with spaces and hyphens removed.
+
+    Returns ``None`` if the ``dsstox`` table has only CAS/DTXSID (minimal DB) or no match.
+    """
+    if not name or not str(name).strip():
+        return None
+    raw = str(name).strip()
+    key_plain = raw.lower()
+    key_compact = "".join(c for c in key_plain if c not in " \t\n\r-")
+
+    def _row_to_dict(cursor: sqlite3.Cursor, row: Any) -> dict[str, Any]:
+        return dict(zip([d[0] for d in cursor.description], row))
+
+    with get_cursor() as cursor:
+        if cursor is None:
+            return None
+        cursor.execute("PRAGMA table_info(dsstox)")
+        col_rows = cursor.fetchall()
+        if not col_rows:
+            return None
+        by_lower: dict[str, str] = {}
+        for _cid, cname, _ctype, _notnull, _dflt, _pk in col_rows:
+            by_lower[str(cname).lower()] = str(cname)
+        pref_col = by_lower.get("preferred_name")
+        sys_col = by_lower.get("systematic_name")
+        if not pref_col and not sys_col:
+            return None
+        for col in (c for c in (pref_col, sys_col) if c):
+            qi = _sqlite_quote_ident(col)
+            cursor.execute(
+                f"SELECT * FROM dsstox WHERE LOWER(TRIM({qi})) = ? LIMIT 1",
+                (key_plain,),
+            )
+            row = cursor.fetchone()
+            if row:
+                return _row_to_dict(cursor, row)
+        if key_compact:
+            for col in (c for c in (pref_col, sys_col) if c):
+                qi = _sqlite_quote_ident(col)
+                cursor.execute(
+                    f"SELECT * FROM dsstox WHERE REPLACE(REPLACE(LOWER(TRIM({qi})), ' ', ''), '-', '') = ? LIMIT 1",
+                    (key_compact,),
+                )
+                row = cursor.fetchone()
+                if row:
+                    return _row_to_dict(cursor, row)
+        return None
+
+
 # ----------------------------------------------------------------------
 # ToxValDB
 # ----------------------------------------------------------------------
@@ -238,21 +299,38 @@ def get_toxicity_summary(dtxsid: str) -> list[dict[str, Any]]:
 # ----------------------------------------------------------------------
 
 
-def get_db_stats() -> dict[str, Any]:
-    """Database table existence and row counts."""
-    stats = {"dsstox": {"exists": False, "records": 0}, "toxvaldb": {"exists": False, "records": 0, "chemicals": 0}}
+def get_db_stats(*, full_counts: bool = False) -> dict[str, Any]:
+    """Database table existence and optional row counts.
+
+    Full ``COUNT(*)`` on large ToxVal tables is slow on OneDrive-backed SQLite; default is
+    existence-only unless ``full_counts=True`` or ``HAZQUERY_DB_FULL_STATS=1``.
+    """
+    want_counts = full_counts or os.environ.get("HAZQUERY_DB_FULL_STATS", "").strip() == "1"
+    stats: dict[str, Any] = {
+        "dsstox": {"exists": False, "records": 0},
+        "toxvaldb": {"exists": False, "records": 0, "chemicals": 0},
+    }
     with get_cursor() as cursor:
         if cursor is None:
             return stats
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='dsstox'")
         if cursor.fetchone():
             stats["dsstox"]["exists"] = True
-            stats["dsstox"]["records"] = cursor.execute("SELECT COUNT(*) FROM dsstox").fetchone()[0]
+            if want_counts:
+                stats["dsstox"]["records"] = cursor.execute("SELECT COUNT(*) FROM dsstox").fetchone()[0]
+            else:
+                stats["dsstox"]["records"] = None
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='toxvaldb'")
         if cursor.fetchone():
             stats["toxvaldb"]["exists"] = True
-            stats["toxvaldb"]["records"] = cursor.execute("SELECT COUNT(*) FROM toxvaldb").fetchone()[0]
-            stats["toxvaldb"]["chemicals"] = cursor.execute("SELECT COUNT(DISTINCT dtxsid) FROM toxvaldb").fetchone()[0]
+            if want_counts:
+                stats["toxvaldb"]["records"] = cursor.execute("SELECT COUNT(*) FROM toxvaldb").fetchone()[0]
+                stats["toxvaldb"]["chemicals"] = cursor.execute(
+                    "SELECT COUNT(DISTINCT dtxsid) FROM toxvaldb"
+                ).fetchone()[0]
+            else:
+                stats["toxvaldb"]["records"] = None
+                stats["toxvaldb"]["chemicals"] = None
     return stats
 
 

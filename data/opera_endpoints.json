@@ -1,0 +1,759 @@
+{
+  "generated_at": "2026-04-25T02:53:57.992026+00:00",
+  "source": "bundled_header",
+  "opera_version_hint": "2.9",
+  "columns": [
+    {
+      "name": "MoleculeID",
+      "description": "User / file identifier for each row (from .smi second column)"
+    },
+    {
+      "name": "MolWeight",
+      "description": "Molecular weight (OPERA structural property)"
+    },
+    {
+      "name": "nbAtoms",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbHeavyAtoms",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbC",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbO",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbN",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbAromAtom",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbRing",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbHeteroRing",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Sp3Sp2HybRatio",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbRotBd",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbHBdAcc",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "ndHBdDon",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "nbLipinskiFailures",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "TopoPolSurfAir",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "MolarRefract",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CombDipolPolariz",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogP_pred",
+      "description": "Octanol\u2013water partition coefficient (log Kow)"
+    },
+    {
+      "name": "LogP_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_LogP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_LogP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_LogP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "MP_pred",
+      "description": "Melting point (\u00b0C)"
+    },
+    {
+      "name": "MP_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_MP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_MP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_MP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "BP_pred",
+      "description": "Boiling point (\u00b0C)"
+    },
+    {
+      "name": "BP_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_BP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_BP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_BP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogVP_pred",
+      "description": "Vapor pressure (log mmHg)"
+    },
+    {
+      "name": "VP_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_VP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_VP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_VP",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogWS_pred",
+      "description": "Aqueous solubility (log mol/L at 25 \u00b0C)"
+    },
+    {
+      "name": "WS_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_WS",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_WS",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_WS",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogHL_pred",
+      "description": "Henry\u2019s law constant (log atm\u00b7m\u00b3/mol)"
+    },
+    {
+      "name": "HL_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_HL",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_HL",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_HL",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "RT_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "RT_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_RT",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_RT",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_RT",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogKOA_pred",
+      "description": "Octanol\u2013air partition coefficient (log)"
+    },
+    {
+      "name": "KOA_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_KOA",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_KOA",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_KOA",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "ionization",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "pKa_a_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "pKa_a_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "pKa_b_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "pKa_b_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_pKa",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_pKa",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_pKa",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogD55_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogD55_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogD74_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogD74_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_LogD",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_LogD",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_LogD",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogOH_pred",
+      "description": "OH radical reaction rate (log cm\u00b3/molecule\u00b7s)"
+    },
+    {
+      "name": "LogOH_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_AOH",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_AOH",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_AOH",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogBCF_pred",
+      "description": "Fish bioconcentration factor (log)"
+    },
+    {
+      "name": "BCF_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_BCF",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_BCF",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_BCF",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "BioDeg_LogHalfLife_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "BioDeg_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_BioDeg",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_BioDeg",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_BioDeg",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "ReadyBiodeg_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_ReadyBiodeg",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_ReadyBiodeg",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_ReadyBiodeg",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogKM_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "KM_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_KM",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_KM",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_KM",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "LogKoc_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Koc_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_Koc",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_Koc",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_Koc",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "FUB_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "FUB_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_FUB",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_FUB",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_FUB",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Clint_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Clint_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_Clint",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_Clint",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_Clint",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CACO2_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CACO2_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_CACO2",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_CACO2",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_CACO2",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CERAPP_Ago_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_CERAPP_Ago",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_CERAPP_Ago",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_CERAPP_Ago",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CERAPP_Anta_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_CERAPP_Anta",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_CERAPP_Anta",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_CERAPP_Anta",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CERAPP_Bind_pred",
+      "description": "CERAPP estrogen receptor binding"
+    },
+    {
+      "name": "AD_CERAPP_Bind",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_CERAPP_Bind",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_CERAPP_Bind",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CoMPARA_Ago_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_CoMPARA_Ago",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_CoMPARA_Ago",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_CoMPARA_Ago",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CoMPARA_Anta_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_CoMPARA_Anta",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_CoMPARA_Anta",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_CoMPARA_Anta",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CoMPARA_Bind_pred",
+      "description": "CoMPARA androgen receptor binding"
+    },
+    {
+      "name": "AD_CoMPARA_Bind",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_CoMPARA_Bind",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_CoMPARA_Bind",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CATMoS_VT_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CATMoS_NT_pred",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "CATMoS_EPA_pred",
+      "description": "CATMoS EPA acute toxicity category"
+    },
+    {
+      "name": "CATMoS_GHS_pred",
+      "description": "CATMoS GHS acute toxicity category"
+    },
+    {
+      "name": "CATMoS_LD50_pred",
+      "description": "CATMoS acute oral LD50 (mg/kg)"
+    },
+    {
+      "name": "CATMoS_LD50_predRange",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_CATMoS",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "AD_index_CATMoS",
+      "description": "OPERA output column"
+    },
+    {
+      "name": "Conf_index_CATMoS",
+      "description": "OPERA output column"
+    }
+  ],
+  "column_names_only": [
+    "MoleculeID",
+    "MolWeight",
+    "nbAtoms",
+    "nbHeavyAtoms",
+    "nbC",
+    "nbO",
+    "nbN",
+    "nbAromAtom",
+    "nbRing",
+    "nbHeteroRing",
+    "Sp3Sp2HybRatio",
+    "nbRotBd",
+    "nbHBdAcc",
+    "ndHBdDon",
+    "nbLipinskiFailures",
+    "TopoPolSurfAir",
+    "MolarRefract",
+    "CombDipolPolariz",
+    "LogP_pred",
+    "LogP_predRange",
+    "AD_LogP",
+    "AD_index_LogP",
+    "Conf_index_LogP",
+    "MP_pred",
+    "MP_predRange",
+    "AD_MP",
+    "AD_index_MP",
+    "Conf_index_MP",
+    "BP_pred",
+    "BP_predRange",
+    "AD_BP",
+    "AD_index_BP",
+    "Conf_index_BP",
+    "LogVP_pred",
+    "VP_predRange",
+    "AD_VP",
+    "AD_index_VP",
+    "Conf_index_VP",
+    "LogWS_pred",
+    "WS_predRange",
+    "AD_WS",
+    "AD_index_WS",
+    "Conf_index_WS",
+    "LogHL_pred",
+    "HL_predRange",
+    "AD_HL",
+    "AD_index_HL",
+    "Conf_index_HL",
+    "RT_pred",
+    "RT_predRange",
+    "AD_RT",
+    "AD_index_RT",
+    "Conf_index_RT",
+    "LogKOA_pred",
+    "KOA_predRange",
+    "AD_KOA",
+    "AD_index_KOA",
+    "Conf_index_KOA",
+    "ionization",
+    "pKa_a_pred",
+    "pKa_a_predRange",
+    "pKa_b_pred",
+    "pKa_b_predRange",
+    "AD_pKa",
+    "AD_index_pKa",
+    "Conf_index_pKa",
+    "LogD55_pred",
+    "LogD55_predRange",
+    "LogD74_pred",
+    "LogD74_predRange",
+    "AD_LogD",
+    "AD_index_LogD",
+    "Conf_index_LogD",
+    "LogOH_pred",
+    "LogOH_predRange",
+    "AD_AOH",
+    "AD_index_AOH",
+    "Conf_index_AOH",
+    "LogBCF_pred",
+    "BCF_predRange",
+    "AD_BCF",
+    "AD_index_BCF",
+    "Conf_index_BCF",
+    "BioDeg_LogHalfLife_pred",
+    "BioDeg_predRange",
+    "AD_BioDeg",
+    "AD_index_BioDeg",
+    "Conf_index_BioDeg",
+    "ReadyBiodeg_pred",
+    "AD_ReadyBiodeg",
+    "AD_index_ReadyBiodeg",
+    "Conf_index_ReadyBiodeg",
+    "LogKM_pred",
+    "KM_predRange",
+    "AD_KM",
+    "AD_index_KM",
+    "Conf_index_KM",
+    "LogKoc_pred",
+    "Koc_predRange",
+    "AD_Koc",
+    "AD_index_Koc",
+    "Conf_index_Koc",
+    "FUB_pred",
+    "FUB_predRange",
+    "AD_FUB",
+    "AD_index_FUB",
+    "Conf_index_FUB",
+    "Clint_pred",
+    "Clint_predRange",
+    "AD_Clint",
+    "AD_index_Clint",
+    "Conf_index_Clint",
+    "CACO2_pred",
+    "CACO2_predRange",
+    "AD_CACO2",
+    "AD_index_CACO2",
+    "Conf_index_CACO2",
+    "CERAPP_Ago_pred",
+    "AD_CERAPP_Ago",
+    "AD_index_CERAPP_Ago",
+    "Conf_index_CERAPP_Ago",
+    "CERAPP_Anta_pred",
+    "AD_CERAPP_Anta",
+    "AD_index_CERAPP_Anta",
+    "Conf_index_CERAPP_Anta",
+    "CERAPP_Bind_pred",
+    "AD_CERAPP_Bind",
+    "AD_index_CERAPP_Bind",
+    "Conf_index_CERAPP_Bind",
+    "CoMPARA_Ago_pred",
+    "AD_CoMPARA_Ago",
+    "AD_index_CoMPARA_Ago",
+    "Conf_index_CoMPARA_Ago",
+    "CoMPARA_Anta_pred",
+    "AD_CoMPARA_Anta",
+    "AD_index_CoMPARA_Anta",
+    "Conf_index_CoMPARA_Anta",
+    "CoMPARA_Bind_pred",
+    "AD_CoMPARA_Bind",
+    "AD_index_CoMPARA_Bind",
+    "Conf_index_CoMPARA_Bind",
+    "CATMoS_VT_pred",
+    "CATMoS_NT_pred",
+    "CATMoS_EPA_pred",
+    "CATMoS_GHS_pred",
+    "CATMoS_LD50_pred",
+    "CATMoS_LD50_predRange",
+    "AD_CATMoS",
+    "AD_index_CATMoS",
+    "Conf_index_CATMoS"
+  ]
+}

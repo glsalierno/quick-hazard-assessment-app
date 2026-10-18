@@ -1,0 +1,586 @@
+endpoint,clarification,database,matched_type,matched_count
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic,23305
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),subchronic,17813
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),short term,16262
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic long term,1756
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),short term repeated dose toxicity,71
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),sub chronic toxicity,42
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic dietary,9
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic toxicity,8
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),epidemiological (chronic),5
+AD_BioDeg,"Applicability-domain outcome for BioDeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),case report of chronic self intoxication,5
+AD_CACO2,"Applicability-domain outcome for CACO2 models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_CACO2,"Applicability-domain outcome for CACO2 models (inside/outside domain, OPERA)",ToxValDB (local SQLite),clinical,154
+AD_CACO2,"Applicability-domain outcome for CACO2 models (inside/outside domain, OPERA)",ToxValDB (local SQLite),occupational,75
+AD_CACO2,"Applicability-domain outcome for CACO2 models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_CACO2,"Applicability-domain outcome for CACO2 models (inside/outside domain, OPERA)",ToxValDB (local SQLite),clinical (double blind),5
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),acute,69869
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),acute exposure guidelines,13475
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),toxicity value,13018
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),short term repeated dose toxicity,71
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),sub chronic toxicity,42
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental toxicity,25
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),neurotoxicity,18
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),toxicity,8
+AD_CATMoS,"Applicability-domain outcome for CATMoS models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic toxicity,8
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproduction developmental,32156
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental,9676
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),uterotrophic,771
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),hershberger,526
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproductive,194
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental toxicity,25
+AD_CERAPP_Ago,"Applicability-domain outcome for CERAPP_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproduction developmental,32156
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental,9676
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),uterotrophic,771
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),hershberger,526
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproductive,194
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental toxicity,25
+AD_CERAPP_Anta,"Applicability-domain outcome for CERAPP_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproduction developmental,32156
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental,9676
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),uterotrophic,771
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),hershberger,526
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproductive,194
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental toxicity,25
+AD_CERAPP_Bind,"Applicability-domain outcome for CERAPP_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_Clint,"Applicability-domain outcome for Clint models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_Clint,"Applicability-domain outcome for Clint models (inside/outside domain, OPERA)",ToxValDB (local SQLite),clinical,154
+AD_Clint,"Applicability-domain outcome for Clint models (inside/outside domain, OPERA)",ToxValDB (local SQLite),occupational,75
+AD_Clint,"Applicability-domain outcome for Clint models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_Clint,"Applicability-domain outcome for Clint models (inside/outside domain, OPERA)",ToxValDB (local SQLite),clinical (double blind),5
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproduction developmental,32156
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental,9676
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),uterotrophic,771
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),hershberger,526
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproductive,194
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental toxicity,25
+AD_CoMPARA_Ago,"Applicability-domain outcome for CoMPARA_Ago models (inside/outside domain, OPERA)",ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproduction developmental,32156
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental,9676
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),uterotrophic,771
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),hershberger,526
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproductive,194
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental toxicity,25
+AD_CoMPARA_Anta,"Applicability-domain outcome for CoMPARA_Anta models (inside/outside domain, OPERA)",ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproduction developmental,32156
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental,9676
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),uterotrophic,771
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),hershberger,526
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),reproductive,194
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),developmental toxicity,25
+AD_CoMPARA_Bind,"Applicability-domain outcome for CoMPARA_Bind models (inside/outside domain, OPERA)",ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_FUB,"Applicability-domain outcome for FUB models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro,618
+AD_FUB,"Applicability-domain outcome for FUB models (inside/outside domain, OPERA)",ToxValDB (local SQLite),clinical,154
+AD_FUB,"Applicability-domain outcome for FUB models (inside/outside domain, OPERA)",ToxValDB (local SQLite),occupational,75
+AD_FUB,"Applicability-domain outcome for FUB models (inside/outside domain, OPERA)",ToxValDB (local SQLite),in vitro microbiological,35
+AD_FUB,"Applicability-domain outcome for FUB models (inside/outside domain, OPERA)",ToxValDB (local SQLite),clinical (double blind),5
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic,23305
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),subchronic,17813
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),short term,16262
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic long term,1756
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),short term repeated dose toxicity,71
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),sub chronic toxicity,42
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic dietary,9
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),chronic toxicity,8
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),epidemiological (chronic),5
+AD_ReadyBiodeg,"Applicability-domain outcome for ReadyBiodeg models (inside/outside domain, OPERA)",ToxValDB (local SQLite),case report of chronic self intoxication,5
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),chronic,23305
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),subchronic,17813
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),short term,16262
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),chronic long term,1756
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),short term repeated dose toxicity,71
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),sub chronic toxicity,42
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),chronic dietary,9
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),chronic toxicity,8
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),epidemiological (chronic),5
+AD_index_BioDeg,Applicability-domain distance index for BioDeg (lower = closer to training domain),ToxValDB (local SQLite),case report of chronic self intoxication,5
+AD_index_CACO2,Applicability-domain distance index for CACO2 (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_CACO2,Applicability-domain distance index for CACO2 (lower = closer to training domain),ToxValDB (local SQLite),clinical,154
+AD_index_CACO2,Applicability-domain distance index for CACO2 (lower = closer to training domain),ToxValDB (local SQLite),occupational,75
+AD_index_CACO2,Applicability-domain distance index for CACO2 (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_CACO2,Applicability-domain distance index for CACO2 (lower = closer to training domain),ToxValDB (local SQLite),clinical (double blind),5
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),acute,69869
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),acute exposure guidelines,13475
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),toxicity value,13018
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),short term repeated dose toxicity,71
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),sub chronic toxicity,42
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),developmental toxicity,25
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),neurotoxicity,18
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),toxicity,8
+AD_index_CATMoS,Applicability-domain distance index for CATMoS (lower = closer to training domain),ToxValDB (local SQLite),chronic toxicity,8
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),reproduction developmental,32156
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),developmental,9676
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),uterotrophic,771
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),hershberger,526
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),reproductive,194
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),developmental toxicity,25
+AD_index_CERAPP_Ago,Applicability-domain distance index for CERAPP_Ago (lower = closer to training domain),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),reproduction developmental,32156
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),developmental,9676
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),uterotrophic,771
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),hershberger,526
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),reproductive,194
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),developmental toxicity,25
+AD_index_CERAPP_Anta,Applicability-domain distance index for CERAPP_Anta (lower = closer to training domain),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),reproduction developmental,32156
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),developmental,9676
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),uterotrophic,771
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),hershberger,526
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),reproductive,194
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),developmental toxicity,25
+AD_index_CERAPP_Bind,Applicability-domain distance index for CERAPP_Bind (lower = closer to training domain),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_index_Clint,Applicability-domain distance index for Clint (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_Clint,Applicability-domain distance index for Clint (lower = closer to training domain),ToxValDB (local SQLite),clinical,154
+AD_index_Clint,Applicability-domain distance index for Clint (lower = closer to training domain),ToxValDB (local SQLite),occupational,75
+AD_index_Clint,Applicability-domain distance index for Clint (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_Clint,Applicability-domain distance index for Clint (lower = closer to training domain),ToxValDB (local SQLite),clinical (double blind),5
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),reproduction developmental,32156
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),developmental,9676
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),uterotrophic,771
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),hershberger,526
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),reproductive,194
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),developmental toxicity,25
+AD_index_CoMPARA_Ago,Applicability-domain distance index for CoMPARA_Ago (lower = closer to training domain),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),reproduction developmental,32156
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),developmental,9676
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),uterotrophic,771
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),hershberger,526
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),reproductive,194
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),developmental toxicity,25
+AD_index_CoMPARA_Anta,Applicability-domain distance index for CoMPARA_Anta (lower = closer to training domain),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),reproduction developmental,32156
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),developmental,9676
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),uterotrophic,771
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),hershberger,526
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),reproductive,194
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),two generation reproductive toxicity,86
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),one generation reproductive toxicity,73
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),developmental toxicity,25
+AD_index_CoMPARA_Bind,Applicability-domain distance index for CoMPARA_Bind (lower = closer to training domain),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_index_FUB,Applicability-domain distance index for FUB (lower = closer to training domain),ToxValDB (local SQLite),in vitro,618
+AD_index_FUB,Applicability-domain distance index for FUB (lower = closer to training domain),ToxValDB (local SQLite),clinical,154
+AD_index_FUB,Applicability-domain distance index for FUB (lower = closer to training domain),ToxValDB (local SQLite),occupational,75
+AD_index_FUB,Applicability-domain distance index for FUB (lower = closer to training domain),ToxValDB (local SQLite),in vitro microbiological,35
+AD_index_FUB,Applicability-domain distance index for FUB (lower = closer to training domain),ToxValDB (local SQLite),clinical (double blind),5
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),chronic,23305
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),subchronic,17813
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),short term,16262
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),chronic long term,1756
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),short term repeated dose toxicity,71
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),sub chronic toxicity,42
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),chronic dietary,9
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),chronic toxicity,8
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),epidemiological (chronic),5
+AD_index_ReadyBiodeg,Applicability-domain distance index for ReadyBiodeg (lower = closer to training domain),ToxValDB (local SQLite),case report of chronic self intoxication,5
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),chronic,23305
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),subchronic,17813
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),short term,16262
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),chronic long term,1756
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),short term repeated dose toxicity,71
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),sub chronic toxicity,42
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),chronic dietary,9
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),chronic toxicity,8
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),epidemiological (chronic),5
+BioDeg_LogHalfLife_pred,QSAR prediction for BioDeg_LogHalfLife (OPERA model output),ToxValDB (local SQLite),case report of chronic self intoxication,5
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),chronic,23305
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),subchronic,17813
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),short term,16262
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),chronic long term,1756
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),short term repeated dose toxicity,71
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),sub chronic toxicity,42
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),chronic dietary,9
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),chronic toxicity,8
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),epidemiological (chronic),5
+BioDeg_predRange,Numeric interval or uncertainty range paired with BioDeg_pred (OPERA),ToxValDB (local SQLite),case report of chronic self intoxication,5
+CACO2_pred,QSAR prediction for CACO2 (OPERA model output),ToxValDB (local SQLite),in vitro,618
+CACO2_pred,QSAR prediction for CACO2 (OPERA model output),ToxValDB (local SQLite),clinical,154
+CACO2_pred,QSAR prediction for CACO2 (OPERA model output),ToxValDB (local SQLite),occupational,75
+CACO2_pred,QSAR prediction for CACO2 (OPERA model output),ToxValDB (local SQLite),in vitro microbiological,35
+CACO2_pred,QSAR prediction for CACO2 (OPERA model output),ToxValDB (local SQLite),clinical (double blind),5
+CACO2_predRange,Numeric interval or uncertainty range paired with CACO2_pred (OPERA),ToxValDB (local SQLite),in vitro,618
+CACO2_predRange,Numeric interval or uncertainty range paired with CACO2_pred (OPERA),ToxValDB (local SQLite),clinical,154
+CACO2_predRange,Numeric interval or uncertainty range paired with CACO2_pred (OPERA),ToxValDB (local SQLite),occupational,75
+CACO2_predRange,Numeric interval or uncertainty range paired with CACO2_pred (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+CACO2_predRange,Numeric interval or uncertainty range paired with CACO2_pred (OPERA),ToxValDB (local SQLite),clinical (double blind),5
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),acute,69869
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),acute exposure guidelines,13475
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),toxicity value,13018
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),two generation reproductive toxicity,86
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),one generation reproductive toxicity,73
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),short term repeated dose toxicity,71
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),sub chronic toxicity,42
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),developmental toxicity,25
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),neurotoxicity,18
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),toxicity,8
+CATMoS_EPA_pred,CATMoS EPA acute toxicity category,ToxValDB (local SQLite),chronic toxicity,8
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),acute,69869
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),acute exposure guidelines,13475
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),toxicity value,13018
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),two generation reproductive toxicity,86
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),one generation reproductive toxicity,73
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),short term repeated dose toxicity,71
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),sub chronic toxicity,42
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),developmental toxicity,25
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),neurotoxicity,18
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),toxicity,8
+CATMoS_GHS_pred,CATMoS GHS acute toxicity category,ToxValDB (local SQLite),chronic toxicity,8
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),acute,69869
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),acute exposure guidelines,13475
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),toxicity value,13018
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),two generation reproductive toxicity,86
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),one generation reproductive toxicity,73
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),short term repeated dose toxicity,71
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),sub chronic toxicity,42
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),developmental toxicity,25
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),neurotoxicity,18
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),toxicity,8
+CATMoS_LD50_pred,CATMoS acute oral LD50 (mg/kg),ToxValDB (local SQLite),chronic toxicity,8
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),acute,69869
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),acute exposure guidelines,13475
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),toxicity value,13018
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),two generation reproductive toxicity,86
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),one generation reproductive toxicity,73
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),short term repeated dose toxicity,71
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),sub chronic toxicity,42
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),developmental toxicity,25
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),neurotoxicity,18
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),toxicity,8
+CATMoS_LD50_predRange,Numeric interval or uncertainty range paired with CATMoS_LD50_pred (OPERA),ToxValDB (local SQLite),chronic toxicity,8
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),acute,69869
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),acute exposure guidelines,13475
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),toxicity value,13018
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),two generation reproductive toxicity,86
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),one generation reproductive toxicity,73
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),short term repeated dose toxicity,71
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),sub chronic toxicity,42
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),developmental toxicity,25
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),neurotoxicity,18
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),toxicity,8
+CATMoS_NT_pred,QSAR prediction for CATMoS_NT (OPERA model output),ToxValDB (local SQLite),chronic toxicity,8
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),acute,69869
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),acute exposure guidelines,13475
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),toxicity value,13018
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),two generation reproductive toxicity,86
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),one generation reproductive toxicity,73
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),short term repeated dose toxicity,71
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),sub chronic toxicity,42
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),developmental toxicity,25
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),neurotoxicity,18
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),toxicity,8
+CATMoS_VT_pred,QSAR prediction for CATMoS_VT (OPERA model output),ToxValDB (local SQLite),chronic toxicity,8
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),reproduction developmental,32156
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),developmental,9676
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),uterotrophic,771
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),in vitro,618
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),hershberger,526
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),reproductive,194
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),two generation reproductive toxicity,86
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),one generation reproductive toxicity,73
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),in vitro microbiological,35
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),developmental toxicity,25
+CERAPP_Ago_pred,QSAR prediction for CERAPP_Ago (OPERA model output),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),reproduction developmental,32156
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),developmental,9676
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),uterotrophic,771
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),in vitro,618
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),hershberger,526
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),reproductive,194
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),two generation reproductive toxicity,86
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),one generation reproductive toxicity,73
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),in vitro microbiological,35
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),developmental toxicity,25
+CERAPP_Anta_pred,QSAR prediction for CERAPP_Anta (OPERA model output),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),reproduction developmental,32156
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),developmental,9676
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),uterotrophic,771
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),in vitro,618
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),hershberger,526
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),reproductive,194
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),two generation reproductive toxicity,86
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),one generation reproductive toxicity,73
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),in vitro microbiological,35
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),developmental toxicity,25
+CERAPP_Bind_pred,CERAPP estrogen receptor binding,ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Clint_pred,QSAR prediction for Clint (OPERA model output),ToxValDB (local SQLite),in vitro,618
+Clint_pred,QSAR prediction for Clint (OPERA model output),ToxValDB (local SQLite),clinical,154
+Clint_pred,QSAR prediction for Clint (OPERA model output),ToxValDB (local SQLite),occupational,75
+Clint_pred,QSAR prediction for Clint (OPERA model output),ToxValDB (local SQLite),in vitro microbiological,35
+Clint_pred,QSAR prediction for Clint (OPERA model output),ToxValDB (local SQLite),clinical (double blind),5
+Clint_predRange,Numeric interval or uncertainty range paired with Clint_pred (OPERA),ToxValDB (local SQLite),in vitro,618
+Clint_predRange,Numeric interval or uncertainty range paired with Clint_pred (OPERA),ToxValDB (local SQLite),clinical,154
+Clint_predRange,Numeric interval or uncertainty range paired with Clint_pred (OPERA),ToxValDB (local SQLite),occupational,75
+Clint_predRange,Numeric interval or uncertainty range paired with Clint_pred (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Clint_predRange,Numeric interval or uncertainty range paired with Clint_pred (OPERA),ToxValDB (local SQLite),clinical (double blind),5
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),reproduction developmental,32156
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),developmental,9676
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),uterotrophic,771
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),in vitro,618
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),hershberger,526
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),reproductive,194
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),two generation reproductive toxicity,86
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),one generation reproductive toxicity,73
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),in vitro microbiological,35
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),developmental toxicity,25
+CoMPARA_Ago_pred,QSAR prediction for CoMPARA_Ago (OPERA model output),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),reproduction developmental,32156
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),developmental,9676
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),uterotrophic,771
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),in vitro,618
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),hershberger,526
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),reproductive,194
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),two generation reproductive toxicity,86
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),one generation reproductive toxicity,73
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),in vitro microbiological,35
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),developmental toxicity,25
+CoMPARA_Anta_pred,QSAR prediction for CoMPARA_Anta (OPERA model output),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),reproduction developmental,32156
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),developmental,9676
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),uterotrophic,771
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),in vitro,618
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),hershberger,526
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),reproductive,194
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),two generation reproductive toxicity,86
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),one generation reproductive toxicity,73
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),in vitro microbiological,35
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),developmental toxicity,25
+CoMPARA_Bind_pred,CoMPARA androgen receptor binding,ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),chronic,23305
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),subchronic,17813
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),short term,16262
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),chronic long term,1756
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),short term repeated dose toxicity,71
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),sub chronic toxicity,42
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),chronic dietary,9
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),chronic toxicity,8
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),epidemiological (chronic),5
+Conf_index_BioDeg,Model confidence index for BioDeg predictions (OPERA),ToxValDB (local SQLite),case report of chronic self intoxication,5
+Conf_index_CACO2,Model confidence index for CACO2 predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_CACO2,Model confidence index for CACO2 predictions (OPERA),ToxValDB (local SQLite),clinical,154
+Conf_index_CACO2,Model confidence index for CACO2 predictions (OPERA),ToxValDB (local SQLite),occupational,75
+Conf_index_CACO2,Model confidence index for CACO2 predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_CACO2,Model confidence index for CACO2 predictions (OPERA),ToxValDB (local SQLite),clinical (double blind),5
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),acute,69869
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),acute exposure guidelines,13475
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),toxicity value,13018
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),two generation reproductive toxicity,86
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),one generation reproductive toxicity,73
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),short term repeated dose toxicity,71
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),sub chronic toxicity,42
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),developmental toxicity,25
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),neurotoxicity,18
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),toxicity,8
+Conf_index_CATMoS,Model confidence index for CATMoS predictions (OPERA),ToxValDB (local SQLite),chronic toxicity,8
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),reproduction developmental,32156
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),developmental,9676
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),uterotrophic,771
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),hershberger,526
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),reproductive,194
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),two generation reproductive toxicity,86
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),one generation reproductive toxicity,73
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),developmental toxicity,25
+Conf_index_CERAPP_Ago,Model confidence index for CERAPP_Ago predictions (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),reproduction developmental,32156
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),developmental,9676
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),uterotrophic,771
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),hershberger,526
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),reproductive,194
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),two generation reproductive toxicity,86
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),one generation reproductive toxicity,73
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),developmental toxicity,25
+Conf_index_CERAPP_Anta,Model confidence index for CERAPP_Anta predictions (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),reproduction developmental,32156
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),developmental,9676
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),uterotrophic,771
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),hershberger,526
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),reproductive,194
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),two generation reproductive toxicity,86
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),one generation reproductive toxicity,73
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),developmental toxicity,25
+Conf_index_CERAPP_Bind,Model confidence index for CERAPP_Bind predictions (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_Clint,Model confidence index for Clint predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_Clint,Model confidence index for Clint predictions (OPERA),ToxValDB (local SQLite),clinical,154
+Conf_index_Clint,Model confidence index for Clint predictions (OPERA),ToxValDB (local SQLite),occupational,75
+Conf_index_Clint,Model confidence index for Clint predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_Clint,Model confidence index for Clint predictions (OPERA),ToxValDB (local SQLite),clinical (double blind),5
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),reproduction developmental,32156
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),developmental,9676
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),uterotrophic,771
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),hershberger,526
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),reproductive,194
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),two generation reproductive toxicity,86
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),one generation reproductive toxicity,73
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),developmental toxicity,25
+Conf_index_CoMPARA_Ago,Model confidence index for CoMPARA_Ago predictions (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),reproduction developmental,32156
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),developmental,9676
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),uterotrophic,771
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),hershberger,526
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),reproductive,194
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),two generation reproductive toxicity,86
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),one generation reproductive toxicity,73
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),developmental toxicity,25
+Conf_index_CoMPARA_Anta,Model confidence index for CoMPARA_Anta predictions (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),reproduction developmental,32156
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),developmental,9676
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),uterotrophic,771
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),hershberger,526
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),reproductive,194
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),two generation reproductive toxicity,86
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),one generation reproductive toxicity,73
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),screening for reproductive developmental toxicity,58
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),developmental toxicity,25
+Conf_index_CoMPARA_Bind,Model confidence index for CoMPARA_Bind predictions (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_FUB,Model confidence index for FUB predictions (OPERA),ToxValDB (local SQLite),in vitro,618
+Conf_index_FUB,Model confidence index for FUB predictions (OPERA),ToxValDB (local SQLite),clinical,154
+Conf_index_FUB,Model confidence index for FUB predictions (OPERA),ToxValDB (local SQLite),occupational,75
+Conf_index_FUB,Model confidence index for FUB predictions (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+Conf_index_FUB,Model confidence index for FUB predictions (OPERA),ToxValDB (local SQLite),clinical (double blind),5
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),chronic,23305
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),subchronic,17813
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),short term,16262
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),chronic long term,1756
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),short term repeated dose toxicity,71
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),sub chronic toxicity,42
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),chronic dietary,9
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),chronic toxicity,8
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),epidemiological (chronic),5
+Conf_index_ReadyBiodeg,Model confidence index for ReadyBiodeg predictions (OPERA),ToxValDB (local SQLite),case report of chronic self intoxication,5
+FUB_pred,QSAR prediction for FUB (OPERA model output),ToxValDB (local SQLite),in vitro,618
+FUB_pred,QSAR prediction for FUB (OPERA model output),ToxValDB (local SQLite),clinical,154
+FUB_pred,QSAR prediction for FUB (OPERA model output),ToxValDB (local SQLite),occupational,75
+FUB_pred,QSAR prediction for FUB (OPERA model output),ToxValDB (local SQLite),in vitro microbiological,35
+FUB_pred,QSAR prediction for FUB (OPERA model output),ToxValDB (local SQLite),clinical (double blind),5
+FUB_predRange,Numeric interval or uncertainty range paired with FUB_pred (OPERA),ToxValDB (local SQLite),in vitro,618
+FUB_predRange,Numeric interval or uncertainty range paired with FUB_pred (OPERA),ToxValDB (local SQLite),clinical,154
+FUB_predRange,Numeric interval or uncertainty range paired with FUB_pred (OPERA),ToxValDB (local SQLite),occupational,75
+FUB_predRange,Numeric interval or uncertainty range paired with FUB_pred (OPERA),ToxValDB (local SQLite),in vitro microbiological,35
+FUB_predRange,Numeric interval or uncertainty range paired with FUB_pred (OPERA),ToxValDB (local SQLite),clinical (double blind),5
+RT_pred,QSAR prediction for RT (OPERA model output),ToxValDB (local SQLite),short term,16262
+RT_pred,QSAR prediction for RT (OPERA model output),ToxValDB (local SQLite),not reported,562
+RT_pred,QSAR prediction for RT (OPERA model output),ToxValDB (local SQLite),short term repeated dose toxicity,71
+RT_pred,QSAR prediction for RT (OPERA model output),ToxValDB (local SQLite),epidemiological (cohort),7
+RT_pred,QSAR prediction for RT (OPERA model output),ToxValDB (local SQLite),"fertility, other",5
+RT_pred,QSAR prediction for RT (OPERA model output),ToxValDB (local SQLite),case report of chronic self intoxication,5
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),chronic,23305
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),subchronic,17813
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),short term,16262
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),chronic long term,1756
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),short term repeated dose toxicity,71
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),sub chronic toxicity,42
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),subchronic prospective supplementation trial,12
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),"subchronic, developmental reproductive",10
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),chronic dietary,9
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),chronic toxicity,8
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),epidemiological (chronic),5
+ReadyBiodeg_pred,QSAR prediction for ReadyBiodeg (OPERA model output),ToxValDB (local SQLite),case report of chronic self intoxication,5

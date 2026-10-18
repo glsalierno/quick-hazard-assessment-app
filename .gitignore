@@ -20,9 +20,54 @@ Thumbs.db
 # Streamlit
 .streamlit/secrets.toml
 
+# Auto-generated P2OASys dev matrix (install official TURI xlsx for calibrated scores)
+data/p2oasys_matrix_dev_placeholder.xlsx
+
+# Offline REACH / IUCLID caches and local DB artifacts
+data/offline_cache/
+**/offline_snippets_cache.db
+data/*.sqlite
+!data/cameo_nfpa.sqlite
+!data/chemical_db.sqlite
+!data/p2oasys_score_lookup.sqlite
+!data/p2oasys_harvest.sqlite
+
+# Local writable HSPiP CLI mirror (copied from Program Files)
+data/hspip_workdir/
+data/ghaz7_settings.json
+
+# Local verification logs (may contain absolute paths)
+verification_full.txt
+verification_output.txt
+
 # Local reports / outputs (optional)
 *.log
 reports/
+artifacts/
+verification_full.txt
+verification_output.txt
+verification_results.json
+
+# CAS BERT weights (too large for GitHub; train with scripts/train_cas_bert.py or use Git LFS if needed)
+models/cas_bert/*.safetensors
+models/cas_bert/pytorch_model.bin
+models/cas_bert/*.bin
+# PDF extraction cache (MarkItDown / OCR artifacts)
+cache/
+
+# Derived OPERA / offline test dumps (rebuild with scripts/precompute_opera_*.py)
+data/opera_envfate_cohort500/
+data/opera_envfate_smiles_subset/
+data/opera_toxval_plots/
+data/test_offline_10/
+data/runs/
+
+# Local analysis dumps
+vulture_report*.txt
+validation_report.csv
+data/p2oasys_audit_smoke.jsonl
+data/p2oasys_upload_67-64-1_*.csv
+scripts/_probe_*
 
 # Do NOT ignore DSS/ — the DSSTox mapping is tracked via Git LFS for publishing.
 

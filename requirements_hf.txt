@@ -1,0 +1,21 @@
+# Hugging Face Transformers CAS extractor (scripts/run_hf_cas_extractor.py)
+# Install when using local HF models for SDS CAS extraction.
+
+# Core
+streamlit>=1.28.0
+pandas>=2.0.0
+
+# PDF processing
+pdfplumber>=0.10.0
+PyPDF2>=3.0.0
+
+# Hugging Face
+transformers>=4.35.0
+torch>=2.1.0
+accelerate>=0.25.0
+bitsandbytes>=0.41.0
+sentencepiece>=0.1.99
+
+# Utilities
+psutil>=5.9.0
+beautifulsoup4>=4.12.0
