@@ -6,8 +6,6 @@ Validates format (digits-digits-digits) and optional checksum.
 from __future__ import annotations
 
 import re
-from typing import Tuple
-
 
 # CAS format: up to 9 digits, hyphen, 2 digits, hyphen, single check digit
 _CAS_PATTERN = re.compile(r"^(\d{1,9})-(\d{2})-(\d)$")
@@ -32,7 +30,7 @@ def cas_checksum(digits: str) -> int:
     return total % 10
 
 
-def validate_cas(cas: str) -> Tuple[bool, str]:
+def validate_cas(cas: str) -> tuple[bool, str]:
     """
     Validate CAS format and check digit.
     Returns (is_valid, normalized_cas).

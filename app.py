@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import platform
 from pathlib import Path
 
@@ -13,8 +14,17 @@ import pandas as pd
 import streamlit as st
 
 import config
-from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
-from utils import diagnostics, toxvaldb_client
+from utils import (
+    cas_validator,
+    chemical_db,
+    data_formatter,
+    diagnostics,
+    dsstox_local,
+    ghs_formatter,
+    pubchem_client,
+    smiles_drawer,
+    toxvaldb_client,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -153,18 +163,13 @@ if current_query:
                     })
             elif dtxsid:
                 try:
-                    api_key = st.secrets.get("COMPTOX_API_KEY") if hasattr(st, "secrets") else None
-                    if not api_key:
-                        import os
-                        api_key = os.environ.get("COMPTOX_API_KEY")
-                    if api_key:
-                        toxval_data = toxvaldb_client.fetch_toxval_data(dtxsid, api_key)
-                except Exception as error:
-                    logger.warning(
-                        'ToxValDB fallback unavailable for DTXSID %s (%s)',
-                        dtxsid, type(error).__name__,
-                    )
-                    toxval_data = None
+                    api_key = st.secrets.get("COMPTOX_API_KEY")
+                except OSError as error:
+                    logger.debug("Streamlit secrets unavailable (%s)", type(error).__name__)
+                    api_key = None
+                api_key = api_key or os.environ.get("COMPTOX_API_KEY")
+                if api_key:
+                    toxval_data = toxvaldb_client.fetch_toxval_data(dtxsid, api_key)
 
             st.session_state["result_for"] = clean_cas
             st.session_state["result_data"] = {
