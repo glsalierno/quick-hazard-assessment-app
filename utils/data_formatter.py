@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 
@@ -23,7 +23,7 @@ def _has_numeric_value(val: Any) -> bool:
 
 def prioritize_toxicity_data(
     pubchem_data: dict[str, Any],
-    toxval_data: Optional[dict[str, list[dict]]] = None,
+    toxval_data: dict[str, list[dict]] | None = None,
 ) -> dict[str, list[dict]]:
     """
     Split toxicity data into quantitative (value + unit) first, then categorical.
@@ -113,8 +113,8 @@ def build_toxicity_display_df(prioritized: dict[str, list[dict]]) -> pd.DataFram
 def create_comprehensive_download_data(
     clean_cas: str,
     pubchem_data: dict[str, Any],
-    dsstox_info: Optional[dict] = None,
-    toxval_data: Optional[dict] = None,
+    dsstox_info: dict | None = None,
+    toxval_data: dict | None = None,
 ) -> dict[str, Any]:
     """
     Build full structure for download: identifiers, properties, GHS, all toxicity rows (no truncation).
@@ -172,9 +172,9 @@ def create_comprehensive_download_data(
 def download_toxicity_csv(
     clean_cas: str,
     pubchem_data: dict[str, Any],
-    dsstox_info: Optional[dict],
-    dtxsid: Optional[str],
-    preferred_name: Optional[str],
+    dsstox_info: dict | None,
+    dtxsid: str | None,
+    preferred_name: str | None,
     h_codes: list[str],
     p_codes: list[str],
     eco: dict,

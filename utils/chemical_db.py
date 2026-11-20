@@ -6,15 +6,20 @@ Use scripts/setup_chemical_db.py to build the DB from DSS CSV and COMPTOX Excel 
 
 from __future__ import annotations
 
+import logging
 import os
 import sqlite3
 from contextlib import contextmanager
-from typing import Any, Optional
+from typing import Any
+from xml.etree.ElementTree import ParseError
+from zipfile import BadZipFile
 
 import pandas as pd
 import streamlit as st
 
 from config import CHEMICAL_DB_PATH, REPO_ROOT
+
+logger = logging.getLogger(__name__)
 
 
 def _db_path() -> str:
@@ -26,14 +31,14 @@ def _db_path() -> str:
 
 
 @st.cache_resource
-def get_db_connection() -> Optional[sqlite3.Connection]:
+def get_db_connection() -> sqlite3.Connection | None:
     """Cached database connection (shared across sessions)."""
     path = _db_path()
     if not path or not os.path.isfile(path):
         return None
     try:
         return sqlite3.connect(path, check_same_thread=False)
-    except Exception:
+    except sqlite3.Error:
         return None
 
 
@@ -57,7 +62,7 @@ def get_cursor():
 # ----------------------------------------------------------------------
 
 
-def create_dsstox_table(csv_path: str, db_path: Optional[str] = None) -> int:
+def create_dsstox_table(csv_path: str, db_path: str | None = None) -> int:
     """
     One-time setup: convert DSSTox CSV to SQLite table.
     """
@@ -94,7 +99,7 @@ def create_dsstox_table(csv_path: str, db_path: Optional[str] = None) -> int:
     return count
 
 
-def get_dsstox_by_cas(cas: str) -> Optional[dict[str, Any]]:
+def get_dsstox_by_cas(cas: str) -> dict[str, Any] | None:
     """Get all DSSTox fields for a CAS number."""
     with get_cursor() as cursor:
         if cursor is None:
@@ -113,7 +118,7 @@ def get_dsstox_by_cas(cas: str) -> Optional[dict[str, Any]]:
         return None
 
 
-def get_dsstox_by_dtxsid(dtxsid: str) -> Optional[dict[str, Any]]:
+def get_dsstox_by_dtxsid(dtxsid: str) -> dict[str, Any] | None:
     """Get DSSTox record by DTXSID."""
     with get_cursor() as cursor:
         if cursor is None:
@@ -130,7 +135,7 @@ def get_dsstox_by_dtxsid(dtxsid: str) -> Optional[dict[str, Any]]:
 # ----------------------------------------------------------------------
 
 
-def create_toxvaldb_table(excel_path_or_folder: str, db_path: Optional[str] = None) -> int:
+def create_toxvaldb_table(excel_path_or_folder: str, db_path: str | None = None) -> int:
     """
     One-time setup: load ToxValDB from a single Excel file or a folder of Excel files.
     Each file can have one or more sheets; we look for columns like dtxsid, casrn, toxval_numeric, study_type.
@@ -161,7 +166,8 @@ def create_toxvaldb_table(excel_path_or_folder: str, db_path: Optional[str] = No
                 if "dtxsid" not in df.columns and "casrn" in df.columns:
                     df["dtxsid"] = ""
                 frames.append(df)
-        except Exception:
+        except (BadZipFile, ImportError, OSError, ParseError, ValueError) as error:
+            logger.warning("ToxValDB workbook %s not loaded (%s)", os.path.basename(path), type(error).__name__)
             continue
 
     if not frames:
