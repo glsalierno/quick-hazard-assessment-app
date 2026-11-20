@@ -101,7 +101,7 @@ def draw_molecule_canonical(
     except (OSError, RuntimeError, TypeError, ValueError) as e:
         logger.warning('RDKit drawing failed for SMILES %r (%s)', smiles, type(e).__name__)
         if st is not None:
-            st.error(f"RDKit drawing error: {str(e)}")
+            st.error(f"RDKit drawing error: {e!s}")
         return None
 
 
@@ -119,7 +119,7 @@ def draw_molecule_with_stereo(smiles: str, width: int = 500, height: int = 300) 
     except (OSError, RuntimeError, TypeError, ValueError) as e:
         logger.warning('RDKit drawing failed for SMILES %r (%s)', smiles, type(e).__name__)
         if st is not None:
-            st.error(f"RDKit stereo drawing error: {str(e)}")
+            st.error(f"RDKit stereo drawing error: {e!s}")
         return None
 
 
