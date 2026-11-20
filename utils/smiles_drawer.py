@@ -5,11 +5,13 @@ Falls back to smiles-drawer (client-side JS) if RDKit is unavailable or renderin
 
 from __future__ import annotations
 
-import io
 import json
+import logging
 from typing import Optional
 
 import streamlit as st
+
+logger = logging.getLogger(__name__)
 
 # Optional RDKit import
 try:
@@ -28,8 +30,8 @@ except ImportError:
 if _RDKIT_AVAILABLE:
     try:
         rdDepictor.SetPreferCoordGen(True)
-    except Exception:
-        pass
+    except Exception as error:
+        logger.debug('Could not enable RDKit CoordGen (%s)', type(error).__name__)
 
 
 def _escape_smiles_for_js(smiles: str) -> str:
@@ -97,6 +99,7 @@ def draw_molecule_canonical(
             img = Draw.MolToImage(mol, size=size)
         return img
     except Exception as e:
+        logger.warning('RDKit drawing failed for SMILES %r (%s)', smiles, type(e).__name__)
         if st is not None:
             st.error(f"RDKit drawing error: {str(e)}")
         return None
@@ -114,6 +117,7 @@ def draw_molecule_with_stereo(smiles: str, width: int = 500, height: int = 300) 
         rdDepictor.Compute2DCoords(mol)
         return Draw.MolToImage(mol, size=(width, height))
     except Exception as e:
+        logger.warning('RDKit drawing failed for SMILES %r (%s)', smiles, type(e).__name__)
         if st is not None:
             st.error(f"RDKit stereo drawing error: {str(e)}")
         return None

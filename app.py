@@ -4,16 +4,19 @@ Quick Hazard Assessment — Streamlit app.
 
 from __future__ import annotations
 
-import io
 import json
-from typing import Any
+import logging
+import platform
+from pathlib import Path
 
 import pandas as pd
 import streamlit as st
 
 import config
 from utils import cas_validator, chemical_db, data_formatter, dsstox_local, ghs_formatter, pubchem_client, smiles_drawer
-from utils import toxvaldb_client
+from utils import diagnostics, toxvaldb_client
+
+logger = logging.getLogger(__name__)
 
 # Page config
 st.set_page_config(page_title=config.APP_TITLE, layout="centered", initial_sidebar_state="collapsed")
@@ -36,7 +39,8 @@ if "ghs_layout" not in st.session_state:
     st.session_state["ghs_layout"] = "two_columns"
 
 # Prefer SQLite chemical DB when present (fast); else fall back to CSV-based DSSTox
-db_stats = chemical_db.get_db_stats()
+db_status = diagnostics.artifact_status(Path(config.CHEMICAL_DB_PATH))
+db_stats = chemical_db.get_db_stats() if db_status == 'present' else {}
 use_sqlite_dsstox = db_stats.get("dsstox", {}).get("exists", False)
 use_sqlite_toxval = db_stats.get("toxvaldb", {}).get("exists", False)
 dsstox_data = None if use_sqlite_dsstox else dsstox_local.load_dsstox_enhanced()
@@ -66,6 +70,23 @@ with st.sidebar:
         st.caption(f"{tox_chems:,} chemicals")
     else:
         st.error("ToxValDB (SQLite) not found. Build it locally with `scripts/setup_chemical_db.py`.")
+
+    with st.expander("System Status / Diagnostics"):
+        mapping_status = diagnostics.artifact_status(
+            Path(config.DSS_PATH) / "cas_dtxsid_mapping.csv"
+        )
+        st.write(f"`DSS/cas_dtxsid_mapping.csv`: {mapping_status}")
+        csv_count = f"{len(dsstox_data):,} unique CAS records" if dsstox_data is not None else "not loaded"
+        st.caption(f"DSSTox CSV mappings loaded across available files: {csv_count}")
+        st.write(f"`data/chemical_db.sqlite`: {db_status}")
+        for key, label in (("dsstox", "DSSTox"), ("toxvaldb", "ToxValDB")):
+            details = db_stats.get(key, {})
+            count = f"{details.get('records', 0):,} rows" if details.get("exists") else "not loaded"
+            st.caption(f"{label} SQLite: {count}")
+        st.caption(
+            f"Python {platform.python_version()} · Streamlit {diagnostics.package_version('streamlit')}"
+            f" · RDKit {diagnostics.package_version('rdkit')}"
+        )
 
 # Input form
 with st.form("cas_input"):
@@ -138,7 +159,11 @@ if current_query:
                         api_key = os.environ.get("COMPTOX_API_KEY")
                     if api_key:
                         toxval_data = toxvaldb_client.fetch_toxval_data(dtxsid, api_key)
-                except Exception:
+                except Exception as error:
+                    logger.warning(
+                        'ToxValDB fallback unavailable for DTXSID %s (%s)',
+                        dtxsid, type(error).__name__,
+                    )
                     toxval_data = None
 
             st.session_state["result_for"] = clean_cas

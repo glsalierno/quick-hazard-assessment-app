@@ -6,6 +6,7 @@ Uses pubchempy and PUG REST for CID resolution and PUG View for GHS/hazard.
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
 from typing import Any, Optional
@@ -13,6 +14,8 @@ from urllib.parse import quote
 
 import pubchempy as pcp
 import requests
+
+logger = logging.getLogger(__name__)
 
 PUBCHEM_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 PUG_VIEW_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view"
@@ -38,7 +41,8 @@ def get_cid(identifier: str, input_type: str = "name") -> Optional[int]:
             return int(cids[0]) if cids else None
         cids = pcp.get_cids(identifier, input_type, "compound")
         return cids[0] if cids else None
-    except (pcp.BadRequestError, pcp.NotFoundError, ValueError, requests.RequestException):
+    except (pcp.BadRequestError, pcp.NotFoundError, ValueError, requests.RequestException) as error:
+        logger.warning('PubChem CID lookup failed for %s %r (%s)', input_type, identifier, type(error).__name__)
         return None
 
 
@@ -55,7 +59,8 @@ def _fetch_pug_view(cid: int) -> Optional[dict]:
                 time.sleep(2**attempt)
                 continue
             r.raise_for_status()
-        except (requests.RequestException, json.JSONDecodeError):
+        except (requests.RequestException, json.JSONDecodeError) as error:
+            logger.debug('PubChem PUG View failed for CID %s (attempt %s: %s)', cid, attempt + 1, type(error).__name__)
             if attempt == MAX_RETRIES - 1:
                 return None
             time.sleep(2**attempt)
@@ -320,7 +325,7 @@ def _parse_ecotox_text(raw: str) -> dict[str, Any]:
             out["ci_low"] = float(m_ci.group(1))
             out["ci_high"] = float(m_ci.group(2))
         except ValueError:
-            pass
+            logger.debug('Could not parse PubChem ecotoxicity confidence interval: %r', m_ci.group(0))
 
     # Conditions: for now, keep the full text for display/filtering
     out["conditions"] = text
@@ -401,7 +406,7 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
                 try:
                     return float(m.group(1))
                 except ValueError:
-                    pass
+                    logger.debug('Could not parse PubChem oral LD50: %r', m.group(1))
         return None
 
     def extract_ld50_dermal():
@@ -416,7 +421,7 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
                 try:
                     return float(m.group(1))
                 except ValueError:
-                    pass
+                    logger.debug('Could not parse PubChem dermal LD50: %r', m.group(1))
         return None
 
     def extract_lc50_inhalation():
@@ -429,7 +434,7 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
                 try:
                     return float(m.group(1).replace(",", ""))
                 except ValueError:
-                    pass
+                    logger.debug('Could not parse PubChem inhalation LC50: %r', m.group(1))
         return None
 
     out = {"oral": {}, "dermal": {}, "inhalation": {}}
@@ -465,7 +470,8 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
         return None
     try:
         comp = pcp.Compound.from_cid(cid)
-    except Exception:
+    except Exception as error:
+        logger.warning('PubChem compound properties unavailable for CID %s (%s)', cid, type(error).__name__)
         return None
     # Basic props from pubchempy
     smiles = getattr(comp, "smiles", None) or getattr(comp, "isomeric_smiles", None) or getattr(comp, "canonical_smiles", None)

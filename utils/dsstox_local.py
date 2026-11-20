@@ -10,6 +10,7 @@ can use a non-LFS CSV (e.g. cas_dtxsid_mapping.csv) if committed without LFS.
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import Optional
 
@@ -17,6 +18,9 @@ import pandas as pd
 import streamlit as st
 
 from config import DSS_DIR, DSS_PATH, DSSTOX_MAPPING_FILENAMES
+
+
+logger = logging.getLogger(__name__)
 
 
 def _dss_dir_resolved() -> str:
@@ -38,7 +42,8 @@ def _is_lfs_pointer(path: str) -> bool:
         with open(path, "rb") as f:
             head = f.read(200).decode("utf-8", errors="ignore")
         return "git-lfs" in head or "oid sha256" in head
-    except Exception:
+    except (OSError, UnicodeError) as error:
+        logger.debug('Cannot inspect DSSTox mapping %s (%s)', os.path.basename(path), type(error).__name__)
         return False
 
 
@@ -190,7 +195,8 @@ def load_dsstox_enhanced() -> Optional[dict[str, dict]]:
                     for k, v in record.items():
                         if k not in merged[cas] or not merged[cas][k]:
                             merged[cas][k] = v
-        except Exception:
+        except Exception as error:
+            logger.warning('DSSTox mapping %s not loaded (%s)', os.path.basename(path), type(error).__name__)
             continue
 
     return merged if merged else None

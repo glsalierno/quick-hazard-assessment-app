@@ -24,7 +24,7 @@ def is_valid_cas_format(cas: str) -> bool:
 
 
 def cas_checksum(digits: str) -> int:
-    """Compute CAS check digit. digits is the full numeric string (no hyphens)."""
+    """Compute CAS check digit. digits excludes both hyphens and the check digit."""
     n = len(digits)
     total = 0
     for i, d in enumerate(digits):
@@ -45,7 +45,7 @@ def validate_cas(cas: str) -> Tuple[bool, str]:
     if not m:
         return False, s
     first, second, check = m.group(1), m.group(2), m.group(3)
-    digits = first + second + check
+    digits = first + second
     expected_check = str(cas_checksum(digits))
     if check != expected_check:
         return False, f"{first}-{second}-{check}"
