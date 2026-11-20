@@ -136,11 +136,11 @@ def load_dsstox_enhanced() -> dict[str, dict] | None:
 
                 record: dict[str, object] = {}
 
-                def _get(field: str) -> str | None:
-                    col = colmap.get(field)
+                def _get(field: str, *, _row=row, _colmap=colmap) -> str | None:
+                    col = _colmap.get(field)
                     if not col:
                         return None
-                    val = str(row[col]).strip()
+                    val = str(_row[col]).strip()
                     return val if val and val.lower() not in ("nan", "none") else None
 
                 dtxsid = _get("dtxsid")

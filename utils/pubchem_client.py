@@ -157,21 +157,16 @@ def _extract_hazard_metrics(data: dict) -> dict[str, Any]:
             return
         name_l = (name or "").lower()
         head_l = (heading or "").lower()
-        if "flash point" in name_l or "flash point" in head_l:
-            if text not in result["flash_point"]:
-                result["flash_point"].append(text)
-        if "vapor pressure" in name_l or "vapor pressure" in head_l:
-            if text not in result["vapor_pressure"]:
-                result["vapor_pressure"].append(text)
-        if "nfpa" in name_l or "nfpa" in head_l:
-            if text not in result["nfpa"]:
-                result["nfpa"].append(text)
-        if "iarc" in name_l or "iarc" in head_l:
-            if text not in result["iarc"]:
-                result["iarc"].append(text)
-        if "proposition 65" in name_l or "prop 65" in name_l:
-            if text not in result["prop65"]:
-                result["prop65"].append(text)
+        if ("flash point" in name_l or "flash point" in head_l) and text not in result["flash_point"]:
+            result["flash_point"].append(text)
+        if ("vapor pressure" in name_l or "vapor pressure" in head_l) and text not in result["vapor_pressure"]:
+            result["vapor_pressure"].append(text)
+        if ("nfpa" in name_l or "nfpa" in head_l) and text not in result["nfpa"]:
+            result["nfpa"].append(text)
+        if ("iarc" in name_l or "iarc" in head_l) and text not in result["iarc"]:
+            result["iarc"].append(text)
+        if ("proposition 65" in name_l or "prop 65" in name_l) and text not in result["prop65"]:
+            result["prop65"].append(text)
 
     def walk_section(section: dict, heading: str = "") -> None:
         if not isinstance(section, dict):
@@ -189,10 +184,10 @@ def _extract_hazard_metrics(data: dict) -> dict[str, Any]:
 
 
 # Patterns for structured toxicity extraction (from quick_hazard_assessment/hazard_query_structured)
-_UNIT_PATTERN = re.compile(r"(mg/kg|mg/m³|ppm|g/kg|mL/kg|mg/L|µg/kg|mg/m3|ppb)\b", re.I)
+_UNIT_PATTERN = re.compile(r"(mg/kg|mg/m³|ppm|g/kg|mL/kg|mg/L|µg/kg|mg/m3|ppb)\b", re.IGNORECASE)
 _SPECIES_ROUTE_PATTERN = re.compile(
     r"\b(rat|mouse|rabbit|dog|guinea pig|human|oral|dermal|inhalation|ip|iv|sc|ld50|lc50|fish|trout|daphnia|algae|aquatic)\b",
-    re.I,
+    re.IGNORECASE,
 )
 
 
@@ -240,14 +235,14 @@ _SPECIES_TOKENS = {"rat", "mouse", "rabbit", "dog", "guinea pig", "human", "fish
 _ROUTE_TOKENS = {"oral", "dermal", "inhalation", "ip", "iv", "sc"}
 
 # Ecotoxicity parsing patterns
-_ECOTOX_ENDPOINT_RE = re.compile(r"\b(LC50|EC50|LC10|LC20|LC90|EC10|EC20|EC90|NOEC|LOEC)\b", re.I)
-_ECOTOX_DURATION_RE = re.compile(r"(\d+\s*(?:h|hr|hrs|hour|hours|d|day|days))\b", re.I)
+_ECOTOX_ENDPOINT_RE = re.compile(r"\b(LC50|EC50|LC10|LC20|LC90|EC10|EC20|EC90|NOEC|LOEC)\b", re.IGNORECASE)
+_ECOTOX_DURATION_RE = re.compile(r"(\d+\s*(?:h|hr|hrs|hour|hours|d|day|days))\b", re.IGNORECASE)
 _ECOTOX_VALUE_UNIT_RE = re.compile(
-    r"([<>~]?\s*\d+(?:[.,]\d+)?)\s*(mg/L|µg/L|ug/L|mg/kg|g/L|mg/l)\b", re.I
+    r"([<>~]?\s*\d+(?:[.,]\d+)?)\s*(mg/L|µg/L|ug/L|mg/kg|g/L|mg/l)\b", re.IGNORECASE
 )
 _ECOTOX_CI_RE = re.compile(
     r"(?:CI|confidence interval)[^0-9]*([0-9]+(?:\.\d+)?)\s*[–-]\s*([0-9]+(?:\.\d+)?)",
-    re.I,
+    re.IGNORECASE,
 )
 
 
@@ -429,7 +424,7 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
             v = (t.get("value") or "").lower()
             if "lc50" not in v:
                 continue
-            m = re.search(r"(\d+(?:[.,]\d+)*)\s*mg\s*/\s*m", v) or re.search(r"(\d+(?:[.,]\d+)*)\s*mg/m3", v, re.I)
+            m = re.search(r"(\d+(?:[.,]\d+)*)\s*mg\s*/\s*m", v) or re.search(r"(\d+(?:[.,]\d+)*)\s*mg/m3", v, re.IGNORECASE)
             if m:
                 try:
                     return float(m.group(1).replace(",", ""))
