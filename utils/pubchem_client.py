@@ -9,7 +9,7 @@ import json
 import logging
 import re
 import time
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import quote
 
 import pubchempy as pcp
@@ -26,7 +26,7 @@ GHS_H_CODE = re.compile(r"H\d+(?:\+\d+)?(?:\s*\([^)]+\))?")
 GHS_P_CODE = re.compile(r"P\d+(?:\+\d+)?(?:\s*\([^)]+\))?")
 
 
-def get_cid(identifier: str, input_type: str = "name") -> Optional[int]:
+def get_cid(identifier: str, input_type: str = "name") -> int | None:
     """Resolve chemical identifier (CAS or name) to PubChem CID."""
     try:
         if input_type.lower() == "cid":
@@ -46,7 +46,7 @@ def get_cid(identifier: str, input_type: str = "name") -> Optional[int]:
         return None
 
 
-def _fetch_pug_view(cid: int) -> Optional[dict]:
+def _fetch_pug_view(cid: int) -> dict | None:
     """Fetch full PUG View compound record for GHS and hazard extraction."""
     url = f"{PUG_VIEW_BASE}/data/compound/{cid}/JSON"
     for attempt in range(MAX_RETRIES):
@@ -451,7 +451,7 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
     return out
 
 
-def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dict[str, Any]]:
+def get_compound_data(identifier: str, input_type: str = "auto") -> dict[str, Any] | None:
     """
     Fetch compound data for display: SMILES, formula, MW, IUPAC name, GHS, flash point, etc.
     identifier: CAS number (e.g. 67-64-1) or chemical name.
@@ -470,7 +470,7 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
         return None
     try:
         comp = pcp.Compound.from_cid(cid)
-    except Exception as error:
+    except (pcp.PubChemPyError, OSError, ValueError) as error:
         logger.warning('PubChem compound properties unavailable for CID %s (%s)', cid, type(error).__name__)
         return None
     # Basic props from pubchempy

@@ -6,15 +6,20 @@ Use scripts/setup_chemical_db.py to build the DB from DSS CSV and COMPTOX Excel 
 
 from __future__ import annotations
 
+import logging
 import os
 import sqlite3
 from contextlib import contextmanager
 from typing import Any
+from xml.etree.ElementTree import ParseError
+from zipfile import BadZipFile
 
 import pandas as pd
 import streamlit as st
 
 from config import CHEMICAL_DB_PATH, REPO_ROOT
+
+logger = logging.getLogger(__name__)
 
 
 def _db_path() -> str:
@@ -161,7 +166,8 @@ def create_toxvaldb_table(excel_path_or_folder: str, db_path: str | None = None)
                 if "dtxsid" not in df.columns and "casrn" in df.columns:
                     df["dtxsid"] = ""
                 frames.append(df)
-        except Exception:
+        except (BadZipFile, ImportError, OSError, ParseError, ValueError) as error:
+            logger.warning("ToxValDB workbook %s not loaded (%s)", os.path.basename(path), type(error).__name__)
             continue
 
     if not frames:

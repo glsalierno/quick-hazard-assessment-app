@@ -12,13 +12,13 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Optional
+from xml.etree.ElementTree import ParseError
+from zipfile import BadZipFile
 
 import pandas as pd
 import streamlit as st
 
 from config import DSS_DIR, DSS_PATH, DSSTOX_MAPPING_FILENAMES
-
 
 logger = logging.getLogger(__name__)
 
@@ -102,7 +102,7 @@ def _detect_columns(df: pd.DataFrame) -> dict[str, str]:
 
 
 @st.cache_data(ttl=86400)
-def load_dsstox_enhanced() -> Optional[dict[str, dict]]:
+def load_dsstox_enhanced() -> dict[str, dict] | None:
     """
     Load DSSTox mapping from all CSV/Excel files in DSS/ with caching.
     Returns dict mapping CAS (str) -> dict of all available DSSTox fields,
@@ -136,7 +136,7 @@ def load_dsstox_enhanced() -> Optional[dict[str, dict]]:
 
                 record: dict[str, object] = {}
 
-                def _get(field: str) -> Optional[str]:
+                def _get(field: str) -> str | None:
                     col = colmap.get(field)
                     if not col:
                         return None
@@ -195,14 +195,14 @@ def load_dsstox_enhanced() -> Optional[dict[str, dict]]:
                     for k, v in record.items():
                         if k not in merged[cas] or not merged[cas][k]:
                             merged[cas][k] = v
-        except Exception as error:
+        except (BadZipFile, ImportError, OSError, ParseError, ValueError) as error:
             logger.warning('DSSTox mapping %s not loaded (%s)', os.path.basename(path), type(error).__name__)
             continue
 
     return merged if merged else None
 
 
-def get_dsstox_info(cas_number: str, dsstox_data: Optional[dict[str, dict]]) -> Optional[dict]:
+def get_dsstox_info(cas_number: str, dsstox_data: dict[str, dict] | None) -> dict | None:
     """
     Retrieve all available DSSTox information for a CAS number.
     Returns dict of fields or None if not found.
@@ -220,7 +220,7 @@ def get_dsstox_info(cas_number: str, dsstox_data: Optional[dict[str, dict]]) -> 
     return None
 
 
-def format_dsstox_display(dsstox_info: Optional[dict]) -> dict:
+def format_dsstox_display(dsstox_info: dict | None) -> dict:
     """
     Format DSSTox information for display in the app.
     Sections: DTXSID, Names, Molecular, Structure.
@@ -267,7 +267,7 @@ def format_dsstox_display(dsstox_info: Optional[dict]) -> dict:
     return display
 
 
-def get_dsstox_summary_stats(dsstox_data: Optional[dict[str, dict]]) -> dict:
+def get_dsstox_summary_stats(dsstox_data: dict[str, dict] | None) -> dict:
     """Return simple summary statistics for sidebar display."""
     if not dsstox_data:
         return {}
@@ -295,7 +295,7 @@ def get_dsstox_summary_stats(dsstox_data: Optional[dict[str, dict]]) -> dict:
 
 # Backwards-compatible thin wrappers used elsewhere in the app
 @st.cache_data
-def load_dsstox_mapping() -> Optional[dict[str, dict]]:
+def load_dsstox_mapping() -> dict[str, dict] | None:
     """Legacy API: return CAS -> {dtxsid, preferred_name} mapping."""
     data = load_dsstox_enhanced()
     if not data:
@@ -309,7 +309,7 @@ def load_dsstox_mapping() -> Optional[dict[str, dict]]:
     return simple
 
 
-def _get_record(cas_number: str, mapping_dict: Optional[dict]) -> Optional[dict]:
+def _get_record(cas_number: str, mapping_dict: dict | None) -> dict | None:
     """Legacy helper for get_dtxsid/get_preferred_name."""
     if not mapping_dict or not cas_number:
         return None
@@ -324,13 +324,13 @@ def _get_record(cas_number: str, mapping_dict: Optional[dict]) -> Optional[dict]
     return None
 
 
-def get_dtxsid(cas_number: str, mapping_dict: Optional[dict]) -> Optional[str]:
+def get_dtxsid(cas_number: str, mapping_dict: dict | None) -> str | None:
     """Legacy API: look up DTXSID from simple mapping."""
     rec = _get_record(cas_number, mapping_dict)
     return rec.get("dtxsid") if isinstance(rec, dict) else None
 
 
-def get_preferred_name(cas_number: str, mapping_dict: Optional[dict]) -> Optional[str]:
+def get_preferred_name(cas_number: str, mapping_dict: dict | None) -> str | None:
     """Legacy API: look up preferred name from simple mapping."""
     rec = _get_record(cas_number, mapping_dict)
     return rec.get("preferred_name") if isinstance(rec, dict) else None

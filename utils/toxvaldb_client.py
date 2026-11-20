@@ -6,7 +6,7 @@ Not required for the app; used only when COMPTOX_API_KEY is set (e.g. in Streaml
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 import requests
 
@@ -14,7 +14,7 @@ import requests
 TOXVAL_BASE = "https://api-ccte.epa.gov/chemical/search/by-dtxsid/dtxsid/"
 
 
-def fetch_toxval_data(dtxsid: str, api_key: Optional[str] = None) -> Optional[dict[str, list[dict]]]:
+def fetch_toxval_data(dtxsid: str, api_key: str | None = None) -> dict[str, list[dict]] | None:
     """
     Fetch toxicity data from EPA CompTox ToxValDB for a given DTXSID.
 
@@ -38,7 +38,7 @@ def fetch_toxval_data(dtxsid: str, api_key: Optional[str] = None) -> Optional[di
             return None
         data = r.json()
         return _process_toxval_response(data)
-    except Exception:
+    except (requests.RequestException, TypeError, ValueError):
         return None
 
 
@@ -64,10 +64,12 @@ def _process_toxval_response(raw: Any) -> dict[str, list[dict]]:
     if isinstance(raw, list):
         records = raw
 
+    if not isinstance(records, list):
+        return out
     for rec in records:
         if not isinstance(rec, dict):
             continue
-        study_type = (rec.get("studyType") or rec.get("study_type") or "").lower()
+        study_type = str(rec.get("studyType") or rec.get("study_type") or "").lower()
         category = _categorize_study(study_type)
         val = rec.get("toxValNumeric") or rec.get("toxval_numeric") or rec.get("value")
         units = rec.get("toxValUnits") or rec.get("toxval_units") or rec.get("units", "")

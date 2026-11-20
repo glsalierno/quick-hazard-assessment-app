@@ -25,4 +25,13 @@ jobs:
       - name: Test without deployed datasets
         run: python -m pytest tests/ -v
       - name: Lint
-        run: ruff check --output-format github
+        run: |
+          if ! ruff check --output-format github; then
+            {
+              echo '### Ruff findings'
+              echo '```text'
+              ruff check --output-format concise || true
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
