@@ -6,8 +6,20 @@
 
 ---
 
-## Features
+## Try it in your browser
 
+| Option | What you can do |
+| --- | --- |
+| [Open the classic hosted app](https://quick-hazard-assessment-app.streamlit.app/) | Look up a chemical by CAS number or name. Results use PubChem and DSSTox when the deployment has loaded the mapping. |
+| [Open the v2.0 hosted demo](https://quick-hazard-assessment-v2.streamlit.app/) | Try the same lookup plus the REACH/IUCLID demo when its data are available. The demo contains selected dossiers only; missing results do not mean no data exist. See the [v2.0 release notes](https://github.com/glsalierno/quick-hazard-assessment-app/releases/tag/v2.0.0). |
+| [Run locally](#run-locally) | Start with PubChem without an API key. Add DSSTox and ToxValDB as needed. For full offline REACH/IUCLID data or optional OPERA integration, follow the [v2.0 local setup](https://github.com/glsalierno/quick-hazard-assessment-app/blob/v2.0.0/README.md). |
+
+**First lookup:** Enter `67-64-1` (acetone), then check the chemical identity, GHS hazard statements, and available properties. You can download the report as CSV.
+
+Streamlit may ask you to sign in before opening a hosted app. If you cannot access it, the local quickstart below does not require a Streamlit account.
+
+---
+## Features
 - **Input:** CAS number (e.g. `67-64-1`) or chemical name
 - **DSSTox local:** CAS to DTXSID lookup from a local mapping file (no EPA API key)
 - **PubChem:** Properties, GHS H/P codes with phrase legends, flash point, vapor pressure, IUPAC name, SMILES
@@ -15,11 +27,9 @@
 - **Graceful fallback:** If the DSSTox file is missing, the app runs in **PubChem-only** mode
 - **Download:** Report as CSV
 - **Citation:** Zenodo DOI reminder for research use
-
-*Enhanced predictions with OPERA QSAR is available in the [local-v2.0 version]([https://github.com/glsalierno/quick_hazard_assessment/tree/v2.0](https://github.com/glsalierno/quick-hazard-assessment-app/tree/v2.0)); OPERA is not included in this Streamlit deployment.*
+*OPERA QSAR is not bundled with either hosted deployment. For optional local use, see the [v2.0 Windows container and OPERA instructions](https://github.com/glsalierno/quick-hazard-assessment-app/blob/v2.0.0/README.md#docker-windows-containers--opera--optional-iuclid).*
 
 ---
-
 ## Run locally
 
 1. **Clone and enter the repo**
@@ -28,20 +38,38 @@
  cd quick-hazard-assessment-app
  ```
 
-2. **Create a virtual environment and install dependencies**
- ```bash
- python -m venv .venv
- .venv\Scripts\activate # Windows
- # source .venv/bin/activate # Linux/macOS
- pip install -r requirements.txt
- ```
+2. **Create a virtual environment and install dependencies** using the commands for your shell.
 
+   **Windows (Command Prompt)**
+
+   ```cmd
+   python -m venv .venv
+   .venv\Scripts\activate.bat
+   python -m pip install -r requirements.txt
+   ```
+
+   **Windows (PowerShell)**
+
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   python -m pip install -r requirements.txt
+   ```
+
+   If PowerShell blocks activation, run the virtual environment's Python directly: `.\.venv\Scripts\python.exe -m pip install -r requirements.txt` and `.\.venv\Scripts\python.exe -m streamlit run app.py`. No system settings need to change.
+
+   **macOS or Linux (bash/zsh)**
+
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   python -m pip install -r requirements.txt
+   ```
 3. **DSSTox mapping (optional but recommended)**
  - Download the [EPA Figshare CAS-DTXSID mapping](https://epa.figshare.com/articles/dataset/DSSTox_Identifiers_Mapped_to_CAS_Numbers_and_Names_File_11_14_2016/5588566) (CSV).
  - Place it in the **`DSS/`** folder (e.g. `DSS/cas_dtxsid_mapping.csv`).
- - See **`DSS/README.md`** for column names, Excel support, and update instructions.
+ - See [`DSS/README.md`](DSS/README.md) for column names, Excel support, and update instructions.
  - If the file is missing, the app runs in PubChem-only mode.
-
 4. **Run the app**
  ```bash
  streamlit run app.py
@@ -49,18 +77,14 @@
  Open the URL shown in the terminal (usually http://localhost:8501).
 
 ---
-
 ## Deploy on Streamlit Community Cloud
-
 1. Push this app to a GitHub repo (e.g. under `quick_hazard_assessment`, in a branch like `feature/streamlit-app` or in a subfolder).
 2. Go to [share.streamlit.io](https://share.streamlit.io), sign in with GitHub, and deploy.
 3. Set **Main file path** to `app.py` and **Root directory** to the folder that contains `app.py` (e.g. repo root or `GHhaz2`).
 4. If you use the DSSTox file: the repo is **Git LFS-ready** (see below). Add the file to `DSS/`, commit, and push; LFS will store it. Or omit it and run in PubChem-only mode.
-
-Update the badge URL in this README to your deployed app URL (e.g. `https://your-app-name.streamlit.app`).
+For your own deployment, update the README's hosted links to match. For DSSTox files that are stored as Git LFS pointers, see the [Streamlit Cloud notes](DSS/README.md#streamlit-community-cloud-no-lfs).
 
 ---
-
 ## Publishing to GitHub (Git LFS)
 
 The DSSTox mapping in **`DSS/`** can be large. The repo uses **Git LFS** so GitHub accepts it and clones stay fast.
