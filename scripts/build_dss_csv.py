@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import os
 import sys
+from xml.etree.ElementTree import ParseError
+from zipfile import BadZipFile
 
 try:
     import pandas as pd
@@ -46,7 +48,7 @@ def main() -> None:
     for path in xlsx_files:
         try:
             df = pd.read_excel(path)
-        except Exception as e:
+        except (BadZipFile, ImportError, OSError, ParseError, ValueError) as e:
             print(f"  Skip {os.path.basename(path)}: {e}", file=sys.stderr)
             continue
         cols_lower = {c.strip().lower(): c for c in df.columns}
