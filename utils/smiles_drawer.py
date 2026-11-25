@@ -5,16 +5,18 @@ Falls back to smiles-drawer (client-side JS) if RDKit is unavailable or renderin
 
 from __future__ import annotations
 
-import io
 import json
-from typing import Optional
+import logging
 
 import streamlit as st
+
+logger = logging.getLogger(__name__)
 
 # Optional RDKit import
 try:
     from rdkit import Chem
     from rdkit.Chem import Draw, rdDepictor
+
     _RDKIT_AVAILABLE = True
 except ImportError:
     _RDKIT_AVAILABLE = False
@@ -28,8 +30,8 @@ except ImportError:
 if _RDKIT_AVAILABLE:
     try:
         rdDepictor.SetPreferCoordGen(True)
-    except Exception:
-        pass
+    except (OSError, RuntimeError, TypeError, ValueError) as error:
+        logger.debug('Could not enable RDKit CoordGen (%s)', type(error).__name__)
 
 
 def _escape_smiles_for_js(smiles: str) -> str:
@@ -46,11 +48,11 @@ def draw_molecule_canonical(
     width: int = 500,
     height: int = 300,
     style: str = "acs_1996",
-    highlight_atoms: Optional[list[int]] = None,
-    highlight_bonds: Optional[list[int]] = None,
+    highlight_atoms: list[int] | None = None,
+    highlight_bonds: list[int] | None = None,
     explicit_hydrogens: bool = False,
     atom_labels: bool = False,
-) -> Optional["Image.Image"]:
+) -> Image.Image | None:
     """
     Generate a canonical molecular drawing using RDKit.
 
@@ -96,13 +98,14 @@ def draw_molecule_canonical(
         else:
             img = Draw.MolToImage(mol, size=size)
         return img
-    except Exception as e:
+    except (OSError, RuntimeError, TypeError, ValueError) as e:
+        logger.warning('RDKit drawing failed for SMILES %r (%s)', smiles, type(e).__name__)
         if st is not None:
-            st.error(f"RDKit drawing error: {str(e)}")
+            st.error(f"RDKit drawing error: {e!s}")
         return None
 
 
-def draw_molecule_with_stereo(smiles: str, width: int = 500, height: int = 300) -> Optional["Image.Image"]:
+def draw_molecule_with_stereo(smiles: str, width: int = 500, height: int = 300) -> Image.Image | None:
     """Emphasize stereochemistry with wedges/dashes."""
     if not _RDKIT_AVAILABLE or Image is None:
         return None
@@ -113,9 +116,10 @@ def draw_molecule_with_stereo(smiles: str, width: int = 500, height: int = 300) 
         Chem.AssignStereochemistry(mol, force=True, cleanIt=True)
         rdDepictor.Compute2DCoords(mol)
         return Draw.MolToImage(mol, size=(width, height))
-    except Exception as e:
+    except (OSError, RuntimeError, TypeError, ValueError) as e:
+        logger.warning('RDKit drawing failed for SMILES %r (%s)', smiles, type(e).__name__)
         if st is not None:
-            st.error(f"RDKit stereo drawing error: {str(e)}")
+            st.error(f"RDKit stereo drawing error: {e!s}")
         return None
 
 

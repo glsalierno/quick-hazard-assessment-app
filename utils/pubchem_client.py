@@ -6,13 +6,16 @@ Uses pubchempy and PUG REST for CID resolution and PUG View for GHS/hazard.
 from __future__ import annotations
 
 import json
+import logging
 import re
 import time
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import quote
 
 import pubchempy as pcp
 import requests
+
+logger = logging.getLogger(__name__)
 
 PUBCHEM_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug"
 PUG_VIEW_BASE = "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view"
@@ -23,7 +26,7 @@ GHS_H_CODE = re.compile(r"H\d+(?:\+\d+)?(?:\s*\([^)]+\))?")
 GHS_P_CODE = re.compile(r"P\d+(?:\+\d+)?(?:\s*\([^)]+\))?")
 
 
-def get_cid(identifier: str, input_type: str = "name") -> Optional[int]:
+def get_cid(identifier: str, input_type: str = "name") -> int | None:
     """Resolve chemical identifier (CAS or name) to PubChem CID."""
     try:
         if input_type.lower() == "cid":
@@ -38,11 +41,12 @@ def get_cid(identifier: str, input_type: str = "name") -> Optional[int]:
             return int(cids[0]) if cids else None
         cids = pcp.get_cids(identifier, input_type, "compound")
         return cids[0] if cids else None
-    except (pcp.BadRequestError, pcp.NotFoundError, ValueError, requests.RequestException):
+    except (pcp.BadRequestError, pcp.NotFoundError, ValueError, requests.RequestException) as error:
+        logger.warning('PubChem CID lookup failed for %s %r (%s)', input_type, identifier, type(error).__name__)
         return None
 
 
-def _fetch_pug_view(cid: int) -> Optional[dict]:
+def _fetch_pug_view(cid: int) -> dict | None:
     """Fetch full PUG View compound record for GHS and hazard extraction."""
     url = f"{PUG_VIEW_BASE}/data/compound/{cid}/JSON"
     for attempt in range(MAX_RETRIES):
@@ -55,7 +59,8 @@ def _fetch_pug_view(cid: int) -> Optional[dict]:
                 time.sleep(2**attempt)
                 continue
             r.raise_for_status()
-        except (requests.RequestException, json.JSONDecodeError):
+        except (requests.RequestException, json.JSONDecodeError) as error:
+            logger.debug('PubChem PUG View failed for CID %s (attempt %s: %s)', cid, attempt + 1, type(error).__name__)
             if attempt == MAX_RETRIES - 1:
                 return None
             time.sleep(2**attempt)
@@ -152,21 +157,16 @@ def _extract_hazard_metrics(data: dict) -> dict[str, Any]:
             return
         name_l = (name or "").lower()
         head_l = (heading or "").lower()
-        if "flash point" in name_l or "flash point" in head_l:
-            if text not in result["flash_point"]:
-                result["flash_point"].append(text)
-        if "vapor pressure" in name_l or "vapor pressure" in head_l:
-            if text not in result["vapor_pressure"]:
-                result["vapor_pressure"].append(text)
-        if "nfpa" in name_l or "nfpa" in head_l:
-            if text not in result["nfpa"]:
-                result["nfpa"].append(text)
-        if "iarc" in name_l or "iarc" in head_l:
-            if text not in result["iarc"]:
-                result["iarc"].append(text)
-        if "proposition 65" in name_l or "prop 65" in name_l:
-            if text not in result["prop65"]:
-                result["prop65"].append(text)
+        if ("flash point" in name_l or "flash point" in head_l) and text not in result["flash_point"]:
+            result["flash_point"].append(text)
+        if ("vapor pressure" in name_l or "vapor pressure" in head_l) and text not in result["vapor_pressure"]:
+            result["vapor_pressure"].append(text)
+        if ("nfpa" in name_l or "nfpa" in head_l) and text not in result["nfpa"]:
+            result["nfpa"].append(text)
+        if ("iarc" in name_l or "iarc" in head_l) and text not in result["iarc"]:
+            result["iarc"].append(text)
+        if ("proposition 65" in name_l or "prop 65" in name_l) and text not in result["prop65"]:
+            result["prop65"].append(text)
 
     def walk_section(section: dict, heading: str = "") -> None:
         if not isinstance(section, dict):
@@ -184,10 +184,10 @@ def _extract_hazard_metrics(data: dict) -> dict[str, Any]:
 
 
 # Patterns for structured toxicity extraction (from quick_hazard_assessment/hazard_query_structured)
-_UNIT_PATTERN = re.compile(r"(mg/kg|mg/m³|ppm|g/kg|mL/kg|mg/L|µg/kg|mg/m3|ppb)\b", re.I)
+_UNIT_PATTERN = re.compile(r"(mg/kg|mg/m³|ppm|g/kg|mL/kg|mg/L|µg/kg|mg/m3|ppb)\b", re.IGNORECASE)
 _SPECIES_ROUTE_PATTERN = re.compile(
     r"\b(rat|mouse|rabbit|dog|guinea pig|human|oral|dermal|inhalation|ip|iv|sc|ld50|lc50|fish|trout|daphnia|algae|aquatic)\b",
-    re.I,
+    re.IGNORECASE,
 )
 
 
@@ -235,14 +235,14 @@ _SPECIES_TOKENS = {"rat", "mouse", "rabbit", "dog", "guinea pig", "human", "fish
 _ROUTE_TOKENS = {"oral", "dermal", "inhalation", "ip", "iv", "sc"}
 
 # Ecotoxicity parsing patterns
-_ECOTOX_ENDPOINT_RE = re.compile(r"\b(LC50|EC50|LC10|LC20|LC90|EC10|EC20|EC90|NOEC|LOEC)\b", re.I)
-_ECOTOX_DURATION_RE = re.compile(r"(\d+\s*(?:h|hr|hrs|hour|hours|d|day|days))\b", re.I)
+_ECOTOX_ENDPOINT_RE = re.compile(r"\b(LC50|EC50|LC10|LC20|LC90|EC10|EC20|EC90|NOEC|LOEC)\b", re.IGNORECASE)
+_ECOTOX_DURATION_RE = re.compile(r"(\d+\s*(?:h|hr|hrs|hour|hours|d|day|days))\b", re.IGNORECASE)
 _ECOTOX_VALUE_UNIT_RE = re.compile(
-    r"([<>~]?\s*\d+(?:[.,]\d+)?)\s*(mg/L|µg/L|ug/L|mg/kg|g/L|mg/l)\b", re.I
+    r"([<>~]?\s*\d+(?:[.,]\d+)?)\s*(mg/L|µg/L|ug/L|mg/kg|g/L|mg/l)\b", re.IGNORECASE
 )
 _ECOTOX_CI_RE = re.compile(
     r"(?:CI|confidence interval)[^0-9]*([0-9]+(?:\.\d+)?)\s*[–-]\s*([0-9]+(?:\.\d+)?)",
-    re.I,
+    re.IGNORECASE,
 )
 
 
@@ -320,7 +320,7 @@ def _parse_ecotox_text(raw: str) -> dict[str, Any]:
             out["ci_low"] = float(m_ci.group(1))
             out["ci_high"] = float(m_ci.group(2))
         except ValueError:
-            pass
+            logger.debug('Could not parse PubChem ecotoxicity confidence interval: %r', m_ci.group(0))
 
     # Conditions: for now, keep the full text for display/filtering
     out["conditions"] = text
@@ -401,7 +401,7 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
                 try:
                     return float(m.group(1))
                 except ValueError:
-                    pass
+                    logger.debug('Could not parse PubChem oral LD50: %r', m.group(1))
         return None
 
     def extract_ld50_dermal():
@@ -416,7 +416,7 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
                 try:
                     return float(m.group(1))
                 except ValueError:
-                    pass
+                    logger.debug('Could not parse PubChem dermal LD50: %r', m.group(1))
         return None
 
     def extract_lc50_inhalation():
@@ -424,12 +424,12 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
             v = (t.get("value") or "").lower()
             if "lc50" not in v:
                 continue
-            m = re.search(r"(\d+(?:[.,]\d+)*)\s*mg\s*/\s*m", v) or re.search(r"(\d+(?:[.,]\d+)*)\s*mg/m3", v, re.I)
+            m = re.search(r"(\d+(?:[.,]\d+)*)\s*mg\s*/\s*m", v) or re.search(r"(\d+(?:[.,]\d+)*)\s*mg/m3", v, re.IGNORECASE)
             if m:
                 try:
                     return float(m.group(1).replace(",", ""))
                 except ValueError:
-                    pass
+                    logger.debug('Could not parse PubChem inhalation LC50: %r', m.group(1))
         return None
 
     out = {"oral": {}, "dermal": {}, "inhalation": {}}
@@ -446,7 +446,7 @@ def _compute_exposure_bands(toxicities: list[dict]) -> dict[str, Any]:
     return out
 
 
-def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dict[str, Any]]:
+def get_compound_data(identifier: str, input_type: str = "auto") -> dict[str, Any] | None:
     """
     Fetch compound data for display: SMILES, formula, MW, IUPAC name, GHS, flash point, etc.
     identifier: CAS number (e.g. 67-64-1) or chemical name.
@@ -465,7 +465,8 @@ def get_compound_data(identifier: str, input_type: str = "auto") -> Optional[dic
         return None
     try:
         comp = pcp.Compound.from_cid(cid)
-    except Exception:
+    except (pcp.PubChemPyError, OSError, ValueError) as error:
+        logger.warning('PubChem compound properties unavailable for CID %s (%s)', cid, type(error).__name__)
         return None
     # Basic props from pubchempy
     smiles = getattr(comp, "smiles", None) or getattr(comp, "isomeric_smiles", None) or getattr(comp, "canonical_smiles", None)
