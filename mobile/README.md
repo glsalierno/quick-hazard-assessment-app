@@ -32,7 +32,9 @@ Scan the QR code with Expo Go, then search for `67-64-1` or `acetone`.
   - Aquatic ecotoxicity parsing
   - GHS-style LD50/LC50 exposure bands
 - AsyncStorage local history for offline review of previously fetched reports.
-- Bundled DSSTox identifiers for the four example chemicals from the Streamlit app.
+- Bundled DSSTox identifiers for the example chemicals from the Streamlit app, including 1,3-dioxolane.
+- Generated narrative hazard summary from GHS codes, flash point, and toxicity screening bands.
+- Bundled **1,3-dioxolane** example report that opens immediately without a live PubChem fetch.
 
 The original Streamlit app does not contain a questionnaire, scoring table, or decision tree. Its "assessment" is a lookup, extraction, prioritization, and report-display workflow.
 
@@ -44,5 +46,7 @@ npm run typecheck
 npx expo install --check
 npx expo export --platform android
 ```
+
+From the repo root, `python3 -m unittest tests.test_hazard_summary` checks the narrative summary builder, including the 1,3-dioxolane fixture.
 
 See `docs/MOBILE_MIGRATION_PLAN.md` for the framework recommendation, implementation phases, and MCP recommendations.

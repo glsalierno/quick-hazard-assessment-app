@@ -143,6 +143,7 @@ def create_comprehensive_download_data(
             "flash_point": fp_str,
             "vapor_pressure": vp_str,
         },
+        "hazard_summary": pubchem_data.get("hazard_summary") or {},
         "ghs": {
             "h_codes": ghs.get("h_codes") or [],
             "p_codes": ghs.get("p_codes") or [],

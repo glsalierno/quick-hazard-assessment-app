@@ -8,6 +8,7 @@ import { Screen } from '../components/Screen';
 import { researchCitation } from '../constants/examples';
 import { colors, radius, spacing } from '../constants/theme';
 import { phrasePairs } from '../domain/ghs';
+import { summarizeReport } from '../domain/hazardSummary';
 import { PrioritizedToxicityItem } from '../domain/types';
 import { RootStackParamList } from '../navigation/types';
 
@@ -43,6 +44,7 @@ function ToxicityItem({ item }: { item: PrioritizedToxicityItem }) {
 
 export function ResultsScreen({ route }: Props) {
   const { report } = route.params;
+  const hazardSummary = report.hazardSummary ?? summarizeReport(report);
   const hPhrases = phrasePairs(report.ghs.hCodes, 'h');
   const pPhrases = phrasePairs(report.ghs.pCodes, 'p');
   const hasAnyGhs = hPhrases.length > 0 || pPhrases.length > 0 || Boolean(report.ghs.signalWord);
@@ -52,10 +54,39 @@ export function ResultsScreen({ route }: Props) {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.kicker}>{report.inputType === 'cas' ? 'CAS assessment' : 'Name assessment'}</Text>
+          <Text style={styles.kicker}>
+            {report.isExample ? 'Example report' : report.inputType === 'cas' ? 'CAS assessment' : 'Name assessment'}
+          </Text>
           <Text style={styles.title}>{report.dsstox?.preferredName ?? report.iupacName ?? report.normalizedQuery}</Text>
-          <Text style={styles.subtitle}>PubChem CID {report.cid} · saved {new Date(report.queriedAt).toLocaleString()}</Text>
+          <Text style={styles.subtitle}>
+            PubChem CID {report.cid}
+            {report.isExample ? ' · bundled snapshot' : ` · saved ${new Date(report.queriedAt).toLocaleString()}`}
+          </Text>
         </View>
+
+        <Card>
+          <SectionTitle>Hazard summary</SectionTitle>
+          <View style={styles.summaryHeader}>
+            <Chip
+              label={hazardSummary.concernLevel === 'high' ? 'High concern' : `${hazardSummary.concernLevel} concern`}
+              tone={hazardSummary.concernLevel === 'high' ? 'danger' : hazardSummary.concernLevel === 'moderate' ? 'warning' : 'info'}
+            />
+          </View>
+          <Text style={styles.summaryHeadline}>{hazardSummary.headline}</Text>
+          {hazardSummary.paragraphs.map((paragraph) => (
+            <Text key={paragraph} style={styles.summaryParagraph}>
+              {paragraph}
+            </Text>
+          ))}
+          <View style={styles.chips}>
+            {hazardSummary.highlights.map((item) => (
+              <Chip key={`${item.label}-${item.value}`} label={`${item.label}: ${item.value}`} tone={item.tone} />
+            ))}
+          </View>
+          <Text style={styles.summaryNote}>
+            Lookup synthesis from PubChem GHS and property text. Use the SDS and local controls for work planning.
+          </Text>
+        </Card>
 
         <Card>
           <SectionTitle>Molecular structure</SectionTitle>
@@ -171,6 +202,35 @@ const styles = StyleSheet.create({
     color: colors.muted,
     fontSize: 14,
     marginTop: spacing.sm,
+  },
+  summaryHeader: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: spacing.sm,
+  },
+  summaryHeadline: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: '800',
+    letterSpacing: -0.3,
+    lineHeight: 26,
+  },
+  summaryParagraph: {
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 22,
+    marginTop: spacing.sm,
+  },
+  summaryNote: {
+    color: colors.muted,
+    fontSize: 13,
+    lineHeight: 19,
+    marginTop: spacing.md,
+  },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: spacing.md,
   },
   structure: {
     alignSelf: 'center',

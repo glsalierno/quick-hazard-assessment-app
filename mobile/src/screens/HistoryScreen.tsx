@@ -59,7 +59,9 @@ export function HistoryScreen({ navigation }: Props) {
             {({ pressed }) => (
               <View style={[styles.item, pressed && styles.pressed]}>
                 <Text style={styles.itemTitle}>{item.dsstox?.preferredName ?? item.iupacName ?? item.normalizedQuery}</Text>
+                {item.hazardSummary?.headline ? <Text style={styles.itemSummary}>{item.hazardSummary.headline}</Text> : null}
                 <Text style={styles.itemMeta}>
+                  {item.isExample ? 'Example report · ' : ''}
                   {item.normalizedQuery} · CID {item.cid}
                 </Text>
                 <Text style={styles.itemDate}>{new Date(item.queriedAt).toLocaleString()}</Text>
@@ -104,6 +106,12 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 18,
     fontWeight: '800',
+  },
+  itemSummary: {
+    color: colors.text,
+    fontSize: 14,
+    lineHeight: 20,
+    marginTop: spacing.xs,
   },
   itemMeta: {
     color: colors.primaryDark,
